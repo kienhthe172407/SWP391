@@ -8,4 +8,14 @@
         <servlet-name>NewServlet</servlet-name>
         <url-pattern>/new</url-pattern>
     </servlet-mapping>
+    
+    <!-- Contract Management Servlets -->
+    <servlet>
+        <servlet-name>ViewContractsServlet</servlet-name>
+        <servlet-class>controller.contractMgt.ViewContractsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewContractsServlet</servlet-name>
+        <url-pattern>/contracts/list</url-pattern>
+    </servlet-mapping>
 </web-app>
