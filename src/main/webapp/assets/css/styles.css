@@ -1,0 +1,27 @@
+/* Custom styles for HRMS */
+body {
+  background-color: #f5f7fb;
+}
+
+.auth-card {
+  max-width: 420px;
+  margin: 10vh auto;
+}
+
+.brand-title {
+  font-weight: 700;
+}
+
+.content-card {
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.hero {
+  margin-top: 8px;
+}
+
+.card .h4 {
+  letter-spacing: 0.2px;
+}
+
+
