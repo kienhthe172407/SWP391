@@ -18,4 +18,42 @@
         <servlet-name>ViewContractsServlet</servlet-name>
         <url-pattern>/contracts/list</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>CreateContractServlet</servlet-name>
+        <servlet-class>controller.contractMgt.CreateContractServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateContractServlet</servlet-name>
+        <url-pattern>/contracts/create</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ApproveContractServlet</servlet-name>
+        <servlet-class>controller.contractMgt.ApproveContractServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ApproveContractServlet</servlet-name>
+        <url-pattern>/contracts/approve</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>ViewContractDetailServlet</servlet-name>
+        <servlet-class>controller.contractMgt.ViewContractDetailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewContractDetailServlet</servlet-name>
+        <url-pattern>/contracts/detail</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>DeleteContractServlet</servlet-name>
+        <servlet-class>controller.contractMgt.DeleteContractServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteContractServlet</servlet-name>
+        <url-pattern>/contracts/delete</url-pattern>
+    </servlet-mapping>
+    
+    <!-- Development Tools section removed -->
 </web-app>
