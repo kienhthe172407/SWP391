@@ -97,5 +97,51 @@
         <url-pattern>/contracts/delete</url-pattern>
     </servlet-mapping>
     
+    <!-- Job Posting Management Servlets -->
+    <servlet>
+        <servlet-name>ViewJobPostingsServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.ViewJobPostingsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewJobPostingsServlet</servlet-name>
+        <url-pattern>/job-postings/list</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ViewJobPostingDetailServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.ViewJobPostingDetailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewJobPostingDetailServlet</servlet-name>
+        <url-pattern>/job-postings/detail</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>CreateJobPostingServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.CreateJobPostingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateJobPostingServlet</servlet-name>
+        <url-pattern>/job-postings/create</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>DeleteJobPostingServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.DeleteJobPostingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteJobPostingServlet</servlet-name>
+        <url-pattern>/job-postings/delete</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>EditJobPostingServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.EditJobPostingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditJobPostingServlet</servlet-name>
+        <url-pattern>/job-postings/edit</url-pattern>
+    </servlet-mapping>
+    
     <!-- Development Tools section removed -->
 </web-app>
