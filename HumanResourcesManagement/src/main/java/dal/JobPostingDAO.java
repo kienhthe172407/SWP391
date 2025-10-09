@@ -377,6 +377,51 @@ public class JobPostingDAO extends DBContext {
     }
     
     /**
+     * Create a new job posting
+     * @param jobPosting JobPosting object with data to insert
+     * @return boolean indicating success
+     */
+    public boolean createJobPosting(JobPosting jobPosting) {
+        String sql = "INSERT INTO job_postings (job_title, department_id, position_id, job_description, " +
+                     "requirements, benefits, salary_range_from, salary_range_to, number_of_positions, " +
+                     "application_deadline, job_status, posted_by, posted_date, internal_notes) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, jobPosting.getJobTitle());
+            ps.setObject(2, jobPosting.getDepartmentId());
+            ps.setObject(3, jobPosting.getPositionId());
+            ps.setString(4, jobPosting.getJobDescription());
+            ps.setString(5, jobPosting.getRequirements());
+            ps.setString(6, jobPosting.getBenefits());
+            ps.setObject(7, jobPosting.getSalaryRangeFrom());
+            ps.setObject(8, jobPosting.getSalaryRangeTo());
+            ps.setObject(9, jobPosting.getNumberOfPositions());
+            ps.setObject(10, jobPosting.getApplicationDeadline());
+            ps.setString(11, jobPosting.getJobStatus());
+            ps.setObject(12, jobPosting.getPostedBy());
+            ps.setObject(13, jobPosting.getPostedDate());
+            ps.setString(14, jobPosting.getInternalNotes());
+            
+            int affectedRows = ps.executeUpdate();
+            
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        jobPosting.setJobId(generatedKeys.getInt(1));
+                    }
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in createJobPosting: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    /**
      * Delete a job posting
      * @param jobId Job posting ID to delete
      * @return boolean indicating success

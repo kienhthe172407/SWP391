@@ -543,6 +543,17 @@
     <!-- Job Posting Deletion JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide success/error messages after 3 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                if (alert.classList.contains('alert-success')) {
+                    setTimeout(function() {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }, 3000);
+                }
+            });
+
             // Delete button handlers
             document.querySelectorAll('.btn-delete').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {

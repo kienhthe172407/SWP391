@@ -75,6 +75,15 @@
     </servlet-mapping>
     
     <servlet>
+        <servlet-name>CreateJobPostingServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.CreateJobPostingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>CreateJobPostingServlet</servlet-name>
+        <url-pattern>/job-postings/create</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
         <servlet-name>DeleteJobPostingServlet</servlet-name>
         <servlet-class>controller.jobPostingMgt.DeleteJobPostingServlet</servlet-class>
     </servlet>

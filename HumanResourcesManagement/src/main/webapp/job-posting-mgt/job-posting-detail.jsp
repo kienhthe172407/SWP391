@@ -630,6 +630,19 @@
 
     <!-- JavaScript for Delete Modal -->
     <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-hide success/error messages after 3 seconds
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                if (alert.classList.contains('alert-success')) {
+                    setTimeout(function() {
+                        const bsAlert = new bootstrap.Alert(alert);
+                        bsAlert.close();
+                    }, 3000);
+                }
+            });
+        });
+
         function showDeleteModal(button) {
             const jobId = button.getAttribute('data-job-id');
             const jobTitle = button.getAttribute('data-job-title');
