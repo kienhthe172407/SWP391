@@ -17,25 +17,22 @@ public class ContractDAO extends DBContext {
      */
     public List<Contract> getAllContracts() {
         List<Contract> contracts = new ArrayList<>();
-        String sql = "SELECT c.ContractID, c.EmployeeID, c.ContractType, c.StartDate, c.EndDate, c.Status, " +
-                     "CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeFullName, e.ContactInfo " +
-                     "FROM Contract c " +
-                     "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID";
+        String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
+                     "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
+                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.approved_by, c.approval_comment, c.approved_at, " +
+                     "c.created_by, c.created_at, c.updated_at, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
+                     "e.employee_code, e.phone_number, e.personal_email " +
+                     "FROM employment_contracts c " +
+                     "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
+                     "ORDER BY c.created_at DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             
             while (rs.next()) {
-                Contract contract = new Contract();
-                contract.setContractID(rs.getInt("ContractID"));
-                contract.setEmployeeID(rs.getInt("EmployeeID"));
-                contract.setContractType(rs.getString("ContractType"));
-                contract.setStartDate(rs.getDate("StartDate"));
-                contract.setEndDate(rs.getDate("EndDate"));
-                contract.setStatus(rs.getString("Status"));
-                contract.setEmployeeFullName(rs.getString("EmployeeFullName"));
-                contract.setEmployeeContactInfo(rs.getString("ContactInfo"));
-                
+                Contract contract = mapResultSetToContract(rs);
                 contracts.add(contract);
             }
         } catch (SQLException e) {
@@ -56,10 +53,16 @@ public class ContractDAO extends DBContext {
         List<Contract> contracts = new ArrayList<>();
         int offset = (page - 1) * pageSize;
         
-        String sql = "SELECT c.ContractID, c.EmployeeID, c.ContractType, c.StartDate, c.EndDate, c.Status, " +
-                     "CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeFullName, e.ContactInfo " +
-                     "FROM Contract c " +
-                     "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID " +
+        String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
+                     "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
+                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.approved_by, c.approval_comment, c.approved_at, " +
+                     "c.created_by, c.created_at, c.updated_at, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
+                     "e.employee_code, e.phone_number, e.personal_email " +
+                     "FROM employment_contracts c " +
+                     "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
+                     "ORDER BY c.created_at DESC " +
                      "LIMIT ? OFFSET ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -68,16 +71,7 @@ public class ContractDAO extends DBContext {
             
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Contract contract = new Contract();
-                    contract.setContractID(rs.getInt("ContractID"));
-                    contract.setEmployeeID(rs.getInt("EmployeeID"));
-                    contract.setContractType(rs.getString("ContractType"));
-                    contract.setStartDate(rs.getDate("StartDate"));
-                    contract.setEndDate(rs.getDate("EndDate"));
-                    contract.setStatus(rs.getString("Status"));
-                    contract.setEmployeeFullName(rs.getString("EmployeeFullName"));
-                    contract.setEmployeeContactInfo(rs.getString("ContactInfo"));
-                    
+                    Contract contract = mapResultSetToContract(rs);
                     contracts.add(contract);
                 }
             }
@@ -94,7 +88,7 @@ public class ContractDAO extends DBContext {
      * @return Total count
      */
     public int getTotalContracts() {
-        String sql = "SELECT COUNT(*) as total FROM Contract";
+        String sql = "SELECT COUNT(*) as total FROM employment_contracts";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -116,28 +110,23 @@ public class ContractDAO extends DBContext {
      * @return Contract
      */
     public Contract getContractById(int contractID) {
-        String sql = "SELECT c.ContractID, c.EmployeeID, c.ContractType, c.StartDate, c.EndDate, c.Status, " +
-                     "CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeFullName, e.ContactInfo " +
-                     "FROM Contract c " +
-                     "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID " +
-                     "WHERE c.ContractID = ?";
+        String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
+                     "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
+                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.approved_by, c.approval_comment, c.approved_at, " +
+                     "c.created_by, c.created_at, c.updated_at, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
+                     "e.employee_code, e.phone_number, e.personal_email " +
+                     "FROM employment_contracts c " +
+                     "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
+                     "WHERE c.contract_id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractID);
             
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    Contract contract = new Contract();
-                    contract.setContractID(rs.getInt("ContractID"));
-                    contract.setEmployeeID(rs.getInt("EmployeeID"));
-                    contract.setContractType(rs.getString("ContractType"));
-                    contract.setStartDate(rs.getDate("StartDate"));
-                    contract.setEndDate(rs.getDate("EndDate"));
-                    contract.setStatus(rs.getString("Status"));
-                    contract.setEmployeeFullName(rs.getString("EmployeeFullName"));
-                    contract.setEmployeeContactInfo(rs.getString("ContactInfo"));
-                    
-                    return contract;
+                    return mapResultSetToContract(rs);
                 }
             }
         } catch (SQLException e) {
@@ -155,28 +144,24 @@ public class ContractDAO extends DBContext {
      */
     public List<Contract> getContractsByEmployeeId(int employeeID) {
         List<Contract> contracts = new ArrayList<>();
-        String sql = "SELECT c.ContractID, c.EmployeeID, c.ContractType, c.StartDate, c.EndDate, c.Status, " +
-                     "CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeFullName, e.ContactInfo " +
-                     "FROM Contract c " +
-                     "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID " +
-                     "WHERE c.EmployeeID = ? " +
-                     "ORDER BY c.StartDate DESC";
+        String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
+                     "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
+                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.approved_by, c.approval_comment, c.approved_at, " +
+                     "c.created_by, c.created_at, c.updated_at, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
+                     "e.employee_code, e.phone_number, e.personal_email " +
+                     "FROM employment_contracts c " +
+                     "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
+                     "WHERE c.employee_id = ? " +
+                     "ORDER BY c.start_date DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, employeeID);
             
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Contract contract = new Contract();
-                    contract.setContractID(rs.getInt("ContractID"));
-                    contract.setEmployeeID(rs.getInt("EmployeeID"));
-                    contract.setContractType(rs.getString("ContractType"));
-                    contract.setStartDate(rs.getDate("StartDate"));
-                    contract.setEndDate(rs.getDate("EndDate"));
-                    contract.setStatus(rs.getString("Status"));
-                    contract.setEmployeeFullName(rs.getString("EmployeeFullName"));
-                    contract.setEmployeeContactInfo(rs.getString("ContactInfo"));
-                    
+                    Contract contract = mapResultSetToContract(rs);
                     contracts.add(contract);
                 }
             }
@@ -197,26 +182,34 @@ public class ContractDAO extends DBContext {
     public List<Contract> searchContracts(String keyword, String status) {
         List<Contract> contracts = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
-            "SELECT c.ContractID, c.EmployeeID, c.ContractType, c.StartDate, c.EndDate, c.Status, " +
-            "CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeFullName, e.ContactInfo " +
-            "FROM Contract c " +
-            "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID " +
+            "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
+            "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
+            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.approved_by, c.approval_comment, c.approved_at, " +
+            "c.created_by, c.created_at, c.updated_at, " +
+            "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
+            "e.employee_code, e.phone_number, e.personal_email " +
+            "FROM employment_contracts c " +
+            "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
             "WHERE 1=1 "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (CONCAT(e.FirstName, ' ', e.LastName) LIKE ? OR c.ContractType LIKE ?) ");
+            sql.append("AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR c.contract_type LIKE ? OR e.employee_code LIKE ?) ");
         }
         
         if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND c.Status = ? ");
+            sql.append("AND c.contract_status = ? ");
         }
+        
+        sql.append("ORDER BY c.created_at DESC");
         
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
             
             if (keyword != null && !keyword.trim().isEmpty()) {
                 String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
             }
@@ -227,16 +220,7 @@ public class ContractDAO extends DBContext {
             
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Contract contract = new Contract();
-                    contract.setContractID(rs.getInt("ContractID"));
-                    contract.setEmployeeID(rs.getInt("EmployeeID"));
-                    contract.setContractType(rs.getString("ContractType"));
-                    contract.setStartDate(rs.getDate("StartDate"));
-                    contract.setEndDate(rs.getDate("EndDate"));
-                    contract.setStatus(rs.getString("Status"));
-                    contract.setEmployeeFullName(rs.getString("EmployeeFullName"));
-                    contract.setEmployeeContactInfo(rs.getString("ContactInfo"));
-                    
+                    Contract contract = mapResultSetToContract(rs);
                     contracts.add(contract);
                 }
             }
@@ -261,21 +245,27 @@ public class ContractDAO extends DBContext {
         int offset = (page - 1) * pageSize;
         
         StringBuilder sql = new StringBuilder(
-            "SELECT c.ContractID, c.EmployeeID, c.ContractType, c.StartDate, c.EndDate, c.Status, " +
-            "CONCAT(e.FirstName, ' ', e.LastName) AS EmployeeFullName, e.ContactInfo " +
-            "FROM Contract c " +
-            "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID " +
+            "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
+            "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
+            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.approved_by, c.approval_comment, c.approved_at, " +
+            "c.created_by, c.created_at, c.updated_at, " +
+            "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
+            "e.employee_code, e.phone_number, e.personal_email " +
+            "FROM employment_contracts c " +
+            "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
             "WHERE 1=1 "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (CONCAT(e.FirstName, ' ', e.LastName) LIKE ? OR c.ContractType LIKE ?) ");
+            sql.append("AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR c.contract_type LIKE ? OR e.employee_code LIKE ?) ");
         }
         
         if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND c.Status = ? ");
+            sql.append("AND c.contract_status = ? ");
         }
         
+        sql.append("ORDER BY c.created_at DESC ");
         sql.append("LIMIT ? OFFSET ?");
         
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -283,6 +273,7 @@ public class ContractDAO extends DBContext {
             
             if (keyword != null && !keyword.trim().isEmpty()) {
                 String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
             }
@@ -296,16 +287,7 @@ public class ContractDAO extends DBContext {
             
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    Contract contract = new Contract();
-                    contract.setContractID(rs.getInt("ContractID"));
-                    contract.setEmployeeID(rs.getInt("EmployeeID"));
-                    contract.setContractType(rs.getString("ContractType"));
-                    contract.setStartDate(rs.getDate("StartDate"));
-                    contract.setEndDate(rs.getDate("EndDate"));
-                    contract.setStatus(rs.getString("Status"));
-                    contract.setEmployeeFullName(rs.getString("EmployeeFullName"));
-                    contract.setEmployeeContactInfo(rs.getString("ContactInfo"));
-                    
+                    Contract contract = mapResultSetToContract(rs);
                     contracts.add(contract);
                 }
             }
@@ -325,17 +307,17 @@ public class ContractDAO extends DBContext {
      */
     public int getTotalSearchResults(String keyword, String status) {
         StringBuilder sql = new StringBuilder(
-            "SELECT COUNT(*) as total FROM Contract c " +
-            "LEFT JOIN Employee e ON c.EmployeeID = e.EmployeeID " +
+            "SELECT COUNT(*) as total FROM employment_contracts c " +
+            "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
             "WHERE 1=1 "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (CONCAT(e.FirstName, ' ', e.LastName) LIKE ? OR c.ContractType LIKE ?) ");
+            sql.append("AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR c.contract_type LIKE ? OR e.employee_code LIKE ?) ");
         }
         
         if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND c.Status = ? ");
+            sql.append("AND c.contract_status = ? ");
         }
         
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
@@ -343,6 +325,7 @@ public class ContractDAO extends DBContext {
             
             if (keyword != null && !keyword.trim().isEmpty()) {
                 String searchPattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
             }
@@ -362,5 +345,46 @@ public class ContractDAO extends DBContext {
         }
         
         return 0;
+    }
+    
+    /**
+     * Helper method to map ResultSet to Contract object
+     * @param rs ResultSet from query
+     * @return Contract object
+     * @throws SQLException if error occurs
+     */
+    private Contract mapResultSetToContract(ResultSet rs) throws SQLException {
+        Contract contract = new Contract();
+        
+        // Basic contract fields
+        contract.setContractID(rs.getInt("contract_id"));
+        contract.setEmployeeID(rs.getInt("employee_id"));
+        contract.setContractNumber(rs.getString("contract_number"));
+        contract.setContractType(rs.getString("contract_type"));
+        contract.setStartDate(rs.getDate("start_date"));
+        contract.setEndDate(rs.getDate("end_date"));
+        contract.setSalaryAmount(rs.getBigDecimal("salary_amount"));
+        contract.setJobDescription(rs.getString("job_description"));
+        contract.setTermsAndConditions(rs.getString("terms_and_conditions"));
+        contract.setContractStatus(rs.getString("contract_status"));
+        contract.setSignedDate(rs.getDate("signed_date"));
+        
+        // Approval fields
+        contract.setApprovedBy((Integer) rs.getObject("approved_by"));
+        contract.setApprovalComment(rs.getString("approval_comment"));
+        contract.setApprovedAt(rs.getTimestamp("approved_at"));
+        
+        // Audit fields
+        contract.setCreatedBy((Integer) rs.getObject("created_by"));
+        contract.setCreatedAt(rs.getTimestamp("created_at"));
+        contract.setUpdatedAt(rs.getTimestamp("updated_at"));
+        
+        // Employee information from JOIN
+        contract.setEmployeeFullName(rs.getString("employee_full_name"));
+        contract.setEmployeeCode(rs.getString("employee_code"));
+        contract.setEmployeePhone(rs.getString("phone_number"));
+        contract.setEmployeeEmail(rs.getString("personal_email"));
+        
+        return contract;
     }
 }

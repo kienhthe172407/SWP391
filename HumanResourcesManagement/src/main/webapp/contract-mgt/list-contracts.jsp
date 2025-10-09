@@ -164,9 +164,10 @@
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="">All Status</option>
+                                    <option value="Draft" ${status == 'Draft' ? 'selected' : ''}>Draft</option>
+                                    <option value="Pending Approval" ${status == 'Pending Approval' ? 'selected' : ''}>Pending Approval</option>
                                     <option value="Active" ${status == 'Active' ? 'selected' : ''}>Active</option>
                                     <option value="Expired" ${status == 'Expired' ? 'selected' : ''}>Expired</option>
-                                    <option value="Pending" ${status == 'Pending' ? 'selected' : ''}>Pending</option>
                                     <option value="Terminated" ${status == 'Terminated' ? 'selected' : ''}>Terminated</option>
                                 </select>
                             </div>
@@ -208,7 +209,7 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
+                                    <th>Contract #</th>
                                     <th>Employee</th>
                                     <th>Contract Type</th>
                                     <th>Start Date</th>
@@ -221,8 +222,18 @@
                             <tbody>
                                 <c:forEach var="contract" items="${contracts}">
                                     <tr>
-                                        <td><strong>#${contract.contractID}</strong></td>
-                                        <td>${contract.employeeFullName != null ? contract.employeeFullName : 'N/A'}</td>
+                                        <td>
+                                            <strong>#${contract.contractID}</strong>
+                                            <c:if test="${contract.contractNumber != null}">
+                                                <br/><small class="text-muted">${contract.contractNumber}</small>
+                                            </c:if>
+                                        </td>
+                                        <td>
+                                            ${contract.employeeFullName != null ? contract.employeeFullName : 'N/A'}
+                                            <c:if test="${contract.employeeCode != null}">
+                                                <br/><small class="text-muted">(${contract.employeeCode})</small>
+                                            </c:if>
+                                        </td>
                                         <td>${contract.contractType != null ? contract.contractType : 'N/A'}</td>
                                         <td><fmt:formatDate value="${contract.startDate}" pattern="dd/MM/yyyy"/></td>
                                         <td>
@@ -237,21 +248,37 @@
                                         </td>
                                         <td>
                                             <c:choose>
-                                                <c:when test="${contract.status == 'Active'}">
+                                                <c:when test="${contract.contractStatus == 'Active'}">
                                                     <span class="badge badge-active">Active</span>
                                                 </c:when>
-                                                <c:when test="${contract.status == 'Expired'}">
+                                                <c:when test="${contract.contractStatus == 'Expired'}">
                                                     <span class="badge badge-expired">Expired</span>
                                                 </c:when>
-                                                <c:when test="${contract.status == 'Pending'}">
-                                                    <span class="badge badge-pending">Pending</span>
+                                                <c:when test="${contract.contractStatus == 'Pending Approval'}">
+                                                    <span class="badge badge-pending">Pending Approval</span>
+                                                </c:when>
+                                                <c:when test="${contract.contractStatus == 'Draft'}">
+                                                    <span class="badge bg-secondary">Draft</span>
+                                                </c:when>
+                                                <c:when test="${contract.contractStatus == 'Terminated'}">
+                                                    <span class="badge bg-danger">Terminated</span>
                                                 </c:when>
                                                 <c:otherwise>
-                                                    <span class="badge badge-pending">${contract.status}</span>
+                                                    <span class="badge badge-pending">${contract.contractStatus}</span>
                                                 </c:otherwise>
                                             </c:choose>
                                         </td>
-                                        <td><small>${contract.employeeContactInfo != null ? contract.employeeContactInfo : 'N/A'}</small></td>
+                                        <td>
+                                            <c:if test="${contract.employeePhone != null}">
+                                                <small><i class="fas fa-phone"></i> ${contract.employeePhone}</small><br/>
+                                            </c:if>
+                                            <c:if test="${contract.employeeEmail != null}">
+                                                <small><i class="fas fa-envelope"></i> ${contract.employeeEmail}</small>
+                                            </c:if>
+                                            <c:if test="${contract.employeePhone == null && contract.employeeEmail == null}">
+                                                <small class="text-muted">N/A</small>
+                                            </c:if>
+                                        </td>
                                         <td class="actions-cell">
                                             <div class="actions-wrapper">
                                                 <a href="#" class="btn-action btn-view" title="View">

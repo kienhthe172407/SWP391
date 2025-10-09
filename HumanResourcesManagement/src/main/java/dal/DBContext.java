@@ -12,7 +12,7 @@ public abstract class DBContext {
             // Thông tin kết nối MySQL
             String user = "root";
             String pass = "123456";
-            String url = "jdbc:mysql://127.0.0.1:3306/HRMS11?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
+            String url = "jdbc:mysql://127.0.0.1:3306/hr_management_system?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
 
             // Load MySQL driver
             Class.forName("com.mysql.cj.jdbc.Driver");
