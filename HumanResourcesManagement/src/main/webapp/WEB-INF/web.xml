@@ -100,6 +100,16 @@
         <servlet-name>EditJobPostingServlet</servlet-name>
         <url-pattern>/job-postings/edit</url-pattern>
     </servlet-mapping>
-    
+
+    <!-- Employee Management Servlets -->
+    <servlet>
+        <servlet-name>ViewEmployeesServlet</servlet-name>
+        <servlet-class>controller.employeeMgt.ViewEmployeesServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewEmployeesServlet</servlet-name>
+        <url-pattern>/employees/list</url-pattern>
+    </servlet-mapping>
+
     <!-- Development Tools section removed -->
 </web-app>

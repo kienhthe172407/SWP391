@@ -66,7 +66,7 @@
 
                     <li class="menu-section">Employee Management</li>
                     <li>
-                        <a href="#">
+                        <a href="${pageContext.request.contextPath}/employees/list">
                             <i class="fas fa-users"></i>
                             <span>All Employees</span>
                         </a>
