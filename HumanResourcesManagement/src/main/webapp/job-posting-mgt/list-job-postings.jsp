@@ -248,18 +248,18 @@
             <!-- Search Card -->
             <div class="card">
                 <div class="card-header">
-                    <i class="fas fa-search me-2"></i>Search Job Postings
+                    <i class="fas fa-search me-2"></i>Search & Filter Job Postings
                 </div>
                 <div class="card-body">
                     <form action="${pageContext.request.contextPath}/job-postings/list" method="GET">
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label class="form-label">Keyword</label>
                                 <input type="text" name="keyword" class="form-control" 
                                        placeholder="Job title, department, position..." 
                                        value="${keyword}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="">All Status</option>
@@ -268,7 +268,25 @@
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div class="col-md-5 d-flex align-items-end gap-2">
+                            <div class="col-md-2">
+                                <label class="form-label">Department</label>
+                                <select name="department" class="form-select">
+                                    <option value="">All Departments</option>
+                                    <c:forEach var="deptOption" items="${departments}">
+                                        <option value="${deptOption.departmentId}" ${department == deptOption.departmentId ? 'selected' : ''}>${deptOption.departmentName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Position</label>
+                                <select name="position" class="form-select">
+                                    <option value="">All Positions</option>
+                                    <c:forEach var="posOption" items="${positions}">
+                                        <option value="${posOption.positionId}" ${position == posOption.positionId ? 'selected' : ''}>${posOption.positionName}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex align-items-end gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="fas fa-search me-1"></i>Search
                                 </button>
@@ -324,11 +342,28 @@
                                         </td>
                                         <td>
                                             ${jobPosting.jobTitle}
-                                            <c:if test="${jobPosting.positionName != null}">
-                                                <br/><small class="text-muted">${jobPosting.positionName}</small>
-                                            </c:if>
+                                            <c:choose>
+                                                <c:when test="${jobPosting.positionName != null && jobPosting.positionName != 'N/A'}">
+                                                    <br/><small class="text-muted">${jobPosting.positionName}</small>
+                                                </c:when>
+                                                <c:when test="${jobPosting.positionId != null}">
+                                                    <br/><small class="text-muted">Position ID: ${jobPosting.positionId}</small>
+                                                </c:when>
+                                            </c:choose>
                                         </td>
-                                        <td>${jobPosting.departmentName != null ? jobPosting.departmentName : 'N/A'}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${jobPosting.departmentName != null && jobPosting.departmentName != 'N/A'}">
+                                                    ${jobPosting.departmentName}
+                                                </c:when>
+                                                <c:when test="${jobPosting.departmentId != null}">
+                                                    <span class="text-muted">Department ID: ${jobPosting.departmentId}</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="text-muted">N/A</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
                                         <td>
                                             <span class="badge bg-info">${jobPosting.numberOfPositions}</span>
                                         </td>
@@ -414,6 +449,8 @@
                                     <c:param name="page" value="${currentPage - 1}"/>
                                     <c:param name="keyword" value="${keyword}"/>
                                     <c:param name="status" value="${status}"/>
+                                    <c:param name="department" value="${department}"/>
+                                    <c:param name="position" value="${position}"/>
                                 </c:url>
                                 <a class="page-link" href="${currentPage > 1 ? prevUrl : '#'}" aria-label="Previous">
                                     <i class="fas fa-chevron-left"></i>
@@ -427,6 +464,8 @@
                                         <c:param name="page" value="${pageNum}"/>
                                         <c:param name="keyword" value="${keyword}"/>
                                         <c:param name="status" value="${status}"/>
+                                        <c:param name="department" value="${department}"/>
+                                        <c:param name="position" value="${position}"/>
                                     </c:url>
                                     <li class="page-item ${currentPage == pageNum ? 'active' : ''}">
                                         <a class="page-link" href="${pageUrl}">${pageNum}</a>
@@ -445,6 +484,8 @@
                                     <c:param name="page" value="${currentPage + 1}"/>
                                     <c:param name="keyword" value="${keyword}"/>
                                     <c:param name="status" value="${status}"/>
+                                    <c:param name="department" value="${department}"/>
+                                    <c:param name="position" value="${position}"/>
                                 </c:url>
                                 <a class="page-link" href="${currentPage < totalPages ? nextUrl : '#'}" aria-label="Next">
                                     <i class="fas fa-chevron-right"></i>

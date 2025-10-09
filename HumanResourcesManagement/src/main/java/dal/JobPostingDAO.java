@@ -4,6 +4,8 @@ import model.JobPosting;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Department;
+import model.Position;
 
 /**
  * Data Access Object for Job Postings
@@ -37,6 +39,7 @@ public class JobPostingDAO extends DBContext {
                     JobPosting jobPosting = mapJobPosting(rs);
                     jobPostings.add(jobPosting);
                 }
+                System.out.println("Successfully retrieved " + jobPostings.size() + " job postings with JOINs");
             }
         } catch (SQLException e) {
             System.err.println("Error in getAllJobPostings with JOINs: " + e.getMessage());
@@ -69,11 +72,13 @@ public class JobPostingDAO extends DBContext {
      * Search job postings with pagination
      * @param keyword Search keyword for job title, department, position
      * @param status Job status filter
+     * @param department Department filter
+     * @param position Position filter
      * @param page Current page number
      * @param pageSize Number of records per page
      * @return List of job postings matching search criteria
      */
-    public List<JobPosting> searchJobPostings(String keyword, String status, int page, int pageSize) {
+    public List<JobPosting> searchJobPostings(String keyword, String status, String department, String position, int page, int pageSize) {
         List<JobPosting> jobPostings = new ArrayList<>();
         
         StringBuilder sqlBuilder = new StringBuilder();
@@ -91,6 +96,14 @@ public class JobPostingDAO extends DBContext {
         
         if (status != null && !status.trim().isEmpty()) {
             sqlBuilder.append("AND jp.job_status = ? ");
+        }
+        
+        if (department != null && !department.trim().isEmpty()) {
+            sqlBuilder.append("AND jp.department_id = ? ");
+        }
+        
+        if (position != null && !position.trim().isEmpty()) {
+            sqlBuilder.append("AND jp.position_id = ? ");
         }
         
         sqlBuilder.append("ORDER BY jp.posted_date DESC, jp.job_id DESC ");
@@ -111,6 +124,14 @@ public class JobPostingDAO extends DBContext {
                 ps.setString(paramIndex++, status);
             }
             
+            if (department != null && !department.trim().isEmpty()) {
+                ps.setString(paramIndex++, department);
+            }
+            
+            if (position != null && !position.trim().isEmpty()) {
+                ps.setString(paramIndex++, position);
+            }
+            
             // Set pagination parameters
             ps.setInt(paramIndex++, pageSize);
             ps.setInt(paramIndex, (page - 1) * pageSize);
@@ -120,6 +141,7 @@ public class JobPostingDAO extends DBContext {
                     JobPosting jobPosting = mapJobPosting(rs);
                     jobPostings.add(jobPosting);
                 }
+                System.out.println("Successfully retrieved " + jobPostings.size() + " job postings with JOINs (search)");
             }
         } catch (SQLException e) {
             System.err.println("Error in searchJobPostings with JOINs: " + e.getMessage());
@@ -138,6 +160,14 @@ public class JobPostingDAO extends DBContext {
                 simpleSqlBuilder.append("AND job_status = ? ");
             }
             
+            if (department != null && !department.trim().isEmpty()) {
+                simpleSqlBuilder.append("AND department_id = ? ");
+            }
+            
+            if (position != null && !position.trim().isEmpty()) {
+                simpleSqlBuilder.append("AND position_id = ? ");
+            }
+            
             simpleSqlBuilder.append("ORDER BY posted_date DESC, job_id DESC LIMIT ? OFFSET ?");
             
             try (PreparedStatement ps = connection.prepareStatement(simpleSqlBuilder.toString())) {
@@ -149,6 +179,14 @@ public class JobPostingDAO extends DBContext {
                 
                 if (status != null && !status.trim().isEmpty()) {
                     ps.setString(paramIndex++, status);
+                }
+                
+                if (department != null && !department.trim().isEmpty()) {
+                    ps.setString(paramIndex++, department);
+                }
+                
+                if (position != null && !position.trim().isEmpty()) {
+                    ps.setString(paramIndex++, position);
                 }
                 
                 ps.setInt(paramIndex++, pageSize);
@@ -193,9 +231,11 @@ public class JobPostingDAO extends DBContext {
      * Get total number of job postings matching search criteria
      * @param keyword Search keyword
      * @param status Job status filter
+     * @param department Department filter
+     * @param position Position filter
      * @return Total count of matching records
      */
-    public int getTotalSearchResults(String keyword, String status) {
+    public int getTotalSearchResults(String keyword, String status, String department, String position) {
         StringBuilder sqlBuilder = new StringBuilder();
         sqlBuilder.append("SELECT COUNT(*) FROM job_postings jp ");
         sqlBuilder.append("LEFT JOIN departments d ON jp.department_id = d.department_id ");
@@ -211,6 +251,14 @@ public class JobPostingDAO extends DBContext {
             sqlBuilder.append("AND jp.job_status = ? ");
         }
         
+        if (department != null && !department.trim().isEmpty()) {
+            sqlBuilder.append("AND jp.department_id = ? ");
+        }
+        
+        if (position != null && !position.trim().isEmpty()) {
+            sqlBuilder.append("AND jp.position_id = ? ");
+        }
+        
         try (PreparedStatement ps = connection.prepareStatement(sqlBuilder.toString())) {
             int paramIndex = 1;
             
@@ -223,7 +271,15 @@ public class JobPostingDAO extends DBContext {
             }
             
             if (status != null && !status.trim().isEmpty()) {
-                ps.setString(paramIndex, status);
+                ps.setString(paramIndex++, status);
+            }
+            
+            if (department != null && !department.trim().isEmpty()) {
+                ps.setString(paramIndex++, department);
+            }
+            
+            if (position != null && !position.trim().isEmpty()) {
+                ps.setString(paramIndex++, position);
             }
             
             try (ResultSet rs = ps.executeQuery()) {
@@ -318,11 +374,111 @@ public class JobPostingDAO extends DBContext {
     }
     
     /**
+     * Get all departments
+     * @return List of departments
+     */
+    public List<Department> getAllDepartments() {
+        List<Department> departments = new ArrayList<>();
+        String sql = "SELECT department_id, department_name FROM departments ORDER BY department_name";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Department dept = new Department();
+                dept.setDepartmentId(rs.getInt("department_id"));
+                dept.setDepartmentName(rs.getString("department_name"));
+                departments.add(dept);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getAllDepartments: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return departments;
+    }
+    
+    /**
+     * Get all positions
+     * @return List of positions
+     */
+    public List<Position> getAllPositions() {
+        List<Position> positions = new ArrayList<>();
+        String sql = "SELECT position_id, position_name FROM positions ORDER BY position_name";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Position pos = new Position();
+                pos.setPositionId(rs.getInt("position_id"));
+                pos.setPositionName(rs.getString("position_name"));
+                positions.add(pos);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getAllPositions: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return positions;
+    }
+    
+    /**
      * Get database connection for testing
      * @return Connection object
      */
     public Connection getConnection() {
         return connection;
+    }
+    
+    /**
+     * Get department name by ID
+     * @param departmentId Department ID
+     * @return Department name or null if not found
+     */
+    private String getDepartmentNameById(Integer departmentId) {
+        if (departmentId == null) return null;
+        
+        String sql = "SELECT department_name FROM departments WHERE department_id = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, departmentId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("department_name");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getDepartmentNameById: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Get position name by ID
+     * @param positionId Position ID
+     * @return Position name or null if not found
+     */
+    private String getPositionNameById(Integer positionId) {
+        if (positionId == null) return null;
+        
+        String sql = "SELECT position_name FROM positions WHERE position_id = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, positionId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("position_name");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getPositionNameById: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
     }
     
     /**
@@ -352,9 +508,27 @@ public class JobPostingDAO extends DBContext {
         jobPosting.setCreatedAt(rs.getTimestamp("created_at"));
         jobPosting.setUpdatedAt(rs.getTimestamp("updated_at"));
         
-        // Set default values for JOIN fields
-        jobPosting.setDepartmentName("N/A");
-        jobPosting.setPositionName("N/A");
+        // Try to fetch department and position names separately
+        try {
+            if (jobPosting.getDepartmentId() != null) {
+                String deptName = getDepartmentNameById(jobPosting.getDepartmentId());
+                jobPosting.setDepartmentName(deptName != null ? deptName : "N/A");
+            } else {
+                jobPosting.setDepartmentName("N/A");
+            }
+            
+            if (jobPosting.getPositionId() != null) {
+                String posName = getPositionNameById(jobPosting.getPositionId());
+                jobPosting.setPositionName(posName != null ? posName : "N/A");
+            } else {
+                jobPosting.setPositionName("N/A");
+            }
+        } catch (Exception e) {
+            System.err.println("Error fetching department/position names: " + e.getMessage());
+            jobPosting.setDepartmentName("N/A");
+            jobPosting.setPositionName("N/A");
+        }
+        
         jobPosting.setPosterName("N/A");
         
         return jobPosting;

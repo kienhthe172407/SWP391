@@ -2,6 +2,8 @@ package controller.jobPostingMgt;
 
 import dal.JobPostingDAO;
 import model.JobPosting;
+import model.Department;
+import model.Position;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -60,19 +62,25 @@ public class ViewJobPostingsServlet extends HttpServlet {
         // Get search parameters from request
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
+        String department = request.getParameter("department");
+        String position = request.getParameter("position");
 
         // Always set search params to preserve them in pagination links
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.setAttribute("status", status != null ? status : "");
+        request.setAttribute("department", department != null ? department : "");
+        request.setAttribute("position", position != null ? position : "");
 
         List<JobPosting> jobPostings;
         int totalRecords;
         
         // If search parameters exist, call searchJobPostings with pagination
         if ((keyword != null && !keyword.trim().isEmpty()) ||
-            (status != null && !status.trim().isEmpty())) {
-            jobPostings = jobPostingDAO.searchJobPostings(keyword, status, currentPage, PAGE_SIZE);
-            totalRecords = jobPostingDAO.getTotalSearchResults(keyword, status);
+            (status != null && !status.trim().isEmpty()) ||
+            (department != null && !department.trim().isEmpty()) ||
+            (position != null && !position.trim().isEmpty())) {
+            jobPostings = jobPostingDAO.searchJobPostings(keyword, status, department, position, currentPage, PAGE_SIZE);
+            totalRecords = jobPostingDAO.getTotalSearchResults(keyword, status, department, position);
         } else {
             // Otherwise, get all job postings with pagination
             jobPostings = jobPostingDAO.getAllJobPostings(currentPage, PAGE_SIZE);
@@ -85,6 +93,10 @@ public class ViewJobPostingsServlet extends HttpServlet {
         // Get all job posting statuses from database
         List<String> jobStatuses = jobPostingDAO.getAllJobStatuses();
         
+        // Get departments and positions for filter dropdowns
+        List<Department> departments = jobPostingDAO.getAllDepartments();
+        List<Position> positions = jobPostingDAO.getAllPositions();
+        
         // Set attributes for display in JSP
         request.setAttribute("jobPostings", jobPostings);
         request.setAttribute("currentPage", currentPage);
@@ -92,6 +104,8 @@ public class ViewJobPostingsServlet extends HttpServlet {
         request.setAttribute("totalRecords", totalRecords);
         request.setAttribute("pageSize", PAGE_SIZE);
         request.setAttribute("jobStatuses", jobStatuses);
+        request.setAttribute("departments", departments);
+        request.setAttribute("positions", positions);
         
         // Forward to JSP page
         request.getRequestDispatcher("/job-posting-mgt/list-job-postings.jsp").forward(request, response);
