@@ -1,6 +1,13 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="c" uri="jakarta.tags.core"%>
+<%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
+
+<%-- Set admin role by default for all users --%>
+<% 
+    session.setAttribute("userRole", "HR Manager");
+    session.setAttribute("userId", 1);
+%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -33,81 +40,156 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            
-            <li class="menu-section">Employee Management</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-users"></i>
-                    <span>Employees</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Recruitment</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Departments</span>
-                </a>
-            </li>
-            
-            <li class="menu-section">Contract & Attendance</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/contracts/list" class="active">
-                    <i class="fas fa-file-contract"></i>
-                    <span>Contracts</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clock"></i>
-                    <span>Attendance</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Leave Requests</span>
-                </a>
-            </li>
-            
-            <li class="menu-section">Payroll & Benefits</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Payroll</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-gift"></i>
-                    <span>Benefits</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-award"></i>
-                    <span>Bonuses</span>
-                </a>
-            </li>
-            
-            <li class="menu-section">Reports & Analytics</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reports</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-            </li>
-            
+
+            <c:choose>
+                <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                    <!-- HR Manager Menu -->
+                    <li class="menu-section">HR Management</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users-cog"></i>
+                            <span>HR Staff Management</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-tasks"></i>
+                            <span>Task Assignment</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>Approval Queue</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Employee Management</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            <span>All Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Recruitment</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-briefcase"></i>
+                            <span>Departments</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Contract & Attendance</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/contracts/list" class="active">
+                            <i class="fas fa-file-contract"></i>
+                            <span>Contracts</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-clock"></i>
+                            <span>Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Leave Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Payroll & Benefits</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Payroll</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-gift"></i>
+                            <span>Benefits</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-award"></i>
+                            <span>Bonuses</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Reports & Analytics</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>HR Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analytics</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Statistics</span>
+                        </a>
+                    </li>
+                </c:when>
+                <c:otherwise>
+                    <!-- HR Staff Menu -->
+                    <li class="menu-section">Employee Management</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            <span>Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Recruitment</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Contract & Attendance</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/contracts/list" class="active">
+                            <i class="fas fa-file-contract"></i>
+                            <span>Contracts</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-clock"></i>
+                            <span>Attendance</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Payroll & Benefits</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Payroll</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-gift"></i>
+                            <span>Benefits</span>
+                        </a>
+                    </li>
+                </c:otherwise>
+            </c:choose>
+
             <li class="menu-section">System</li>
             <li>
                 <a href="#">
@@ -130,7 +212,7 @@
         <div class="top-header">
             <h1>Contracts Management</h1>
             <div class="user-info">
-                <span>HR Manager</span>
+                <span>HR Management</span>
                 <div class="avatar">HR</div>
             </div>
         </div>
@@ -146,6 +228,25 @@
         
         <!-- Content Area -->
         <div class="content-area">
+            <!-- Success/Error Messages -->
+            <c:if test="${not empty sessionScope.successMessage}">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="fas fa-check-circle me-2"></i>${sessionScope.successMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <c:remove var="successMessage" scope="session" />
+            </c:if>
+            
+            <c:if test="${not empty sessionScope.errorMessage}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>${sessionScope.errorMessage}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                <c:remove var="errorMessage" scope="session" />
+            </c:if>
+            
+            <!-- Role selection removed -->
+            
             <!-- Search Card -->
             <div class="card">
                 <div class="card-header">
@@ -164,11 +265,9 @@
                                 <label class="form-label">Status</label>
                                 <select name="status" class="form-select">
                                     <option value="">All Status</option>
-                                    <option value="Draft" ${status == 'Draft' ? 'selected' : ''}>Draft</option>
-                                    <option value="Pending Approval" ${status == 'Pending Approval' ? 'selected' : ''}>Pending Approval</option>
-                                    <option value="Active" ${status == 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Expired" ${status == 'Expired' ? 'selected' : ''}>Expired</option>
-                                    <option value="Terminated" ${status == 'Terminated' ? 'selected' : ''}>Terminated</option>
+                                    <c:forEach var="statusOption" items="${contractStatuses}">
+                                        <option value="${statusOption}" ${status == statusOption ? 'selected' : ''}>${statusOption}</option>
+                                    </c:forEach>
                                 </select>
                             </div>
                             <div class="col-md-5 d-flex align-items-end gap-2">
@@ -178,7 +277,7 @@
                                 <a href="${pageContext.request.contextPath}/contracts/list" class="btn btn-secondary">
                                     <i class="fas fa-redo me-1"></i>Reset
                                 </a>
-                                <a href="#" class="btn btn-success ms-auto">
+                                <a href="${pageContext.request.contextPath}/contracts/create" class="btn btn-success ms-auto">
                                     <i class="fas fa-plus me-1"></i>New Contract
                                 </a>
                             </div>
@@ -256,12 +355,33 @@
                                                 </c:when>
                                                 <c:when test="${contract.contractStatus == 'Pending Approval'}">
                                                     <span class="badge badge-pending">Pending Approval</span>
+                                                    <br/>
+                                                    <div class="btn-group btn-group-sm mt-1" role="group">
+                                                        <button type="button" class="btn btn-success btn-sm approve-btn"
+                                                                data-contract-id="${contract.contractID}"
+                                                                data-employee-name="${contract.employeeFullName}"
+                                                                title="Approve Contract">
+                                                            <i class="fas fa-check"></i> Approve
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm reject-btn"
+                                                                data-contract-id="${contract.contractID}"
+                                                                data-employee-name="${contract.employeeFullName}"
+                                                                title="Reject Contract">
+                                                            <i class="fas fa-times"></i> Reject
+                                                        </button>
+                                                    </div>
                                                 </c:when>
                                                 <c:when test="${contract.contractStatus == 'Draft'}">
                                                     <span class="badge bg-secondary">Draft</span>
                                                 </c:when>
                                                 <c:when test="${contract.contractStatus == 'Terminated'}">
                                                     <span class="badge bg-danger">Terminated</span>
+                                                </c:when>
+                                                <c:when test="${contract.contractStatus == 'Rejected'}">
+                                                    <span class="badge bg-danger">Rejected</span>
+                                                    <c:if test="${not empty contract.approvalComment}">
+                                                        <br/><small class="text-danger">${contract.approvalComment}</small>
+                                                    </c:if>
                                                 </c:when>
                                                 <c:otherwise>
                                                     <span class="badge badge-pending">${contract.contractStatus}</span>
@@ -281,14 +401,16 @@
                                         </td>
                                         <td class="actions-cell">
                                             <div class="actions-wrapper">
-                                                <a href="#" class="btn-action btn-view" title="View">
+                                                <a href="${pageContext.request.contextPath}/contracts/detail?id=${contract.contractID}"
+                                                   class="btn-action btn-view" title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
                                                 <a href="#" class="btn-action btn-edit" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <a href="#" class="btn-action btn-delete" title="Delete" 
-                                                   onclick="return confirm('Are you sure you want to delete contract #${contract.contractID}?')">
+                                                <a href="#" class="btn-action btn-delete" title="Delete"
+                                                   data-contract-id="${contract.contractID}"
+                                                   data-employee-name="${contract.employeeFullName != null ? contract.employeeFullName : 'N/A'}">
                                                     <i class="fas fa-trash"></i>
                                                 </a>
                                             </div>
@@ -359,7 +481,165 @@
         </div>
     </div>
 
+    <!-- Approve Contract Modal -->
+    <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveModalLabel">Approve Contract</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="approveForm" method="POST" action="${pageContext.request.contextPath}/contracts/approve">
+                    <div class="modal-body">
+                        <p>Are you sure you want to approve the contract for <strong id="approveEmployeeName"></strong>?</p>
+                        <div class="mb-3">
+                            <label for="approveComment" class="form-label">Approval Comment (Optional)</label>
+                            <textarea class="form-control" id="approveComment" name="comment" rows="3"
+                                      placeholder="Enter any comments about the approval..."></textarea>
+                        </div>
+                        <input type="hidden" id="approveContractId" name="contractId" value="">
+                        <input type="hidden" name="action" value="approve">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check me-1"></i>Approve Contract
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reject Contract Modal -->
+    <div class="modal fade" id="rejectModal" tabindex="-1" aria-labelledby="rejectModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rejectModalLabel">Reject Contract</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="rejectForm" method="POST" action="${pageContext.request.contextPath}/contracts/approve">
+                    <div class="modal-body">
+                        <p>Are you sure you want to reject the contract for <strong id="rejectEmployeeName"></strong>?</p>
+                        <div class="mb-3">
+                            <label for="rejectComment" class="form-label">Rejection Reason <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="rejectComment" name="comment" rows="3"
+                                      placeholder="Please provide a reason for rejecting this contract..." required></textarea>
+                            <div class="invalid-feedback">
+                                Please provide a reason for rejection.
+                            </div>
+                        </div>
+                        <input type="hidden" id="rejectContractId" name="contractId" value="">
+                        <input type="hidden" name="action" value="reject">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-times me-1"></i>Reject Contract
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Delete Contract Modal -->
+    <div class="modal fade" id="deleteContractModal" tabindex="-1" aria-labelledby="deleteContractModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteContractModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Contract
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="deleteContractForm" method="POST" action="${pageContext.request.contextPath}/contracts/delete">
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5>Are you sure you want to delete this contract?</h5>
+                            <p class="text-muted">Contract #<strong id="deleteContractId"></strong> for <strong id="deleteEmployeeName"></strong></p>
+                            <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+                        </div>
+                        <input type="hidden" id="deleteContractIdInput" name="contractId" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-1"></i>Delete Contract
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Contract Approval/Rejection/Deletion JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Approve button handlers
+            document.querySelectorAll('.approve-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const contractId = this.getAttribute('data-contract-id');
+                    const employeeName = this.getAttribute('data-employee-name');
+
+                    document.getElementById('approveContractId').value = contractId;
+                    document.getElementById('approveEmployeeName').textContent = employeeName;
+
+                    const approveModal = new bootstrap.Modal(document.getElementById('approveModal'));
+                    approveModal.show();
+                });
+            });
+
+            // Reject button handlers
+            document.querySelectorAll('.reject-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const contractId = this.getAttribute('data-contract-id');
+                    const employeeName = this.getAttribute('data-employee-name');
+
+                    document.getElementById('rejectContractId').value = contractId;
+                    document.getElementById('rejectEmployeeName').textContent = employeeName;
+
+                    const rejectModal = new bootstrap.Modal(document.getElementById('rejectModal'));
+                    rejectModal.show();
+                });
+            });
+
+            // Delete button handlers
+            document.querySelectorAll('.btn-delete').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const contractId = this.getAttribute('data-contract-id');
+                    const employeeName = this.getAttribute('data-employee-name');
+
+                    document.getElementById('deleteContractIdInput').value = contractId;
+                    document.getElementById('deleteContractId').textContent = contractId;
+                    document.getElementById('deleteEmployeeName').textContent = employeeName;
+
+                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteContractModal'));
+                    deleteModal.show();
+                });
+            });
+
+            // Form validation for reject form
+            document.getElementById('rejectForm').addEventListener('submit', function(e) {
+                const comment = document.getElementById('rejectComment').value.trim();
+                if (!comment) {
+                    e.preventDefault();
+                    document.getElementById('rejectComment').classList.add('is-invalid');
+                } else {
+                    document.getElementById('rejectComment').classList.remove('is-invalid');
+                }
+            });
+        });
+    </script>
 </body>
 </html>
