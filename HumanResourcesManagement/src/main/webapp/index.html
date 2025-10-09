@@ -1,15 +1,110 @@
 <!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
-        <div>TODO write content</div>
-    </body>
-</html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HRM - Human Resources Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+    <style>
+      body { background:#f8fafc; }
+      .hero { background: linear-gradient(135deg,#4e73df 0%, #224abe 100%); color:#fff; }
+      .feature-icon { width:48px;height:48px;border-radius:10px; }
+      .card.shadow-hover { transition: transform .15s ease, box-shadow .15s ease; }
+      .card.shadow-hover:hover { transform: translateY(-3px); box-shadow:0 10px 30px rgba(0,0,0,.12); }
+      .navbar-brand span { font-weight:700; }
+    </style>
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark" style="background: linear-gradient(135deg,#4e73df 0%, #224abe 100%)">
+      <div class="container">
+        <a class="navbar-brand d-flex align-items-center" href="#">
+          <i class="fas fa-users-cog me-2"></i> <span>HRM System</span>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="nav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+            <li class="nav-item"><a class="nav-link" href="#pricing">Pricing</a></li>
+            <li class="nav-item"><a class="btn btn-light text-primary ms-lg-2" href="manager/home.jsp">Go to Dashboard</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="hero py-5">
+      <div class="container py-3">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-7">
+            <h1 class="display-5 fw-bold mb-3">Manage people, contracts and hiring in one place</h1>
+            <p class="lead mb-4">A fast, modern HR platform to streamline your workflows from recruitment to payroll.</p>
+            <a href="manager/home.jsp" class="btn btn-light text-primary btn-lg me-2"><i class="fas fa-gauge me-2"></i>Open Dashboard</a>
+            <a href="#features" class="btn btn-outline-light btn-lg"><i class="fas fa-circle-info me-2"></i>Learn more</a>
+          </div>
+          <div class="col-lg-5 text-center text-lg-end">
+            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?q=80&w=1200&auto=format&fit=crop" class="img-fluid rounded shadow" alt="HR teamwork" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-5">
+      <div class="container">
+        <div class="text-center mb-4">
+          <h2 class="fw-bold">Everything you need for HR</h2>
+          <p class="text-muted">From onboarding to analytics, built with best practices out of the box.</p>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="card h-100 shadow-hover">
+              <div class="card-body">
+                <div class="feature-icon bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center mb-3"><i class="fas fa-file-contract"></i></div>
+                <h5 class="card-title">Contract Management</h5>
+                <p class="card-text text-muted">Create, approve and track contracts with clear statuses and audit trails.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 shadow-hover">
+              <div class="card-body">
+                <div class="feature-icon bg-success-subtle text-success d-inline-flex align-items-center justify-content-center mb-3"><i class="fas fa-briefcase"></i></div>
+                <h5 class="card-title">Recruitment</h5>
+                <p class="card-text text-muted">Publish openings and review candidates with an efficient workflow.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="card h-100 shadow-hover">
+              <div class="card-body">
+                <div class="feature-icon bg-warning-subtle text-warning d-inline-flex align-items-center justify-content-center mb-3"><i class="fas fa-chart-line"></i></div>
+                <h5 class="card-title">Reports & Analytics</h5>
+                <p class="card-text text-muted">Make informed decisions with real-time KPIs and customizable reports.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section id="pricing" class="py-5 bg-white border-top">
+      <div class="container text-center">
+        <h3 class="fw-bold mb-3">Start managing HR better today</h3>
+        <p class="text-muted mb-4">Try the dashboard and see how much time you can save.</p>
+        <a class="btn btn-primary btn-lg" href="manager/home.jsp"><i class="fas fa-right-to-bracket me-2"></i>Go to Dashboard</a>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-muted small">
+      © <script>document.write(new Date().getFullYear())</script> HRM System
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+  </html>

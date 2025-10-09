@@ -1,0 +1,122 @@
+/* Small custom styles to complement Bootstrap 5 */
+body {
+  background: #f5f7fb;
+  color: #223;
+}
+.dashboard-root {
+  max-width: 1200px;
+  margin: 20px auto;
+}
+.card.border-warning {
+  border-width: 2px;
+}
+.list-unstyled li a {
+  color: #0d6efd;
+  text-decoration: none;
+}
+.list-unstyled li a:hover {
+  text-decoration: underline;
+}
+
+/* Keep navbar adjustments if needed */
+.navbar .fw-bold {
+  font-weight: 700;
+}
+
+/* Sidebar styles */
+.sidebar {
+  height: 100vh;
+  border-right: 1px solid #eef1f5;
+  padding-bottom: 60px;
+}
+.sidebar .nav-link {
+  color: #333;
+  padding: 10px 16px;
+}
+.sidebar .nav-link.active {
+  background: #e9f0ff;
+  color: #0d6efd;
+  border-radius: 6px;
+}
+.sidebar .nav-link .badge {
+  float: none;
+}
+
+/* Brand block */
+.brand-block {
+  background: #1e63ff;
+  height: 96px;
+}
+.brand-block h5 {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.brand-block small {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Empty state */
+.empty-state .fa-inbox {
+  color: #9aa4b2;
+}
+.empty-state h5 {
+  color: #333;
+}
+
+/* Page header */
+.page-header h4 {
+  font-weight: 600;
+}
+.page-header .breadcrumb {
+  font-size: 0.875rem;
+}
+.page-header .breadcrumb a {
+  color: #6c8cff;
+  text-decoration: none;
+}
+.page-header .breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+/* Simple avatar circle for header */
+.avatar-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #e9f0ff;
+  color: #224abe;
+  font-weight: 700;
+}
+
+/* Card header mimic */
+.card > .card-header {
+  border-bottom: 1px solid #eef1f5;
+}
+
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
+
+/* Nav section headings */
+.nav-section {
+  padding: 10px 12px;
+  font-weight: 600;
+  color: #9aa4b2;
+}
+.nav-link {
+  transition: background 0.15s ease;
+}
+.nav-link:hover {
+  background: #f5f7fb;
+}
+
+/* Badge */
+.badge.bg-danger {
+  background: #ff4d4f;
+}
