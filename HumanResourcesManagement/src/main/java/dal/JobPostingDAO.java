@@ -422,6 +422,44 @@ public class JobPostingDAO extends DBContext {
     }
     
     /**
+     * Update an existing job posting
+     * @param jobPosting JobPosting object with updated data
+     * @return boolean indicating success
+     */
+    public boolean updateJobPosting(JobPosting jobPosting) {
+        String sql = "UPDATE job_postings SET job_title = ?, department_id = ?, position_id = ?, " +
+                     "job_description = ?, requirements = ?, benefits = ?, salary_range_from = ?, " +
+                     "salary_range_to = ?, number_of_positions = ?, application_deadline = ?, " +
+                     "job_status = ?, internal_notes = ?, updated_at = NOW() " +
+                     "WHERE job_id = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, jobPosting.getJobTitle());
+            ps.setObject(2, jobPosting.getDepartmentId());
+            ps.setObject(3, jobPosting.getPositionId());
+            ps.setString(4, jobPosting.getJobDescription());
+            ps.setString(5, jobPosting.getRequirements());
+            ps.setString(6, jobPosting.getBenefits());
+            ps.setObject(7, jobPosting.getSalaryRangeFrom());
+            ps.setObject(8, jobPosting.getSalaryRangeTo());
+            ps.setObject(9, jobPosting.getNumberOfPositions());
+            ps.setObject(10, jobPosting.getApplicationDeadline());
+            ps.setString(11, jobPosting.getJobStatus());
+            ps.setString(12, jobPosting.getInternalNotes());
+            ps.setInt(13, jobPosting.getJobId());
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error in updateJobPosting: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    /**
      * Delete a job posting
      * @param jobId Job posting ID to delete
      * @return boolean indicating success

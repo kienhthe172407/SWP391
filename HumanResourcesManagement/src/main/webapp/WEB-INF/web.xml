@@ -92,5 +92,14 @@
         <url-pattern>/job-postings/delete</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>EditJobPostingServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.EditJobPostingServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditJobPostingServlet</servlet-name>
+        <url-pattern>/job-postings/edit</url-pattern>
+    </servlet-mapping>
+    
     <!-- Development Tools section removed -->
 </web-app>
