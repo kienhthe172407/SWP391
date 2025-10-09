@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 /**
  * Servlet to handle viewing contracts list
@@ -33,11 +34,22 @@ public class ViewContractsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
+        // Get user session information
+//        HttpSession session = request.getSession();
+//        String userRole = (String) session.getAttribute("userRole");
+//        Integer userId = (Integer) session.getAttribute("userId");
+//
+//        // If not logged in, redirect to login
+//        if (userRole == null || userId == null) {
+//            response.sendRedirect(request.getContextPath() + "/login");
+//            return;
+//        }
+
         // Pagination parameters
         final int PAGE_SIZE = 10;
         int currentPage = 1;
-        
+
         String pageParam = request.getParameter("page");
         if (pageParam != null && !pageParam.trim().isEmpty()) {
             try {
@@ -47,20 +59,24 @@ public class ViewContractsServlet extends HttpServlet {
                 currentPage = 1;
             }
         }
-        
+
         // Get search parameters from request
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
-        
+
         // Always set search params to preserve them in pagination links
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.setAttribute("status", status != null ? status : "");
-        
+
         List<Contract> contracts;
         int totalRecords;
+
+        // Set default role as HR Manager for full access
+        String userRole = "HR Manager";
+        Integer userId = 1;
         
         // If search parameters exist, call searchContracts with pagination
-        if ((keyword != null && !keyword.trim().isEmpty()) || 
+        if ((keyword != null && !keyword.trim().isEmpty()) ||
             (status != null && !status.trim().isEmpty())) {
             contracts = contractDAO.searchContracts(keyword, status, currentPage, PAGE_SIZE);
             totalRecords = contractDAO.getTotalSearchResults(keyword, status);
@@ -73,12 +89,16 @@ public class ViewContractsServlet extends HttpServlet {
         // Calculate pagination info
         int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
         
+        // Get all contract statuses from database
+        List<String> contractStatuses = contractDAO.getAllContractStatuses();
+        
         // Set attributes for display in JSP
         request.setAttribute("contracts", contracts);
         request.setAttribute("currentPage", currentPage);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("totalRecords", totalRecords);
         request.setAttribute("pageSize", PAGE_SIZE);
+        request.setAttribute("contractStatuses", contractStatuses);
         
         // Forward to JSP page
         request.getRequestDispatcher("/contract-mgt/list-contracts.jsp").forward(request, response);

@@ -278,7 +278,7 @@ CREATE TABLE employment_contracts (
     salary_amount DECIMAL(12, 2),                              -- Mức lương trong hợp đồng
     job_description TEXT,                                      -- Mô tả công việc
     terms_and_conditions TEXT,                                 -- Điều khoản và điều kiện
-    contract_status ENUM('Draft', 'Pending Approval', 'Active', 'Expired', 'Terminated') DEFAULT 'Draft', -- Trạng thái
+    contract_status ENUM('Draft', 'Pending Approval', 'Active', 'Expired', 'Terminated', 'Rejected') DEFAULT 'Draft', -- Trạng thái
     signed_date DATE,                                          -- Ngày ký
     approved_by INT,                                           -- Người duyệt
     approval_comment TEXT,                                     -- Nhận xét khi duyệt
@@ -697,24 +697,42 @@ INSERT INTO payroll_adjustments (payroll_id, employee_id, adjustment_type, amoun
 
 -- ==============================================================================
 -- INSERT DATA: employment_contracts
--- Dữ liệu hợp đồng lao động
+-- Dữ liệu hợp đồng lao động với nhiều trạng thái khác nhau để test
 -- ==============================================================================
-INSERT INTO employment_contracts (employee_id, contract_number, contract_type, start_date, end_date, salary_amount, job_description, terms_and_conditions, contract_status, signed_date, approved_by, approved_at, created_by) VALUES
-(1, 'CTR-2015-001', 'Indefinite', '2015-01-15', NULL, 7000.00, 'Responsible for overall HR strategy, employee relations, recruitment, and team management', 'Standard employment terms including benefits, leave policy, and confidentiality agreement', 'Active', '2015-01-10', 1, '2015-01-12 10:00:00', 1),
-(2, 'CTR-2018-015', 'Indefinite', '2018-03-10', NULL, 3500.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment terms with 3-month probation period', 'Active', '2018-03-05', 2, '2018-03-07 11:00:00', 2),
-(3, 'CTR-2019-023', 'Indefinite', '2019-06-01', NULL, 3500.00, 'Manage employee relations, benefits administration, and HR compliance', 'Standard employment terms with 3-month probation period', 'Active', '2019-05-28', 2, '2019-05-30 09:00:00', 2),
-(4, 'CTR-2014-008', 'Indefinite', '2014-08-20', NULL, 8000.00, 'Lead IT department, oversee infrastructure, software development, and technical projects', 'Management contract with performance bonuses and stock options', 'Active', '2014-08-15', 1, '2014-08-17 10:00:00', 1),
-(5, 'CTR-2016-012', 'Indefinite', '2016-02-14', NULL, 7500.00, 'Lead sales team, develop sales strategies, and drive revenue growth', 'Management contract with commission structure', 'Active', '2016-02-10', 1, '2016-02-12 14:00:00', 1),
-(6, 'CTR-2019-031', 'Indefinite', '2019-04-15', NULL, 6000.00, 'Lead technical projects, mentor junior developers, and ensure code quality', 'Standard employment with technical certifications support', 'Active', '2019-04-10', 5, '2019-04-12 10:00:00', 3),
-(7, 'CTR-2020-005', 'Indefinite', '2020-01-20', NULL, 4000.00, 'Develop and maintain software applications using modern technologies', 'Standard employment with professional development opportunities', 'Active', '2020-01-15', 5, '2020-01-17 11:00:00', 3),
-(8, 'CTR-2018-042', 'Indefinite', '2018-07-11', NULL, 3000.00, 'Generate sales, maintain client relationships, and achieve sales targets', 'Standard employment with commission-based incentives', 'Active', '2018-07-08', 6, '2018-07-10 09:00:00', 3),
-(9, 'CTR-2020-055', 'Fixed-term', '2020-09-05', '2023-09-04', 3000.00, 'Business development and client acquisition in assigned territory', 'Fixed-term contract with renewal option', 'Expired', '2020-09-01', 6, '2020-09-03 10:00:00', 3),
-(9, 'CTR-2023-048', 'Indefinite', '2023-09-05', NULL, 3000.00, 'Continued business development and senior client management', 'Renewed as indefinite contract after successful performance', 'Active', '2023-09-01', 6, '2023-09-03 11:00:00', 3),
-(10, 'CTR-2017-028', 'Indefinite', '2017-05-18', NULL, 3200.00, 'Develop and execute marketing campaigns, analyze market trends', 'Standard employment with creative project bonuses', 'Active', '2017-05-15', 1, '2017-05-17 10:00:00', 2),
-(11, 'CTR-2019-067', 'Indefinite', '2019-11-22', NULL, 3500.00, 'Manage accounting records, financial reporting, and tax compliance', 'Standard employment with CPA certification support', 'Active', '2019-11-18', 1, '2019-11-20 09:00:00', 2),
-(12, 'CTR-2018-058', 'Indefinite', '2018-10-30', NULL, 6000.00, 'Oversee daily operations, optimize processes, and manage operational staff', 'Management contract with performance metrics', 'Active', '2018-10-25', 1, '2018-10-27 10:00:00', 2),
-(13, 'CTR-2021-015', 'Indefinite', '2021-02-15', NULL, 2500.00, 'Provide administrative support including scheduling, documentation, and coordination', 'Standard employment with benefits after probation', 'Active', '2021-02-10', 12, '2021-02-12 14:00:00', 3),
-(14, 'CTR-2016-078', 'Indefinite', '2016-12-01', '2024-12-31', 4000.00, 'Software development and maintenance of internal systems', 'Standard employment contract', 'Terminated', '2016-11-28', 5, '2016-11-30 10:00:00', 3);
+
+-- Existing Active Contracts (approved by HR Manager)
+INSERT INTO employment_contracts (employee_id, contract_number, contract_type, start_date, end_date, salary_amount, job_description, terms_and_conditions, contract_status, signed_date, approved_by, approval_comment, approved_at, created_by) VALUES
+(1, 'CTR-2015-001', 'Indefinite', '2015-01-15', NULL, 7000.00, 'Responsible for overall HR strategy, employee relations, recruitment, and team management', 'Standard employment terms including benefits, leave policy, and confidentiality agreement', 'Active', '2015-01-10', 2, 'Excellent qualifications and experience', '2015-01-12 10:00:00', 3),
+(2, 'CTR-2018-015', 'Indefinite', '2018-03-10', NULL, 3500.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment terms with 3-month probation period', 'Active', '2018-03-05', 2, 'Strong HR background, approved for immediate start', '2018-03-07 11:00:00', 3),
+(4, 'CTR-2014-008', 'Indefinite', '2014-08-20', NULL, 8000.00, 'Lead IT department, oversee infrastructure, software development, and technical projects', 'Management contract with performance bonuses and stock options', 'Active', '2014-08-15', 2, 'Exceptional technical leadership skills', '2014-08-17 10:00:00', 3),
+(5, 'CTR-2016-012', 'Indefinite', '2016-02-14', NULL, 7500.00, 'Lead sales team, develop sales strategies, and drive revenue growth', 'Management contract with commission structure', 'Active', '2016-02-10', 2, 'Proven sales track record', '2016-02-12 14:00:00', 4),
+
+-- Draft Contracts (created by different HR staff - only visible to creators)
+(6, 'CTR-2024-101', 'Indefinite', '2024-12-01', NULL, 6000.00, 'Lead technical projects, mentor junior developers, and ensure code quality', 'Standard employment with technical certifications support', 'Draft', NULL, NULL, 'Still reviewing technical requirements', NULL, 3),
+(7, 'CTR-2024-102', 'Fixed-term', '2024-11-15', '2025-11-14', 4500.00, 'Develop and maintain software applications using modern technologies', 'Fixed-term contract with renewal option based on performance', 'Draft', NULL, NULL, 'Waiting for budget approval', NULL, 3),
+(8, 'CTR-2024-103', 'Indefinite', '2024-10-20', NULL, 3200.00, 'Generate sales, maintain client relationships, and achieve sales targets', 'Standard employment with commission-based incentives', 'Draft', NULL, NULL, 'Need to finalize commission structure', NULL, 4),
+(9, 'CTR-2024-104', 'Indefinite', '2024-11-01', NULL, 3800.00, 'Business development and client acquisition in assigned territory', 'Standard employment terms with travel allowance', 'Draft', NULL, NULL, 'Reviewing territory assignments', NULL, 4),
+(10, 'CTR-2024-105', 'Fixed-term', '2024-12-15', '2025-06-14', 3000.00, 'Develop and execute marketing campaigns, analyze market trends', 'Temporary contract for holiday season campaign', 'Draft', NULL, NULL, 'Seasonal position - finalizing details', NULL, 2),
+
+-- Pending Approval Contracts (submitted by HR staff, waiting for HR Manager approval)
+(11, 'CTR-2024-201', 'Indefinite', '2024-11-25', NULL, 4200.00, 'Manage accounting records, financial reporting, and tax compliance', 'Standard employment with CPA certification support and annual bonus', 'Pending Approval', NULL, NULL, 'Ready for review - candidate has excellent credentials', NULL, 3),
+(12, 'CTR-2024-202', 'Indefinite', '2024-12-10', NULL, 6500.00, 'Oversee daily operations, optimize processes, and manage operational staff', 'Management contract with performance metrics and team bonuses', 'Pending Approval', NULL, NULL, 'Urgent position - operations manager needed ASAP', NULL, 4),
+(13, 'CTR-2024-203', 'Fixed-term', '2024-11-20', '2025-05-19', 2800.00, 'Provide administrative support including scheduling, documentation, and coordination', 'Temporary contract to cover maternity leave', 'Pending Approval', NULL, NULL, 'Temporary replacement for Sarah - 6 months', NULL, 3),
+(14, 'CTR-2024-204', 'Indefinite', '2024-12-05', NULL, 5500.00, 'Software development and maintenance of internal systems', 'Standard employment with remote work options', 'Pending Approval', NULL, NULL, 'Senior developer with 8 years experience', NULL, 4),
+(1, 'CTR-2024-205', 'Fixed-term', '2025-01-15', '2025-12-31', 4800.00, 'Project management for digital transformation initiative', 'Project-based contract with completion bonuses', 'Pending Approval', NULL, NULL, 'Critical project - need experienced PM', NULL, 3),
+
+-- Rejected Contracts (rejected by HR Manager with reasons)
+(2, 'CTR-2024-301', 'Indefinite', '2024-10-01', NULL, 8500.00, 'Senior HR Business Partner role with strategic responsibilities', 'Executive level contract with stock options', 'Rejected', NULL, 2, 'Salary request exceeds budget allocation for this position. Please revise compensation package.', '2024-10-15 14:30:00', 3),
+(3, 'CTR-2024-302', 'Fixed-term', '2024-09-15', '2024-12-15', 2200.00, 'Data entry and basic administrative tasks', 'Entry level position with basic benefits', 'Rejected', NULL, 2, 'Position requirements do not match candidate qualifications. Candidate is overqualified for this role.', '2024-09-20 10:15:00', 4),
+(6, 'CTR-2024-303', 'Indefinite', '2024-08-20', NULL, 7200.00, 'Lead architect for new software platform development', 'Senior technical role with leadership responsibilities', 'Rejected', NULL, 2, 'Technical requirements not clearly defined. Please provide detailed technical specifications and team structure.', '2024-08-25 16:45:00', 3),
+(7, 'CTR-2024-304', 'Fixed-term', '2024-07-10', '2024-09-10', 3500.00, 'Temporary sales support during summer campaign', 'Short-term contract with performance incentives', 'Rejected', NULL, 2, 'Contract duration too short for effective onboarding and training. Minimum 6-month contracts required for sales positions.', '2024-07-15 11:20:00', 4),
+
+-- Expired Contracts
+(8, 'CTR-2023-401', 'Fixed-term', '2023-01-15', '2024-01-14', 3200.00, 'Temporary customer service representative', 'One-year fixed contract with renewal option', 'Expired', '2023-01-10', 2, 'Approved for one year term', '2023-01-12 09:00:00', 3),
+(9, 'CTR-2022-402', 'Fixed-term', '2022-06-01', '2024-05-31', 4100.00, 'Project coordinator for system upgrade', 'Two-year project contract', 'Expired', '2022-05-25', 2, 'Critical project role approved', '2022-05-28 13:30:00', 4),
+
+-- Terminated Contracts
+(10, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns', 'Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', 3);
 
 -- ==============================================================================
 -- INSERT DATA: job_postings
