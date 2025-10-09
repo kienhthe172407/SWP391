@@ -22,11 +22,13 @@ public class JobPostingDAO extends DBContext {
         List<JobPosting> jobPostings = new ArrayList<>();
         
         // First try with JOINs
-        String sql = "SELECT jp.*, d.department_name, p.position_name, u.full_name AS poster_name " +
+        String sql = "SELECT jp.*, d.department_name, p.position_name, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS poster_name " +
                      "FROM job_postings jp " +
                      "LEFT JOIN departments d ON jp.department_id = d.department_id " +
                      "LEFT JOIN positions p ON jp.position_id = p.position_id " +
                      "LEFT JOIN users u ON jp.posted_by = u.user_id " +
+                     "LEFT JOIN employees e ON u.user_id = e.user_id " +
                      "ORDER BY jp.posted_date DESC, jp.job_id DESC " +
                      "LIMIT ? OFFSET ?";
         
@@ -82,11 +84,13 @@ public class JobPostingDAO extends DBContext {
         List<JobPosting> jobPostings = new ArrayList<>();
         
         StringBuilder sqlBuilder = new StringBuilder();
-        sqlBuilder.append("SELECT jp.*, d.department_name, p.position_name, u.full_name AS poster_name ");
+        sqlBuilder.append("SELECT jp.*, d.department_name, p.position_name, ");
+        sqlBuilder.append("CONCAT(e.first_name, ' ', e.last_name) AS poster_name ");
         sqlBuilder.append("FROM job_postings jp ");
         sqlBuilder.append("LEFT JOIN departments d ON jp.department_id = d.department_id ");
         sqlBuilder.append("LEFT JOIN positions p ON jp.position_id = p.position_id ");
         sqlBuilder.append("LEFT JOIN users u ON jp.posted_by = u.user_id ");
+        sqlBuilder.append("LEFT JOIN employees e ON u.user_id = e.user_id ");
         sqlBuilder.append("WHERE 1=1 ");
         
         // Add search conditions
@@ -329,11 +333,14 @@ public class JobPostingDAO extends DBContext {
      * @return JobPosting object or null if not found
      */
     public JobPosting getJobPostingById(int jobId) {
-        String sql = "SELECT jp.*, d.department_name, p.position_name, u.full_name AS poster_name " +
+        // First try with JOINs to get related information
+        String sql = "SELECT jp.*, d.department_name, p.position_name, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS poster_name " +
                      "FROM job_postings jp " +
                      "LEFT JOIN departments d ON jp.department_id = d.department_id " +
                      "LEFT JOIN positions p ON jp.position_id = p.position_id " +
                      "LEFT JOIN users u ON jp.posted_by = u.user_id " +
+                     "LEFT JOIN employees e ON u.user_id = e.user_id " +
                      "WHERE jp.job_id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -345,8 +352,25 @@ public class JobPostingDAO extends DBContext {
                 }
             }
         } catch (SQLException e) {
-            System.err.println("Error in getJobPostingById: " + e.getMessage());
+            System.err.println("Error in getJobPostingById with JOINs: " + e.getMessage());
             e.printStackTrace();
+            
+            // If JOIN fails, try simple query without JOINs
+            System.out.println("Trying getJobPostingById without JOINs...");
+            String simpleSql = "SELECT * FROM job_postings WHERE job_id = ?";
+            
+            try (PreparedStatement ps = connection.prepareStatement(simpleSql)) {
+                ps.setInt(1, jobId);
+                
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        return mapJobPostingSimple(rs);
+                    }
+                }
+            } catch (SQLException e2) {
+                System.err.println("Error in getJobPostingById without JOINs: " + e2.getMessage());
+                e2.printStackTrace();
+            }
         }
         
         return null;

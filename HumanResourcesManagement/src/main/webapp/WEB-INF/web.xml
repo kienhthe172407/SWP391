@@ -66,21 +66,21 @@
     </servlet-mapping>
     
     <servlet>
+        <servlet-name>ViewJobPostingDetailServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.ViewJobPostingDetailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewJobPostingDetailServlet</servlet-name>
+        <url-pattern>/job-postings/detail</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
         <servlet-name>DeleteJobPostingServlet</servlet-name>
         <servlet-class>controller.jobPostingMgt.DeleteJobPostingServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>DeleteJobPostingServlet</servlet-name>
         <url-pattern>/job-postings/delete</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
-        <servlet-name>TestJobPostingServlet</servlet-name>
-        <servlet-class>controller.jobPostingMgt.TestJobPostingServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>TestJobPostingServlet</servlet-name>
-        <url-pattern>/job-postings/test</url-pattern>
     </servlet-mapping>
     
     <!-- Development Tools section removed -->
