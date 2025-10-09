@@ -1,0 +1,170 @@
+package dao;
+
+import model.Employee;
+import util.DBConnection;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+public class EmployeeDAO {
+
+    
+    public List<Employee> getAllEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        String sql = "SELECT * FROM employees ORDER BY id DESC";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                Employee emp = new Employee();
+                emp.setId(rs.getInt("id"));
+                emp.setEmployeeCode(rs.getString("employee_code"));
+                emp.setFullName(rs.getString("full_name"));
+                emp.setDateOfBirth(rs.getDate("date_of_birth"));
+                emp.setGender(rs.getString("gender"));
+                emp.setEmail(rs.getString("email"));
+                emp.setPhone(rs.getString("phone"));
+                emp.setAddress(rs.getString("address"));
+                emp.setPosition(rs.getString("position"));
+                emp.setDepartment(rs.getString("department"));
+                emp.setHireDate(rs.getDate("hire_date"));
+                emp.setSalary(rs.getBigDecimal("salary"));
+                emp.setStatus(rs.getString("status"));
+                employees.add(emp);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return employees;
+    }
+
+    
+    public Employee getEmployeeById(int id) {
+        Employee emp = null;
+        String sql = "SELECT * FROM employees WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                emp = new Employee();
+                emp.setId(rs.getInt("id"));
+                emp.setEmployeeCode(rs.getString("employee_code"));
+                emp.setFullName(rs.getString("full_name"));
+                emp.setDateOfBirth(rs.getDate("date_of_birth"));
+                emp.setGender(rs.getString("gender"));
+                emp.setEmail(rs.getString("email"));
+                emp.setPhone(rs.getString("phone"));
+                emp.setAddress(rs.getString("address"));
+                emp.setPosition(rs.getString("position"));
+                emp.setDepartment(rs.getString("department"));
+                emp.setHireDate(rs.getDate("hire_date"));
+                emp.setSalary(rs.getBigDecimal("salary"));
+                emp.setStatus(rs.getString("status"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return emp;
+    }
+
+   
+    public boolean addEmployee(Employee emp) {
+        String sql = "INSERT INTO employees (employee_code, full_name, date_of_birth, gender, " +
+                    "email, phone, address, position, department, hire_date, salary, status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, emp.getEmployeeCode());
+            ps.setString(2, emp.getFullName());
+            ps.setDate(3, emp.getDateOfBirth());
+            ps.setString(4, emp.getGender());
+            ps.setString(5, emp.getEmail());
+            ps.setString(6, emp.getPhone());
+            ps.setString(7, emp.getAddress());
+            ps.setString(8, emp.getPosition());
+            ps.setString(9, emp.getDepartment());
+            ps.setDate(10, emp.getHireDate());
+            ps.setBigDecimal(11, emp.getSalary());
+            ps.setString(12, emp.getStatus());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    public boolean updateEmployee(Employee emp) {
+        String sql = "UPDATE employees SET employee_code = ?, full_name = ?, date_of_birth = ?, " +
+                    "gender = ?, email = ?, phone = ?, address = ?, position = ?, department = ?, " +
+                    "hire_date = ?, salary = ?, status = ? WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, emp.getEmployeeCode());
+            ps.setString(2, emp.getFullName());
+            ps.setDate(3, emp.getDateOfBirth());
+            ps.setString(4, emp.getGender());
+            ps.setString(5, emp.getEmail());
+            ps.setString(6, emp.getPhone());
+            ps.setString(7, emp.getAddress());
+            ps.setString(8, emp.getPosition());
+            ps.setString(9, emp.getDepartment());
+            ps.setDate(10, emp.getHireDate());
+            ps.setBigDecimal(11, emp.getSalary());
+            ps.setString(12, emp.getStatus());
+            ps.setInt(13, emp.getId());
+            
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    public boolean deleteEmployee(int id) {
+        String sql = "DELETE FROM employees WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setInt(1, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    
+    public boolean isEmployeeCodeExists(String employeeCode, int excludeId) {
+        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ? AND id != ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, employeeCode);
+            ps.setInt(2, excludeId);
+            ResultSet rs = ps.executeQuery();
+            
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+}
