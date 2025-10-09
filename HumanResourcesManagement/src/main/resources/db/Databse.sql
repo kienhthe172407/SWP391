@@ -87,7 +87,8 @@ CREATE TABLE employees (
     INDEX idx_full_name (first_name, last_name),               -- Index cho tìm kiếm họ tên
     INDEX idx_department (department_id),                      -- Index cho lọc theo phòng ban
     INDEX idx_position (position_id),                          -- Index cho lọc theo chức vụ
-    INDEX idx_employment_status (employment_status)            -- Index cho lọc theo trạng thái
+    INDEX idx_employment_status (employment_status),           -- Index cho lọc theo trạng thái
+    FULLTEXT INDEX ft_employee_search (first_name, last_name, employee_code) -- FULLTEXT index cho tìm kiếm toàn văn
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -291,7 +292,8 @@ CREATE TABLE employment_contracts (
     INDEX idx_employee (employee_id),                          -- Index cho lọc theo nhân viên
     INDEX idx_contract_number (contract_number),               -- Index cho tìm kiếm số HĐ
     INDEX idx_contract_status (contract_status),               -- Index cho lọc theo trạng thái
-    INDEX idx_dates (start_date, end_date)                     -- Index cho lọc theo thời gian
+    INDEX idx_dates (start_date, end_date),                    -- Index cho lọc theo thời gian
+    FULLTEXT INDEX ft_contract_search (contract_number, job_description) -- FULLTEXT index cho tìm kiếm toàn văn (không bao gồm contract_type vì là ENUM)
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -1734,3 +1736,6 @@ SELECT 'Total tables: 25' AS final_count;
 SELECT 'Total views: 9 (added 1 more)' AS final_count;
 SELECT 'Total stored procedures: 7 (added 2 more)' AS final_count;
 SELECT 'System now fully supports all 67 use cases!' AS final_status;
+
+-- Note: FULLTEXT indexes đã được thêm vào các bảng employees và employment_contracts
+-- Các indexes này hỗ trợ tìm kiếm MATCH...AGAINST trong Boolean mode được sử dụng trong các hàm tìm kiếm

@@ -195,7 +195,14 @@ public class ContractDAO extends DBContext {
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR c.contract_type LIKE ? OR e.employee_code LIKE ?) ");
+            sql.append("AND ( " +
+                "MATCH(e.first_name, e.last_name, e.employee_code) AGAINST (? IN BOOLEAN MODE) " +
+                " OR MATCH(c.contract_number, c.job_description) AGAINST (? IN BOOLEAN MODE) " +
+                " OR CONCAT(e.first_name, ' ', e.last_name) LIKE ? " +
+                " OR c.contract_type LIKE ? " +
+                " OR c.contract_number LIKE ? " +
+                " OR e.employee_code LIKE ? " +
+            ") ");
         }
         
         if (status != null && !status.trim().isEmpty()) {
@@ -208,10 +215,14 @@ public class ContractDAO extends DBContext {
             int paramIndex = 1;
             
             if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword.trim() + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
+                String booleanPattern = "+" + keyword.trim() + "*";
+                String likePattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, booleanPattern);
+                ps.setString(paramIndex++, booleanPattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
             }
             
             if (status != null && !status.trim().isEmpty()) {
@@ -258,7 +269,14 @@ public class ContractDAO extends DBContext {
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR c.contract_type LIKE ? OR e.employee_code LIKE ?) ");
+            sql.append("AND ( " +
+                "MATCH(e.first_name, e.last_name, e.employee_code) AGAINST (? IN BOOLEAN MODE) " +
+                " OR MATCH(c.contract_number, c.job_description) AGAINST (? IN BOOLEAN MODE) " +
+                " OR CONCAT(e.first_name, ' ', e.last_name) LIKE ? " +
+                " OR c.contract_type LIKE ? " +
+                " OR c.contract_number LIKE ? " +
+                " OR e.employee_code LIKE ? " +
+            ") ");
         }
         
         if (status != null && !status.trim().isEmpty()) {
@@ -272,10 +290,14 @@ public class ContractDAO extends DBContext {
             int paramIndex = 1;
             
             if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword.trim() + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
+                String booleanPattern = "+" + keyword.trim() + "*";
+                String likePattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, booleanPattern);
+                ps.setString(paramIndex++, booleanPattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
             }
             
             if (status != null && !status.trim().isEmpty()) {
@@ -313,7 +335,12 @@ public class ContractDAO extends DBContext {
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
-            sql.append("AND (CONCAT(e.first_name, ' ', e.last_name) LIKE ? OR c.contract_type LIKE ? OR e.employee_code LIKE ?) ");
+            sql.append("AND ( " +
+                "MATCH(e.first_name, e.last_name, c.contract_type, e.employee_code, c.job_description) AGAINST (? IN BOOLEAN MODE) " +
+                " OR CONCAT(e.first_name, ' ', e.last_name) LIKE ? " +
+                " OR c.contract_type LIKE ? " +
+                " OR e.employee_code LIKE ? " +
+            ") ");
         }
         
         if (status != null && !status.trim().isEmpty()) {
@@ -324,10 +351,11 @@ public class ContractDAO extends DBContext {
             int paramIndex = 1;
             
             if (keyword != null && !keyword.trim().isEmpty()) {
-                String searchPattern = "%" + keyword.trim() + "%";
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
-                ps.setString(paramIndex++, searchPattern);
+                ps.setString(paramIndex++, "+" + keyword.trim() + "*");
+                String likePattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
             }
             
             if (status != null && !status.trim().isEmpty()) {
