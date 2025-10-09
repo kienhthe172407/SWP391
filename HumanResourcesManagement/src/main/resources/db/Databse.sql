@@ -324,7 +324,8 @@ CREATE TABLE job_postings (
     INDEX idx_job_title (job_title),                           -- Index cho tìm kiếm tiêu đề
     INDEX idx_department (department_id),                      -- Index cho lọc theo phòng ban
     INDEX idx_job_status (job_status),                         -- Index cho lọc theo trạng thái
-    INDEX idx_posted_date (posted_date)                        -- Index cho lọc theo ngày đăng
+    INDEX idx_posted_date (posted_date),                       -- Index cho lọc theo ngày đăng
+    FULLTEXT INDEX ft_job_posting_search (job_title, job_description, requirements) -- FULLTEXT index cho tìm kiếm toàn văn
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -525,7 +526,19 @@ INSERT INTO users (username, password_hash, email, role, status, created_by) VAL
 ('jennifer.thomas', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jennifer.thomas@company.com', 'Employee', 'Active', 1),
 ('james.martinez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'james.martinez@company.com', 'Employee', 'Active', 1),
 ('mary.garcia', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mary.garcia@company.com', 'Employee', 'Active', 1),
-('william.rodriguez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'william.rodriguez@company.com', 'Employee', 'Inactive', 1);
+('william.rodriguez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'william.rodriguez@company.com', 'Employee', 'Inactive', 1),
+
+-- Additional user accounts created by Admin (without employee records yet - for testing Create Employee functionality)
+('alex.chen', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'alex.chen@company.com', 'Employee', 'Active', 1),
+('sophia.kim', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sophia.kim@company.com', 'Employee', 'Active', 1),
+('daniel.lee', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'daniel.lee@company.com', 'Dept Manager', 'Active', 1),
+('rachel.white', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'rachel.white@company.com', 'Employee', 'Active', 1),
+('kevin.park', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'kevin.park@company.com', 'Employee', 'Active', 1),
+('amanda.jones', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'amanda.jones@company.com', 'HR', 'Active', 1),
+('ryan.miller', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ryan.miller@company.com', 'Employee', 'Active', 1),
+('jessica.clark', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jessica.clark@company.com', 'Employee', 'Active', 1),
+('brandon.hall', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'brandon.hall@company.com', 'Dept Manager', 'Active', 1),
+('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', 'Employee', 'Active', 1);
 
 -- ==============================================================================
 -- INSERT DATA: departments
@@ -1755,5 +1768,13 @@ SELECT 'Total views: 9 (added 1 more)' AS final_count;
 SELECT 'Total stored procedures: 7 (added 2 more)' AS final_count;
 SELECT 'System now fully supports all 67 use cases!' AS final_status;
 
--- Note: FULLTEXT indexes đã được thêm vào các bảng employees và employment_contracts
+-- Note: FULLTEXT indexes đã được thêm vào các bảng employees, employment_contracts, và job_postings
 -- Các indexes này hỗ trợ tìm kiếm MATCH...AGAINST trong Boolean mode được sử dụng trong các hàm tìm kiếm
+--
+-- FULLTEXT indexes:
+-- - employees: ft_employee_search (first_name, last_name, employee_code)
+-- - employment_contracts: ft_contract_search (contract_number, job_description)
+-- - job_postings: ft_job_posting_search (job_title, job_description, requirements)
+--
+-- Additional test user accounts (user_id 16-25) have been added without employee records
+-- for testing the Create Employee functionality where HR links employee info to existing user accounts

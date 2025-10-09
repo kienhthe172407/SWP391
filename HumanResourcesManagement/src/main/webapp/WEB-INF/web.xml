@@ -153,5 +153,14 @@
         <url-pattern>/employees/list</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>AddEmployeeInformationServlet</servlet-name>
+        <servlet-class>controller.employeeMgt.AddEmployeeInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AddEmployeeInformationServlet</servlet-name>
+        <url-pattern>/employees/addInformation</url-pattern>
+    </servlet-mapping>
+
     <!-- Development Tools section removed -->
 </web-app>

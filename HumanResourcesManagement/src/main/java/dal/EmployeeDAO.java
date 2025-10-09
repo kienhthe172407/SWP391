@@ -234,6 +234,217 @@ public class EmployeeDAO extends DBContext {
     }
 
     /**
+     * Create a new employee record
+     * @param employee Employee object with data
+     * @return boolean success
+     */
+    public boolean createEmployee(Employee employee) {
+        String sql = "INSERT INTO employees (user_id, employee_code, first_name, last_name, " +
+                    "date_of_birth, gender, phone_number, personal_email, home_address, " +
+                    "emergency_contact_name, emergency_contact_phone, department_id, position_id, " +
+                    "manager_id, hire_date, employment_status) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            // Set user_id (can be null)
+            if (employee.getUserID() != null) {
+                ps.setInt(1, employee.getUserID());
+            } else {
+                ps.setNull(1, java.sql.Types.INTEGER);
+            }
+
+            ps.setString(2, employee.getEmployeeCode());
+            ps.setString(3, employee.getFirstName());
+            ps.setString(4, employee.getLastName());
+
+            // Set date_of_birth (can be null)
+            if (employee.getDateOfBirth() != null) {
+                ps.setDate(5, employee.getDateOfBirth());
+            } else {
+                ps.setNull(5, java.sql.Types.DATE);
+            }
+
+            ps.setString(6, employee.getGender());
+            ps.setString(7, employee.getPhoneNumber());
+            ps.setString(8, employee.getPersonalEmail());
+            ps.setString(9, employee.getHomeAddress());
+            ps.setString(10, employee.getEmergencyContactName());
+            ps.setString(11, employee.getEmergencyContactPhone());
+
+            // Set department_id (can be null)
+            if (employee.getDepartmentID() != null) {
+                ps.setInt(12, employee.getDepartmentID());
+            } else {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            }
+
+            // Set position_id (can be null)
+            if (employee.getPositionID() != null) {
+                ps.setInt(13, employee.getPositionID());
+            } else {
+                ps.setNull(13, java.sql.Types.INTEGER);
+            }
+
+            // Set manager_id (can be null)
+            if (employee.getManagerID() != null) {
+                ps.setInt(14, employee.getManagerID());
+            } else {
+                ps.setNull(14, java.sql.Types.INTEGER);
+            }
+
+            // Set hire_date (can be null, but default to current date)
+            if (employee.getHireDate() != null) {
+                ps.setDate(15, employee.getHireDate());
+            } else {
+                // Default to current date if not provided
+                ps.setDate(15, new java.sql.Date(System.currentTimeMillis()));
+            }
+
+            ps.setString(16, employee.getEmploymentStatus() != null ? employee.getEmploymentStatus() : "Active");
+
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows > 0) {
+                // Get generated employee ID
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        employee.setEmployeeID(generatedKeys.getInt(1));
+                    }
+                }
+                return true;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in createEmployee: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check if employee code already exists
+     * @param employeeCode Employee code to check
+     * @return boolean true if exists
+     */
+    public boolean isEmployeeCodeExists(String employeeCode) {
+        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, employeeCode);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in isEmployeeCodeExists: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Get all employees for manager dropdown (excluding the employee being created/edited)
+     * @param excludeEmployeeId Employee ID to exclude (can be null)
+     * @return List<Employee>
+     */
+    public List<Employee> getAllEmployeesForManagerDropdown(Integer excludeEmployeeId) {
+        List<Employee> employees = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT employee_id, employee_code, first_name, last_name, department_id, position_id " +
+            "FROM employees WHERE employment_status = 'Active'"
+        );
+
+        if (excludeEmployeeId != null) {
+            sql.append(" AND employee_id != ?");
+        }
+
+        sql.append(" ORDER BY first_name, last_name");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            if (excludeEmployeeId != null) {
+                ps.setInt(1, excludeEmployeeId);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Employee employee = new Employee();
+                    employee.setEmployeeID(rs.getInt("employee_id"));
+                    employee.setEmployeeCode(rs.getString("employee_code"));
+                    employee.setFirstName(rs.getString("first_name"));
+                    employee.setLastName(rs.getString("last_name"));
+                    employee.setDepartmentID((Integer) rs.getObject("department_id"));
+                    employee.setPositionID((Integer) rs.getObject("position_id"));
+                    employees.add(employee);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getAllEmployeesForManagerDropdown: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return employees;
+    }
+
+    /**
+     * Get all users without employee records (for linking new employees to existing user accounts)
+     * @return List<User> users that don't have employee records yet
+     */
+    public List<model.User> getUsersWithoutEmployeeRecords() {
+        List<model.User> users = new ArrayList<>();
+        String sql = "SELECT u.user_id, u.username, u.email, u.role " +
+                     "FROM users u " +
+                     "LEFT JOIN employees e ON u.user_id = e.user_id " +
+                     "WHERE e.user_id IS NULL AND u.status = 'Active' " +
+                     "AND u.role IN ('Employee', 'Dept Manager', 'HR', 'HR Manager') " +
+                     "ORDER BY u.username";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                model.User user = new model.User();
+                user.setUserId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getUsersWithoutEmployeeRecords: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return users;
+    }
+
+    /**
+     * Check if user already has an employee record
+     * @param userId User ID to check
+     * @return boolean true if user already has employee record
+     */
+    public boolean isUserAlreadyLinkedToEmployee(int userId) {
+        String sql = "SELECT COUNT(*) FROM employees WHERE user_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in isUserAlreadyLinkedToEmployee: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
      * Helper method to map ResultSet to Employee object
      * @param rs ResultSet from query
      * @return Employee object

@@ -72,6 +72,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="${pageContext.request.contextPath}/employees/create">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Employee Info</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="#">
                             <i class="fas fa-user-plus"></i>
                             <span>Recruitment</span>

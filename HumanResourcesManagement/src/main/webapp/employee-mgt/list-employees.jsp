@@ -94,6 +94,12 @@
                         </a>
                     </li>
                     <li>
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Employee Info</span>
+                        </a>
+                    </li>
+                    <li>
                         <a href="${pageContext.request.contextPath}/job-postings/list">
                             <i class="fas fa-user-plus"></i>
                             <span>Recruitment</span>
@@ -162,6 +168,12 @@
                         <a href="${pageContext.request.contextPath}/employees/list" class="active">
                             <i class="fas fa-users"></i>
                             <span>All Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Employee Info</span>
                         </a>
                     </li>
                     <li>
@@ -246,6 +258,11 @@
         <div class="top-header">
             <h1>Employee Records Management</h1>
             <div class="user-info">
+                <c:if test="${sessionScope.userRole == 'HR Manager' || sessionScope.userRole == 'HR'}">
+                    <a href="${pageContext.request.contextPath}/employees/addInformation" class="btn btn-primary me-3">
+                        <i class="fas fa-user-plus"></i> Add Employee Info
+                    </a>
+                </c:if>
                 <span>HR Management</span>
                 <div class="avatar">HR</div>
             </div>
@@ -254,7 +271,7 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Home</a></li>
+                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="#">Employee Management</a></li>
                 <li class="breadcrumb-item active">All Employees</li>
             </ol>

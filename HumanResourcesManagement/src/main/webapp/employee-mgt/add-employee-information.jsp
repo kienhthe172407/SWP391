@@ -1,0 +1,578 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Employee Information - HR Management System</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Global CSS -->
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    
+    <style>
+        .form-section {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section h5 {
+            margin-bottom: 1.5rem;
+            color: #0d6efd;
+        }
+        
+        .required-field::after {
+            content: "*";
+            color: red;
+            margin-left: 4px;
+        }
+        
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545;
+        }
+        
+        .btn-group-custom {
+            gap: 10px;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h4>HR Management</h4>
+            <p>Human Resources System</p>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li class="menu-section">Dashboard</li>
+            <li>
+                <a href="${pageContext.request.contextPath}/">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+
+            <li class="menu-section">HR Management</li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-users-cog"></i>
+                    <span>HR Staff Management</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-tasks"></i>
+                    <span>Task Assignment</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-clipboard-check"></i>
+                    <span>Approval Queue</span>
+                </a>
+            </li>
+
+            <li class="menu-section">Employee Management</li>
+            <li>
+                <a href="${pageContext.request.contextPath}/employees/list">
+                    <i class="fas fa-users"></i>
+                    <span>All Employees</span>
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/employees/addInformation" class="active">
+                    <i class="fas fa-user-plus"></i>
+                    <span>Add Employee</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-briefcase"></i>
+                    <span>Departments</span>
+                </a>
+            </li>
+
+            <li class="menu-section">Contract & Attendance</li>
+            <li>
+                <a href="${pageContext.request.contextPath}/contracts/list">
+                    <i class="fas fa-file-contract"></i>
+                    <span>Contracts</span>
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/contracts/create">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Create Contract</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-clock"></i>
+                    <span>Attendance</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Leave Requests</span>
+                </a>
+            </li>
+
+            <li class="menu-section">Job Posting Management</li>
+            <li>
+                <a href="${pageContext.request.contextPath}/job-postings/list">
+                    <i class="fas fa-briefcase"></i>
+                    <span>All Job Postings</span>
+                </a>
+            </li>
+            <li>
+                <a href="${pageContext.request.contextPath}/job-postings/create">
+                    <i class="fas fa-plus-circle"></i>
+                    <span>Create Job Posting</span>
+                </a>
+            </li>
+
+            <li class="menu-section">Payroll & Benefits</li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Payroll</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-gift"></i>
+                    <span>Benefits</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-award"></i>
+                    <span>Bonuses</span>
+                </a>
+            </li>
+
+            <li class="menu-section">Reports & Analytics</li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-chart-bar"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+
+            <li class="menu-section">System</li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-users-cog"></i>
+                    <span>User Management</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Top Header -->
+        <div class="top-header">
+            <h1>Create New Employee</h1>
+            <div class="user-info">
+                <a href="${pageContext.request.contextPath}/employees/addInformation" class="btn btn-primary me-3">
+                    <i class="fas fa-user-plus"></i> Add Employee
+                </a>
+                <span>HR Management</span>
+                <div class="avatar">HR</div>
+            </div>
+        </div>
+
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Dashboard</a></li>
+                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/employees/list">Employee Management</a></li>
+                <li class="breadcrumb-item active">Create Employee</li>
+            </ol>
+        </nav>
+
+        <!-- Content Area -->
+        <div class="content-area">
+
+                <!-- Success/Error Messages -->
+                <c:if test="${not empty sessionScope.successMessage}">
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <i class="fas fa-check-circle"></i> ${sessionScope.successMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <c:remove var="successMessage" scope="session"/>
+                </c:if>
+
+                <c:if test="${not empty sessionScope.errorMessage}">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <i class="fas fa-exclamation-circle"></i> ${sessionScope.errorMessage}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                    <c:remove var="errorMessage" scope="session"/>
+                </c:if>
+
+                <!-- Create Employee Form -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-user-plus"></i> Employee Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="createEmployeeForm" method="post" action="${pageContext.request.contextPath}/employees/addInformation">
+                            
+                            <!-- User Account Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-user-circle"></i> User Account Linking</h5>
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="mb-3">
+                                            <label for="userId" class="form-label required-field">Select User Account</label>
+                                            <select class="form-select" id="userId" name="userId" required>
+                                                <option value="">Select a user account created by Admin</option>
+                                                <c:choose>
+                                                    <c:when test="${not empty availableUsers}">
+                                                        <c:forEach var="user" items="${availableUsers}">
+                                                            <option value="${user.userId}">
+                                                                ${user.username} - ${user.email} (${user.roleDisplayName})
+                                                            </option>
+                                                        </c:forEach>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <option value="" disabled>No available user accounts found</option>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </select>
+                                            <div class="error-message" id="userIdError">Please select a user account.</div>
+                                            <c:choose>
+                                                <c:when test="${not empty availableUsers}">
+                                                    <div class="form-text">
+                                                        <i class="fas fa-info-circle"></i>
+                                                        Only user accounts created by Admin that don't have employee records are shown.
+                                                    </div>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <div class="form-text text-warning">
+                                                        <i class="fas fa-exclamation-triangle"></i>
+                                                        No user accounts are available. Please ask Admin to create user accounts first.
+                                                    </div>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Basic Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-user"></i> Basic Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="employeeCode" class="form-label required-field">Employee Code</label>
+                                            <input type="text" class="form-control" id="employeeCode" name="employeeCode"
+                                                   value="${defaultEmployeeCode}" required>
+                                            <div class="error-message" id="employeeCodeError">Employee code is required.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="employmentStatus" class="form-label">Employment Status</label>
+                                            <select class="form-select" id="employmentStatus" name="employmentStatus">
+                                                <option value="Active" selected>Active</option>
+                                                <option value="On Leave">On Leave</option>
+                                                <option value="Terminated">Terminated</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="firstName" class="form-label required-field">First Name</label>
+                                            <input type="text" class="form-control" id="firstName" name="firstName" required>
+                                            <div class="error-message" id="firstNameError">First name is required.</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="lastName" class="form-label required-field">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName" name="lastName" required>
+                                            <div class="error-message" id="lastNameError">Last name is required.</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="dateOfBirth" class="form-label">Date of Birth</label>
+                                            <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="gender" class="form-label">Gender</label>
+                                            <select class="form-select" id="gender" name="gender">
+                                                <option value="">Select Gender</option>
+                                                <option value="Male">Male</option>
+                                                <option value="Female">Female</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Contact Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-address-book"></i> Contact Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="phoneNumber" class="form-label">Phone Number</label>
+                                            <input type="tel" class="form-control" id="phoneNumber" name="phoneNumber">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="personalEmail" class="form-label">Personal Email</label>
+                                            <input type="email" class="form-control" id="personalEmail" name="personalEmail">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="homeAddress" class="form-label">Home Address</label>
+                                    <textarea class="form-control" id="homeAddress" name="homeAddress" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="emergencyContactName" class="form-label">Emergency Contact Name</label>
+                                            <input type="text" class="form-control" id="emergencyContactName" name="emergencyContactName">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="emergencyContactPhone" class="form-label">Emergency Contact Phone</label>
+                                            <input type="tel" class="form-control" id="emergencyContactPhone" name="emergencyContactPhone">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Job Information Section -->
+                            <div class="form-section">
+                                <h5><i class="fas fa-briefcase"></i> Job Information</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="departmentId" class="form-label">Department</label>
+                                            <select class="form-select" id="departmentId" name="departmentId">
+                                                <option value="">Select Department</option>
+                                                <c:forEach var="department" items="${departments}">
+                                                    <option value="${department.departmentId}">${department.departmentName}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="positionId" class="form-label">Position</label>
+                                            <select class="form-select" id="positionId" name="positionId">
+                                                <option value="">Select Position</option>
+                                                <c:forEach var="position" items="${positions}">
+                                                    <option value="${position.positionId}">${position.positionName}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="managerId" class="form-label">Manager</label>
+                                            <select class="form-select" id="managerId" name="managerId">
+                                                <option value="">Select Manager</option>
+                                                <c:forEach var="manager" items="${managers}">
+                                                    <option value="${manager.employeeID}">${manager.employeeCode} - ${manager.firstName} ${manager.lastName}</option>
+                                                </c:forEach>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="mb-3">
+                                            <label for="hireDate" class="form-label">Hire Date</label>
+                                            <input type="date" class="form-control" id="hireDate" name="hireDate" 
+                                                   value="<fmt:formatDate value='${currentDate}' pattern='yyyy-MM-dd'/>">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Form Actions -->
+                            <div class="d-flex justify-content-end btn-group-custom">
+                                <a href="${pageContext.request.contextPath}/employees/list" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i> Cancel
+                                </a>
+                                <c:choose>
+                                    <c:when test="${not empty availableUsers}">
+                                        <button type="button" id="submitBtn" class="btn btn-primary">
+                                            <i class="fas fa-save"></i> Add Employee Information
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="button" class="btn btn-primary" disabled>
+                                            <i class="fas fa-save"></i> Add Employee Information (No Users Available)
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('createEmployeeForm');
+            
+            // Set current date as default for hire date if not set
+            const hireDateInput = document.getElementById('hireDate');
+            if (!hireDateInput.value) {
+                const today = new Date().toISOString().split('T')[0];
+                hireDateInput.value = today;
+            }
+            
+            // Function to show error message
+            const showError = function(fieldId, show = true) {
+                const field = document.getElementById(fieldId);
+                const errorDiv = document.getElementById(fieldId + 'Error');
+                
+                if (show) {
+                    field.classList.add('is-invalid');
+                    if (errorDiv) errorDiv.style.display = 'block';
+                } else {
+                    field.classList.remove('is-invalid');
+                    if (errorDiv) errorDiv.style.display = 'none';
+                }
+            };
+            
+            // Function to validate the form
+            const validateForm = function() {
+                let isValid = true;
+                
+                // Clear all previous errors
+                document.querySelectorAll('.error-message').forEach(el => {
+                    el.style.display = 'none';
+                });
+                
+                document.querySelectorAll('.is-invalid').forEach(el => {
+                    el.classList.remove('is-invalid');
+                });
+                
+                // Check required fields
+                const userId = document.getElementById('userId').value;
+                if (!userId) {
+                    showError('userId', true);
+                    isValid = false;
+                }
+
+                const employeeCode = document.getElementById('employeeCode').value.trim();
+                if (!employeeCode) {
+                    showError('employeeCode', true);
+                    isValid = false;
+                }
+
+                const firstName = document.getElementById('firstName').value.trim();
+                if (!firstName) {
+                    showError('firstName', true);
+                    isValid = false;
+                }
+
+                const lastName = document.getElementById('lastName').value.trim();
+                if (!lastName) {
+                    showError('lastName', true);
+                    isValid = false;
+                }
+                
+                return isValid;
+            };
+            
+            // Button click validation
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.addEventListener('click', function() {
+                const isValid = validateForm();
+                
+                if (!isValid) {
+                    // Scroll to first error
+                    const firstError = document.querySelector('.is-invalid');
+                    if (firstError) {
+                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        firstError.focus();
+                    }
+                } else {
+                    // Validation passed - submit the form
+                    form.submit();
+                }
+            });
+            
+            // Auto-dismiss alerts after 5 seconds
+            setTimeout(function() {
+                const alerts = document.querySelectorAll('.alert');
+                alerts.forEach(function(alert) {
+                    const bsAlert = new bootstrap.Alert(alert);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
