@@ -68,7 +68,7 @@ public class EmployeeServlet extends HttpServlet {
         }
     }
 
-    // Hiển thị danh sách nhân viên
+    
     private void listEmployees(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Employee> employees = employeeDAO.getAllEmployees();
@@ -76,13 +76,13 @@ public class EmployeeServlet extends HttpServlet {
         request.getRequestDispatcher("/views/employee-list.jsp").forward(request, response);
     }
 
-    // Hiển thị form thêm nhân viên
+    
     private void showCreateForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         request.getRequestDispatcher("/views/employee-form.jsp").forward(request, response);
     }
 
-    // Hiển thị form sửa nhân viên
+    
     private void showEditForm(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
@@ -91,7 +91,7 @@ public class EmployeeServlet extends HttpServlet {
         request.getRequestDispatcher("/views/employee-form.jsp").forward(request, response);
     }
 
-    // Tạo nhân viên mới
+    
     private void createEmployee(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -132,7 +132,7 @@ public class EmployeeServlet extends HttpServlet {
         }
     }
 
-    // Cập nhật thông tin nhân viên
+    
     private void updateEmployee(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
@@ -174,7 +174,7 @@ public class EmployeeServlet extends HttpServlet {
         }
     }
 
-    // Xóa nhân viên
+    
     private void deleteEmployee(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
