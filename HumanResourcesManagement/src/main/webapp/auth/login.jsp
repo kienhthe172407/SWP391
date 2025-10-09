@@ -96,6 +96,9 @@
                                             <a href="${pageContext.request.contextPath}/auth/forgot-password.jsp">
                                                 <i class="fas fa-key me-1"></i> Quên mật khẩu?
                                             </a>
+                                            <a href="${pageContext.request.contextPath}/auth/register.jsp" class="ms-3">
+                                                <i class="fas fa-user-plus me-1"></i> Tạo tài khoản mới
+                                            </a>
                                         </div>
                                     </div>
                                 </div>
