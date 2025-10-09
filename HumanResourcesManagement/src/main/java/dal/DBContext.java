@@ -22,8 +22,10 @@ public abstract class DBContext {
             System.out.println("Connected to MySQL successfully.");
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "MySQL Driver not found.", ex);
+            throw new RuntimeException("MySQL JDBC Driver not found. Ensure mysql-connector-j is on the classpath.", ex);
         } catch (SQLException ex) {
             Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "Connection failed.", ex);
+            throw new RuntimeException("Failed to establish database connection. Check URL/credentials and that MySQL is running.", ex);
         }
     }
     
