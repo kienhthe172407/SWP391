@@ -17,7 +17,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 
 /**
- * Servlet to handle creating new employee records
+ * Servlet to handle adding employee information
  * Only accessible by HR and HR Manager roles
  */
 @WebServlet(name = "AddEmployeeInformationServlet", urlPatterns = {"/employees/addInformation"})
@@ -32,7 +32,7 @@ public class AddEmployeeInformationServlet extends HttpServlet {
     }
 
     /**
-     * Handle GET request - display employee creation form
+     * Handle GET request - display add employee information form
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -54,7 +54,7 @@ public class AddEmployeeInformationServlet extends HttpServlet {
         // Check if user has permission to create employee records
         String userRole = (String) session.getAttribute("userRole");
         if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR staff can create employee records.");
+            session.setAttribute("errorMessage", "Access denied. Only HR staff can add employee information.");
             response.sendRedirect(request.getContextPath() + "/employees/list");
             return;
         }
@@ -84,13 +84,13 @@ public class AddEmployeeInformationServlet extends HttpServlet {
         } catch (Exception e) {
             System.err.println("Error in AddEmployeeInformationServlet doGet: " + e.getMessage());
             e.printStackTrace();
-            session.setAttribute("errorMessage", "An error occurred while loading the create form.");
+            session.setAttribute("errorMessage", "An error occurred while loading the add employee information form.");
             response.sendRedirect(request.getContextPath() + "/employees/list");
         }
     }
 
     /**
-     * Handle POST request - process employee creation
+     * Handle POST request - process adding employee information
      * @param request servlet request
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
@@ -105,7 +105,7 @@ public class AddEmployeeInformationServlet extends HttpServlet {
         // Check if user has permission to create employee records
         String userRole = (String) session.getAttribute("userRole");
         if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR staff can create employee records.");
+            session.setAttribute("errorMessage", "Access denied. Only HR staff can add employee information.");
             response.sendRedirect(request.getContextPath() + "/employees/list");
             return;
         }
@@ -184,7 +184,10 @@ public class AddEmployeeInformationServlet extends HttpServlet {
             employee.setEmployeeCode(employeeCode.trim());
             employee.setFirstName(firstName.trim());
             employee.setLastName(lastName.trim());
-            employee.setGender(gender);
+            // Gender can be null, set it only if provided
+            if (gender != null && !gender.trim().isEmpty()) {
+                employee.setGender(gender);
+            }
             employee.setPhoneNumber(phoneNumber != null ? phoneNumber.trim() : null);
             employee.setPersonalEmail(personalEmail != null ? personalEmail.trim() : null);
             employee.setHomeAddress(homeAddress != null ? homeAddress.trim() : null);
@@ -232,14 +235,14 @@ public class AddEmployeeInformationServlet extends HttpServlet {
                 }
             }
 
-            // Create the employee
-            boolean success = employeeDAO.createEmployee(employee);
+            // Add employee information
+            boolean success = employeeDAO.addEmployeeInformation(employee);
 
             if (success) {
-                session.setAttribute("successMessage", "Employee '" + employee.getFirstName() + " " + employee.getLastName() + "' has been successfully created.");
+                session.setAttribute("successMessage", "Employee information for '" + employee.getFirstName() + " " + employee.getLastName() + "' has been successfully added.");
                 response.sendRedirect(request.getContextPath() + "/employees/list");
             } else {
-                session.setAttribute("errorMessage", "Failed to create employee. Please try again.");
+                session.setAttribute("errorMessage", "Failed to add employee information. Please try again.");
                 response.sendRedirect(request.getContextPath() + "/employees/addInformation");
             }
 
@@ -250,13 +253,13 @@ public class AddEmployeeInformationServlet extends HttpServlet {
         } catch (Exception e) {
             System.err.println("Error in AddEmployeeInformationServlet doPost: " + e.getMessage());
             e.printStackTrace();
-            session.setAttribute("errorMessage", "An error occurred while creating the employee.");
+            session.setAttribute("errorMessage", "An error occurred while adding employee information.");
             response.sendRedirect(request.getContextPath() + "/employees/addInformation");
         }
     }
 
     @Override
     public String getServletInfo() {
-        return "Create Employee Servlet";
+        return "Add Employee Information Servlet";
     }
 }

@@ -234,11 +234,11 @@ public class EmployeeDAO extends DBContext {
     }
 
     /**
-     * Create a new employee record
+     * Add employee information record
      * @param employee Employee object with data
      * @return boolean success
      */
-    public boolean createEmployee(Employee employee) {
+    public boolean addEmployeeInformation(Employee employee) {
         String sql = "INSERT INTO employees (user_id, employee_code, first_name, last_name, " +
                     "date_of_birth, gender, phone_number, personal_email, home_address, " +
                     "emergency_contact_name, emergency_contact_phone, department_id, position_id, " +
@@ -264,7 +264,12 @@ public class EmployeeDAO extends DBContext {
                 ps.setNull(5, java.sql.Types.DATE);
             }
 
-            ps.setString(6, employee.getGender());
+            // Set gender (can be null)
+            if (employee.getGender() != null) {
+                ps.setString(6, employee.getGender());
+            } else {
+                ps.setNull(6, java.sql.Types.VARCHAR);
+            }
             ps.setString(7, employee.getPhoneNumber());
             ps.setString(8, employee.getPersonalEmail());
             ps.setString(9, employee.getHomeAddress());
@@ -314,7 +319,7 @@ public class EmployeeDAO extends DBContext {
                 return true;
             }
         } catch (SQLException e) {
-            System.err.println("Error in createEmployee: " + e.getMessage());
+            System.err.println("Error in addEmployeeInformation: " + e.getMessage());
             e.printStackTrace();
         }
 

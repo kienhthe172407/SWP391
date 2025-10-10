@@ -480,7 +480,7 @@
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     
-    <script>
+        <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('createEmployeeForm');
             
@@ -518,7 +518,7 @@
                     el.classList.remove('is-invalid');
                 });
                 
-                // Check required fields
+                // Check required fields (only those marked with required-field class)
                 const userId = document.getElementById('userId').value;
                 if (!userId) {
                     showError('userId', true);
