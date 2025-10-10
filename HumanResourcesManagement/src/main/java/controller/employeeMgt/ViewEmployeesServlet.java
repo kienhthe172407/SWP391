@@ -5,6 +5,8 @@ import model.Employee;
 import model.Department;
 import model.Position;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -73,12 +75,51 @@ public class ViewEmployeesServlet extends HttpServlet {
         String department = request.getParameter("department");
         String position = request.getParameter("position");
         String status = request.getParameter("status");
+        
+        // Handle encoding/decoding of special characters in search parameters
+        if (keyword != null) {
+            keyword = keyword.trim();
+        }
 
         // Always set search params to preserve them in pagination links
         request.setAttribute("keyword", keyword != null ? keyword : "");
         request.setAttribute("department", department != null ? department : "");
         request.setAttribute("position", position != null ? position : "");
         request.setAttribute("status", status != null ? status : "");
+        
+        // Create a search query string for pagination links
+        StringBuilder searchQueryString = new StringBuilder();
+        try {
+            if (keyword != null && !keyword.isEmpty()) {
+                searchQueryString.append("&keyword=").append(URLEncoder.encode(keyword, "UTF-8"));
+            }
+            if (department != null && !department.isEmpty()) {
+                searchQueryString.append("&department=").append(department);
+            }
+            if (position != null && !position.isEmpty()) {
+                searchQueryString.append("&position=").append(position);
+            }
+            if (status != null && !status.isEmpty()) {
+                searchQueryString.append("&status=").append(status);
+            }
+        } catch (UnsupportedEncodingException e) {
+            System.err.println("Error encoding search parameters: " + e.getMessage());
+            // Fallback to non-encoded parameters
+            if (keyword != null && !keyword.isEmpty()) {
+                searchQueryString.append("&keyword=").append(keyword);
+            }
+            if (department != null && !department.isEmpty()) {
+                searchQueryString.append("&department=").append(department);
+            }
+            if (position != null && !position.isEmpty()) {
+                searchQueryString.append("&position=").append(position);
+            }
+            if (status != null && !status.isEmpty()) {
+                searchQueryString.append("&status=").append(status);
+            }
+        }
+        
+        request.setAttribute("searchQueryString", searchQueryString.toString());
 
         List<Employee> employees;
         int totalRecords;

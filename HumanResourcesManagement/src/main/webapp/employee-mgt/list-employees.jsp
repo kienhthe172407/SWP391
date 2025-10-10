@@ -44,6 +44,45 @@
             white-space: normal;
             display: inline-block;
         }
+        .terminated-employee {
+            background-color: rgba(220, 53, 69, 0.05);
+        }
+        .terminated-employee td {
+            color: #6c757d;
+        }
+        .terminated-employee strong {
+            text-decoration: line-through;
+            text-decoration-color: rgba(220, 53, 69, 0.5);
+            text-decoration-thickness: 1px;
+        }
+        .card-header {
+            background-color: #0d6efd;
+            color: white;
+        }
+        .search-form .form-label {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        .search-form .form-select,
+        .search-form .form-control {
+            border-radius: 0.375rem;
+            border: 1px solid #dee2e6;
+        }
+        .search-form .input-group-text {
+            border-right: 0;
+        }
+        .search-form .form-control:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .search-form .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .search-form .btn-outline-secondary {
+            color: #6c757d;
+            border-color: #6c757d;
+        }
     </style>
 </head>
 <body>
@@ -297,21 +336,22 @@
             </c:if>
             
             <!-- Search Card -->
-            <div class="card">
-                <div class="card-header">
-                    <i class="fas fa-search me-2"></i>Search & Filter Employees
-                </div>
-                <div class="card-body">
-                    <form action="${pageContext.request.contextPath}/employees/list" method="GET">
-                        <div class="row g-3">
+            <div class="card shadow-sm border-0 mb-4">
+                <div class="card-body py-4 px-4">
+                    <form class="search-form" action="${pageContext.request.contextPath}/employees/list" method="GET">
+                        <div class="row align-items-end g-3">
                             <div class="col-md-3">
-                                <label class="form-label">Keyword</label>
-                                <input type="text" name="keyword" class="form-control" 
-                                       placeholder="Name, employee code, email..." 
-                                       value="${keyword}">
+                                <label class="form-label fw-medium">Search</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-secondary"></i></span>
+                                    <input type="text" name="keyword" class="form-control border-start-0" 
+                                           placeholder="Name, code, email, phone..." 
+                                           value="${keyword}">
+                                </div>
+                                <!-- <div class="form-text small text-muted">Search across multiple fields</div> -->
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Department</label>
+                                <label class="form-label fw-medium">Department</label>
                                 <select name="department" class="form-select">
                                     <option value="">All Departments</option>
                                     <c:forEach var="deptOption" items="${departments}">
@@ -320,7 +360,7 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Position</label>
+                                <label class="form-label fw-medium">Position</label>
                                 <select name="position" class="form-select">
                                     <option value="">All Positions</option>
                                     <c:forEach var="posOption" items="${positions}">
@@ -329,20 +369,21 @@
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <label class="form-label">Status</label>
-                                <select name="status" class="form-select">
-                                    <option value="">All Status</option>
+                                <label class="form-label fw-medium">Employment Status</label>
+                                <select name="status" class="form-select" id="statusFilter">
+                                    <option value="">All Statuses</option>
                                     <c:forEach var="statusOption" items="${employmentStatuses}">
                                         <option value="${statusOption}" ${status == statusOption ? 'selected' : ''}>${statusOption}</option>
                                     </c:forEach>
+                                    <option value="!Terminated" ${status == '!Terminated' ? 'selected' : ''}>Hide Terminated</option>
                                 </select>
                             </div>
-                            <div class="col-md-3 d-flex align-items-end gap-2">
-                                <button type="submit" class="btn btn-primary">
+                            <div class="col-md-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary px-3 py-2">
                                     <i class="fas fa-search me-1"></i>Search
                                 </button>
-                                <a href="${pageContext.request.contextPath}/employees/list" class="btn btn-secondary">
-                                    <i class="fas fa-redo me-1"></i>Reset
+                                <a href="${pageContext.request.contextPath}/employees/list" class="btn btn-outline-secondary px-2 py-2">
+                                    <i class="fas fa-sync-alt me-1"></i>Reset
                                 </a>
                             </div>
                         </div>
@@ -385,7 +426,7 @@
                             </thead>
                             <tbody>
                                 <c:forEach var="employee" items="${employees}">
-                                    <tr>
+                                    <tr class="${employee.employmentStatus == 'Terminated' ? 'terminated-employee' : ''}">
                                         <td>
                                             <strong>#${employee.employeeID}</strong>
                                             <c:if test="${employee.employeeCode != null}">
@@ -518,7 +559,7 @@
                         <c:choose>
                             <c:when test="${currentPage > 1}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage - 1}&keyword=${keyword}&department=${department}&position=${position}&status=${status}">
+                                    <a class="page-link" href="?page=${currentPage - 1}${searchQueryString}">
                                         <i class="fas fa-chevron-left"></i> Previous
                                     </a>
                                 </li>
@@ -540,7 +581,7 @@
                                 </c:when>
                                 <c:otherwise>
                                     <li class="page-item">
-                                        <a class="page-link" href="?page=${pageNum}&keyword=${keyword}&department=${department}&position=${position}&status=${status}">${pageNum}</a>
+                                        <a class="page-link" href="?page=${pageNum}${searchQueryString}">${pageNum}</a>
                                     </li>
                                 </c:otherwise>
                             </c:choose>
@@ -550,7 +591,7 @@
                         <c:choose>
                             <c:when test="${currentPage < totalPages}">
                                 <li class="page-item">
-                                    <a class="page-link" href="?page=${currentPage + 1}&keyword=${keyword}&department=${department}&position=${position}&status=${status}">
+                                    <a class="page-link" href="?page=${currentPage + 1}${searchQueryString}">
                                         Next <i class="fas fa-chevron-right"></i>
                                     </a>
                                 </li>

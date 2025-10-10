@@ -171,11 +171,28 @@ public class EmployeeDAO extends DBContext {
         );
 
         if (keyword != null && !keyword.trim().isEmpty()) {
+            // Split keywords for better full-text search
+            String[] keywords = keyword.trim().split("\\s+");
+            StringBuilder fullTextQuery = new StringBuilder();
+            
+            // Build full-text search query with boolean operators
+            for (String word : keywords) {
+                if (fullTextQuery.length() > 0) {
+                    fullTextQuery.append(" +");
+                }
+                fullTextQuery.append(word).append("*");
+            }
+            
             sql.append("AND ( " +
+                // Full-text search on indexed fields
                 "MATCH(e.first_name, e.last_name, e.employee_code) AGAINST (? IN BOOLEAN MODE) " +
+                // Fallback to LIKE searches for better coverage
                 " OR CONCAT(e.first_name, ' ', e.last_name) LIKE ? " +
                 " OR e.employee_code LIKE ? " +
                 " OR e.personal_email LIKE ? " +
+                " OR e.phone_number LIKE ? " +
+                " OR d.department_name LIKE ? " +
+                " OR p.position_name LIKE ? " +
             ") ");
         }
 
@@ -188,7 +205,11 @@ public class EmployeeDAO extends DBContext {
         }
 
         if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND e.employment_status = ? ");
+            if (status.equals("!Terminated")) {
+                sql.append("AND e.employment_status != 'Terminated' ");
+            } else {
+                sql.append("AND e.employment_status = ? ");
+            }
         }
 
         sql.append("ORDER BY e.created_at DESC, e.employee_id DESC LIMIT ? OFFSET ?");
@@ -197,8 +218,25 @@ public class EmployeeDAO extends DBContext {
             int paramIndex = 1;
 
             if (keyword != null && !keyword.trim().isEmpty()) {
-                ps.setString(paramIndex++, "+" + keyword.trim() + "*");
+                // Use the constructed full-text search query
+                String[] keywords = keyword.trim().split("\\s+");
+                StringBuilder fullTextQuery = new StringBuilder();
+                
+                // Build full-text search query with boolean operators
+                for (String word : keywords) {
+                    if (fullTextQuery.length() > 0) {
+                        fullTextQuery.append(" +");
+                    }
+                    fullTextQuery.append(word).append("*");
+                }
+                
+                ps.setString(paramIndex++, fullTextQuery.toString());
+                
+                // Set LIKE parameters for broader matching
                 String likePattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
                 ps.setString(paramIndex++, likePattern);
                 ps.setString(paramIndex++, likePattern);
                 ps.setString(paramIndex++, likePattern);
@@ -212,7 +250,7 @@ public class EmployeeDAO extends DBContext {
                 ps.setInt(paramIndex++, Integer.parseInt(position));
             }
 
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !status.equals("!Terminated")) {
                 ps.setString(paramIndex++, status);
             }
 
@@ -504,11 +542,28 @@ public class EmployeeDAO extends DBContext {
         );
 
         if (keyword != null && !keyword.trim().isEmpty()) {
+            // Split keywords for better full-text search
+            String[] keywords = keyword.trim().split("\\s+");
+            StringBuilder fullTextQuery = new StringBuilder();
+            
+            // Build full-text search query with boolean operators
+            for (String word : keywords) {
+                if (fullTextQuery.length() > 0) {
+                    fullTextQuery.append(" +");
+                }
+                fullTextQuery.append(word).append("*");
+            }
+            
             sql.append("AND ( " +
+                // Full-text search on indexed fields
                 "MATCH(e.first_name, e.last_name, e.employee_code) AGAINST (? IN BOOLEAN MODE) " +
+                // Fallback to LIKE searches for better coverage
                 " OR CONCAT(e.first_name, ' ', e.last_name) LIKE ? " +
                 " OR e.employee_code LIKE ? " +
                 " OR e.personal_email LIKE ? " +
+                " OR e.phone_number LIKE ? " +
+                " OR d.department_name LIKE ? " +
+                " OR p.position_name LIKE ? " +
             ") ");
         }
 
@@ -521,15 +576,36 @@ public class EmployeeDAO extends DBContext {
         }
 
         if (status != null && !status.trim().isEmpty()) {
-            sql.append("AND e.employment_status = ? ");
+            if (status.equals("!Terminated")) {
+                sql.append("AND e.employment_status != 'Terminated' ");
+            } else {
+                sql.append("AND e.employment_status = ? ");
+            }
         }
 
         try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
             int paramIndex = 1;
 
             if (keyword != null && !keyword.trim().isEmpty()) {
-                ps.setString(paramIndex++, "+" + keyword.trim() + "*");
+                // Use the constructed full-text search query
+                String[] keywords = keyword.trim().split("\\s+");
+                StringBuilder fullTextQuery = new StringBuilder();
+                
+                // Build full-text search query with boolean operators
+                for (String word : keywords) {
+                    if (fullTextQuery.length() > 0) {
+                        fullTextQuery.append(" +");
+                    }
+                    fullTextQuery.append(word).append("*");
+                }
+                
+                ps.setString(paramIndex++, fullTextQuery.toString());
+                
+                // Set LIKE parameters for broader matching
                 String likePattern = "%" + keyword.trim() + "%";
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
+                ps.setString(paramIndex++, likePattern);
                 ps.setString(paramIndex++, likePattern);
                 ps.setString(paramIndex++, likePattern);
                 ps.setString(paramIndex++, likePattern);
@@ -543,7 +619,7 @@ public class EmployeeDAO extends DBContext {
                 ps.setInt(paramIndex++, Integer.parseInt(position));
             }
 
-            if (status != null && !status.trim().isEmpty()) {
+            if (status != null && !status.trim().isEmpty() && !status.equals("!Terminated")) {
                 ps.setString(paramIndex++, status);
             }
 
@@ -630,5 +706,162 @@ public class EmployeeDAO extends DBContext {
         }
 
         return positions;
+    }
+    
+    /**
+     * Update employee information record
+     * @param employee Employee object with updated data
+     * @return boolean success
+     */
+    public boolean updateEmployeeInformation(Employee employee) {
+        String sql = "UPDATE employees SET first_name = ?, last_name = ?, " +
+                    "date_of_birth = ?, gender = ?, phone_number = ?, personal_email = ?, " +
+                    "home_address = ?, emergency_contact_name = ?, emergency_contact_phone = ?, " +
+                    "department_id = ?, position_id = ?, manager_id = ?, hire_date = ?, " +
+                    "employment_status = ? WHERE employee_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, employee.getFirstName());
+            ps.setString(2, employee.getLastName());
+            
+            // Set date_of_birth (can be null)
+            if (employee.getDateOfBirth() != null) {
+                ps.setDate(3, employee.getDateOfBirth());
+            } else {
+                ps.setNull(3, java.sql.Types.DATE);
+            }
+            
+            // Set gender (can be null)
+            if (employee.getGender() != null) {
+                ps.setString(4, employee.getGender());
+            } else {
+                ps.setNull(4, java.sql.Types.VARCHAR);
+            }
+            
+            ps.setString(5, employee.getPhoneNumber());
+            ps.setString(6, employee.getPersonalEmail());
+            ps.setString(7, employee.getHomeAddress());
+            ps.setString(8, employee.getEmergencyContactName());
+            ps.setString(9, employee.getEmergencyContactPhone());
+            
+            // Set department_id (can be null)
+            if (employee.getDepartmentID() != null) {
+                ps.setInt(10, employee.getDepartmentID());
+            } else {
+                ps.setNull(10, java.sql.Types.INTEGER);
+            }
+            
+            // Set position_id (can be null)
+            if (employee.getPositionID() != null) {
+                ps.setInt(11, employee.getPositionID());
+            } else {
+                ps.setNull(11, java.sql.Types.INTEGER);
+            }
+            
+            // Set manager_id (can be null)
+            if (employee.getManagerID() != null) {
+                ps.setInt(12, employee.getManagerID());
+            } else {
+                ps.setNull(12, java.sql.Types.INTEGER);
+            }
+            
+            // Set hire_date (can be null, but default to current date)
+            if (employee.getHireDate() != null) {
+                ps.setDate(13, employee.getHireDate());
+            } else {
+                // Default to current date if not provided
+                ps.setDate(13, new java.sql.Date(System.currentTimeMillis()));
+            }
+            
+            ps.setString(14, employee.getEmploymentStatus() != null ? employee.getEmploymentStatus() : "Active");
+            ps.setInt(15, employee.getEmployeeID());
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+            
+        } catch (SQLException e) {
+            System.err.println("Error in updateEmployeeInformation: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Check if employee code already exists (excluding the current employee being edited)
+     * @param employeeCode Employee code to check
+     * @param excludeEmployeeId Employee ID to exclude from check
+     * @return boolean true if exists
+     */
+    public boolean isEmployeeCodeExistsExcludingCurrent(String employeeCode, int excludeEmployeeId) {
+        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ? AND employee_id != ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, employeeCode);
+            ps.setInt(2, excludeEmployeeId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in isEmployeeCodeExistsExcludingCurrent: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
+    /**
+     * Delete an employee record by ID
+     * @param employeeId ID of the employee to delete
+     * @return boolean success
+     */
+    public boolean deleteEmployee(int employeeId) {
+        // First check if employee exists
+        if (getEmployeeById(employeeId) == null) {
+            return false;
+        }
+        
+        // Delete the employee record
+        String sql = "DELETE FROM employees WHERE employee_id = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.err.println("Error in deleteEmployee: " + e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    /**
+     * Get employee name by ID (for use in success messages)
+     * @param employeeId ID of the employee
+     * @return String full name of employee or null if not found
+     */
+    public String getEmployeeNameById(int employeeId) {
+        String sql = "SELECT first_name, last_name FROM employees WHERE employee_id = ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, employeeId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    String firstName = rs.getString("first_name");
+                    String lastName = rs.getString("last_name");
+                    return firstName + " " + lastName;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getEmployeeNameById: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return null;
     }
 }

@@ -161,6 +161,33 @@
         <servlet-name>AddEmployeeInformationServlet</servlet-name>
         <url-pattern>/employees/addInformation</url-pattern>
     </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>EditEmployeeInformationServlet</servlet-name>
+        <servlet-class>controller.employeeMgt.EditEmployeeInformationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EditEmployeeInformationServlet</servlet-name>
+        <url-pattern>/employees/edit</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>DeleteEmployeeServlet</servlet-name>
+        <servlet-class>controller.employeeMgt.DeleteEmployeeServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>DeleteEmployeeServlet</servlet-name>
+        <url-pattern>/employees/delete</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ViewEmployeeDetailServlet</servlet-name>
+        <servlet-class>controller.employeeMgt.ViewEmployeeDetailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewEmployeeDetailServlet</servlet-name>
+        <url-pattern>/employees/detail</url-pattern>
+    </servlet-mapping>
 
     <!-- Development Tools section removed -->
 </web-app>
