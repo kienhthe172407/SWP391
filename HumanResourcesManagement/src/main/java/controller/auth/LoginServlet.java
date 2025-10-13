@@ -47,22 +47,11 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
         } catch (RuntimeException ex) {
-            // DB connection failed or other runtime errors. Fall back to dev mode but log.
-            LOGGER.log(Level.WARNING, "DB auth failed, falling back to dev mode: {0}", ex.getMessage());
-            if (!username.trim().isEmpty() && !password.trim().isEmpty()) {
-                User temp = new User();
-                temp.setUserID(-1);
-                temp.setUsername(username);
-                temp.setRole("HR Manager");
-                HttpSession session = request.getSession(true);
-                session.setAttribute("user", temp);
-                response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
-                return;
-            } else {
-                request.setAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng.");
-                request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
-                return;
-            }
+            // DB connection failed or other runtime errors. Log and show generic error to user.
+            LOGGER.log(Level.SEVERE, "DB/auth error: {0}", ex.getMessage());
+            request.setAttribute("errorMessage", "Lỗi hệ thống (không thể kết nối đến cơ sở dữ liệu). Vui lòng thử lại sau.");
+            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+            return;
         }
     }
 
