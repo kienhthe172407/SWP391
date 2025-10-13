@@ -4,6 +4,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import model.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 /**
  * Data Access Object for users table
@@ -11,7 +12,7 @@ import model.User;
 public class UserDAO extends DBContext {
 
     public User getByUsername(String username) {
-        String sql = "SELECT user_id, username, password_hash, email, role, status, created_at FROM users WHERE username = ?";
+        String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name FROM users WHERE username = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
@@ -24,6 +25,8 @@ public class UserDAO extends DBContext {
                     u.setRole(rs.getString("role"));
                     u.setStatus(rs.getString("status"));
                     u.setCreatedAt(rs.getTimestamp("created_at"));
+                    u.setFirstName(rs.getString("first_name"));
+                    u.setLastName(rs.getString("last_name"));
                     return u;
                 }
             }
@@ -34,15 +37,22 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Basic credential check. Assumes passwordHash stores plain or hashed password.
-     * TODO: Use a secure password hashing (BCrypt) and compare properly.
+     * Validate credentials using BCrypt hash stored in password_hash.
+     * Returns the authenticated User on success, otherwise null.
      */
-    public boolean validateCredentials(String username, String password) {
+    public User authenticate(String username, String password) {
         User u = getByUsername(username);
-        if (u == null) return false;
-        String stored = u.getPasswordHash();
-        if (stored == null) return false;
-        // For now, compare directly (if stored as plain) or you can adapt to hash compare.
-        return stored.equals(password);
+        if (u == null) return null;
+        String storedHash = u.getPasswordHash();
+        if (storedHash == null || storedHash.isEmpty()) return null;
+        try {
+            if (BCrypt.checkpw(password, storedHash)) {
+                return u;
+            }
+        } catch (IllegalArgumentException ex) {
+            // In case stored hash is not a BCrypt hash, fall back to plain comparison
+            if (storedHash.equals(password)) return u;
+        }
+        return null;
     }
 }

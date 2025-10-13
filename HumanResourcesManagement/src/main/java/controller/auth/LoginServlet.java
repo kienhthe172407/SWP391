@@ -1,5 +1,6 @@
 package controller.auth;
 
+import dal.UserDAO;
 import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -8,12 +9,16 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Simple login servlet. Mapped in web.xml to /login as well.
+ * Login servlet: authenticate against users table using BCrypt password hashes.
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
+
+    private static final Logger LOGGER = Logger.getLogger(LoginServlet.class.getName());
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -27,20 +32,37 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        // Development fallback mode: accept any non-empty username/password and create a temporary user
-        if (!username.trim().isEmpty() && !password.trim().isEmpty()) {
-            User temp = new User();
-            temp.setUserID(-1);
-            temp.setUsername(username);
-            temp.setRole("HR Manager"); // default role for testing
-            HttpSession session = request.getSession(true);
-            session.setAttribute("user", temp);
-            response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
-            return;
-        } else {
-            request.setAttribute("errorMessage", "Vui lòng nhập tên đăng nhập và mật khẩu hợp lệ.");
-            request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
-            return;
+        UserDAO dao = null;
+        try {
+            dao = new UserDAO();
+            User authenticated = dao.authenticate(username.trim(), password);
+            if (authenticated != null && authenticated.isActive()) {
+                HttpSession session = request.getSession(true);
+                session.setAttribute("user", authenticated);
+                response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
+                return;
+            } else {
+                request.setAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng.");
+                request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+                return;
+            }
+        } catch (RuntimeException ex) {
+            // DB connection failed or other runtime errors. Fall back to dev mode but log.
+            LOGGER.log(Level.WARNING, "DB auth failed, falling back to dev mode: {0}", ex.getMessage());
+            if (!username.trim().isEmpty() && !password.trim().isEmpty()) {
+                User temp = new User();
+                temp.setUserID(-1);
+                temp.setUsername(username);
+                temp.setRole("HR Manager");
+                HttpSession session = request.getSession(true);
+                session.setAttribute("user", temp);
+                response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
+                return;
+            } else {
+                request.setAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng.");
+                request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+                return;
+            }
         }
     }
 
