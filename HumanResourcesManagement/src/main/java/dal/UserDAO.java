@@ -32,6 +32,7 @@ public class UserDAO extends DBContext {
             }
         } catch (SQLException ex) {
             System.err.println("UserDAO.getByUsername: " + ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }
@@ -83,6 +84,7 @@ public class UserDAO extends DBContext {
             }
         } catch (SQLException ex) {
             System.err.println("UserDAO.createUser: " + ex.getMessage());
+            ex.printStackTrace();
         }
         return null;
     }

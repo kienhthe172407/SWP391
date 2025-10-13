@@ -54,8 +54,10 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
         } catch (RuntimeException ex) {
-            // DB connection or query failed
-            request.setAttribute("errorMessage", "Lỗi hệ thống. Vui lòng thử lại sau.");
+            // DB connection or query failed - log full stacktrace for diagnosis
+            ex.printStackTrace();
+            String detail = ex.getMessage() == null ? "" : (": " + ex.getMessage());
+            request.setAttribute("errorMessage", "Lỗi hệ thống. Vui lòng thử lại sau" + detail + ". (Xem server log để biết chi tiết)");
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             return;
         }

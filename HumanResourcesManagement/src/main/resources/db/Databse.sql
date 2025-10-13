@@ -14,6 +14,8 @@ CREATE TABLE users (
     username VARCHAR(50) UNIQUE NOT NULL,                      -- Tên đăng nhập (duy nhất)
     password_hash VARCHAR(255) NOT NULL,                       -- Mật khẩu đã mã hóa
     email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (duy nhất)
+    first_name VARCHAR(50),                                    -- Họ (tuỳ chọn)
+    last_name VARCHAR(50),                                     -- Tên (tuỳ chọn)
     role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- Vai trò người dùng
     status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Trạng thái tài khoản
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
@@ -511,34 +513,34 @@ ADD FOREIGN KEY (manager_id) REFERENCES employees(employee_id) ON DELETE SET NUL
 -- INSERT DATA: users
 -- Dữ liệu người dùng hệ thống
 -- ==============================================================================
-INSERT INTO users (username, password_hash, email, role, status, created_by) VALUES
-('admin', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'admin@company.com', 'Admin', 'Active', NULL),
-('hr_manager', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.manager@company.com', 'HR Manager', 'Active', 1),
-('hr_staff1', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff1@company.com', 'HR', 'Active', 1),
-('hr_staff2', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff2@company.com', 'HR', 'Active', 1),
-('john.smith', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'john.smith@company.com', 'Dept Manager', 'Active', 1),
-('sarah.johnson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sarah.johnson@company.com', 'Dept Manager', 'Active', 1),
-('michael.brown', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'michael.brown@company.com', 'Employee', 'Active', 1),
-('emily.davis', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'emily.davis@company.com', 'Employee', 'Active', 1),
-('david.wilson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'david.wilson@company.com', 'Employee', 'Active', 1),
-('lisa.anderson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'lisa.anderson@company.com', 'Employee', 'Active', 1),
-('robert.taylor', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'robert.taylor@company.com', 'Employee', 'Active', 1),
-('jennifer.thomas', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jennifer.thomas@company.com', 'Employee', 'Active', 1),
-('james.martinez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'james.martinez@company.com', 'Employee', 'Active', 1),
-('mary.garcia', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mary.garcia@company.com', 'Employee', 'Active', 1),
-('william.rodriguez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'william.rodriguez@company.com', 'Employee', 'Inactive', 1),
+INSERT INTO users (username, password_hash, email, first_name, last_name, role, status, created_by) VALUES
+('admin', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'admin@company.com', NULL, NULL, 'Admin', 'Active', NULL),
+('hr_manager', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.manager@company.com', NULL, NULL, 'HR Manager', 'Active', 1),
+('hr_staff1', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff1@company.com', NULL, NULL, 'HR', 'Active', 1),
+('hr_staff2', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff2@company.com', NULL, NULL, 'HR', 'Active', 1),
+('john.smith', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'john.smith@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
+('sarah.johnson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sarah.johnson@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
+('michael.brown', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'michael.brown@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('emily.davis', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'emily.davis@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('david.wilson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'david.wilson@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('lisa.anderson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'lisa.anderson@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('robert.taylor', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'robert.taylor@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('jennifer.thomas', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jennifer.thomas@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('james.martinez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'james.martinez@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('mary.garcia', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mary.garcia@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('william.rodriguez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'william.rodriguez@company.com', NULL, NULL, 'Employee', 'Inactive', 1),
 
 -- Additional user accounts created by Admin (without employee records yet - for testing Create Employee functionality)
-('alex.chen', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'alex.chen@company.com', 'Employee', 'Active', 1),
-('sophia.kim', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sophia.kim@company.com', 'Employee', 'Active', 1),
-('daniel.lee', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'daniel.lee@company.com', 'Dept Manager', 'Active', 1),
-('rachel.white', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'rachel.white@company.com', 'Employee', 'Active', 1),
-('kevin.park', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'kevin.park@company.com', 'Employee', 'Active', 1),
-('amanda.jones', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'amanda.jones@company.com', 'HR', 'Active', 1),
-('ryan.miller', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ryan.miller@company.com', 'Employee', 'Active', 1),
-('jessica.clark', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jessica.clark@company.com', 'Employee', 'Active', 1),
-('brandon.hall', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'brandon.hall@company.com', 'Dept Manager', 'Active', 1),
-('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', 'Employee', 'Active', 1);
+('alex.chen', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'alex.chen@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('sophia.kim', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sophia.kim@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('daniel.lee', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'daniel.lee@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
+('rachel.white', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'rachel.white@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('kevin.park', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'kevin.park@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('amanda.jones', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'amanda.jones@company.com', NULL, NULL, 'HR', 'Active', 1),
+('ryan.miller', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ryan.miller@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('jessica.clark', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jessica.clark@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('brandon.hall', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'brandon.hall@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
+('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', NULL, NULL, 'Employee', 'Active', 1);
 
 -- ==============================================================================
 -- INSERT DATA: departments
