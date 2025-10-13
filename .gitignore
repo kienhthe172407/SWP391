@@ -31,6 +31,14 @@
 .DS_Store
 Thumbs.db
 
+# IntelliJ IDEA
+/HumanResourcesManagement/.idea/
+/HumanResourcesManagement/*.iml
+*.iml
+
+# SmartTomcat
+/HumanResourcesManagement/.smarttomcat/
+
 # Virtual machine crash logs
 hs_err_pid*
 replay_pid*
