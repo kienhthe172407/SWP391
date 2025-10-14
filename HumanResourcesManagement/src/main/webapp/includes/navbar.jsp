@@ -141,6 +141,26 @@ prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
             class="dropdown-menu dropdown-menu-end"
             aria-labelledby="userDropdown"
           >
+            <li class="px-3 py-2">
+              <div class="d-flex align-items-start">
+                <div class="flex-shrink-0 me-2">
+                  <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white" style="width:36px;height:36px;">
+                    <i class="fas fa-user"></i>
+                  </span>
+                </div>
+                <div class="flex-grow-1">
+                  <div class="fw-semibold"><c:out value="${sessionScope.user.fullName}" default="Người dùng" /></div>
+                  <div class="text-muted small"><c:out value="${sessionScope.user.email}" default="" /></div>
+                  <div class="mt-1">
+                    <span class="badge bg-info text-dark"><i class="fas fa-user-shield me-1"></i><c:out value="${sessionScope.user.roleDisplayName}" default="User" /></span>
+                  </div>
+                  <c:if test="${not empty sessionScope.user.lastLogin}">
+                    <div class="text-muted small mt-1"><i class="far fa-clock me-1"></i>Lần đăng nhập gần nhất: <c:out value="${sessionScope.user.lastLogin}" /></div>
+                  </c:if>
+                </div>
+              </div>
+            </li>
+            <li><hr class="dropdown-divider" /></li>
             <li>
               <a
                 class="dropdown-item"

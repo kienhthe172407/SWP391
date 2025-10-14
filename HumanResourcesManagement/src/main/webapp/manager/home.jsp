@@ -270,6 +270,12 @@
                   <span>Dashboard</span>
                 </a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link d-flex align-items-center" href="${pageContext.request.contextPath}/profile">
+                  <i class="fas fa-id-card me-2"></i>
+                  <span>Profile</span>
+                </a>
+              </li>
 
               <li class="nav-section px-3 text-secondary small mt-3">HR MANAGER MANAGEMENT</li>
               <li class="nav-item">
@@ -342,25 +348,25 @@
                                             <img src="https://via.placeholder.com/80x80/4e73df/ffffff?text=HR" 
                                                  class="rounded-circle" width="80" height="80" alt="User Avatar">
                                         </div>
-                                        <h5 class="mb-1">John Doe</h5>
-                                        <p class="text-muted small mb-0">HR Manager</p>
+                                        <h5 class="mb-1"><c:out value="${sessionScope.user.fullName}" default="User"/></h5>
+                                        <p class="text-muted small mb-0"><c:out value="${sessionScope.user.roleDisplayName}" default="HR Manager"/></p>
                                     </div>
                                     <div class="user-info">
                                         <div class="d-flex justify-content-between py-2 border-bottom">
                                             <span class="text-muted">Email:</span>
-                                            <span class="fw-medium">john.doe@company.com</span>
+                                            <span class="fw-medium"><c:out value="${sessionScope.user.email}"/></span>
                                         </div>
                                         <div class="d-flex justify-content-between py-2 border-bottom">
-                                            <span class="text-muted">Phone:</span>
-                                            <span class="fw-medium">+84 123 456 789</span>
+                                            <span class="text-muted">Username:</span>
+                                            <span class="fw-medium"><c:out value="${sessionScope.user.username}"/></span>
                                         </div>
                                         <div class="d-flex justify-content-between py-2 border-bottom">
-                                            <span class="text-muted">Department:</span>
-                                            <span class="fw-medium">Human Resources</span>
+                                            <span class="text-muted">Status:</span>
+                                            <span class="fw-medium"><c:out value="${sessionScope.user.status}"/></span>
                                         </div>
                                         <div class="d-flex justify-content-between py-2">
-                                            <span class="text-muted">Join Date:</span>
-                                            <span class="fw-medium">Jan 15, 2023</span>
+                                            <span class="text-muted">Last Login:</span>
+                                            <span class="fw-medium"><c:out value="${sessionScope.user.lastLogin}"/></span>
                                         </div>
                                     </div>
                                 </div>
@@ -654,52 +660,26 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="editProfileForm">
+                    <form id="editProfileForm" action="${pageContext.request.contextPath}/profile" method="post">
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="editFirstName" class="form-label">First Name</label>
-                                <input type="text" class="form-control" id="editFirstName" value="John" required>
+                                <input type="text" class="form-control" id="editFirstName" name="firstName" value="${sessionScope.user.firstName}" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="editLastName" class="form-label">Last Name</label>
-                                <input type="text" class="form-control" id="editLastName" value="Doe" required>
+                                <input type="text" class="form-control" id="editLastName" name="lastName" value="${sessionScope.user.lastName}" required>
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-12">
                                 <label for="editEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="editEmail" value="john.doe@company.com" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="editPhone" class="form-label">Phone</label>
-                                <input type="tel" class="form-control" id="editPhone" value="+84 123 456 789" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="editDepartment" class="form-label">Department</label>
-                                <select class="form-select" id="editDepartment" required>
-                                    <option value="Human Resources" selected>Human Resources</option>
-                                    <option value="IT">IT</option>
-                                    <option value="Finance">Finance</option>
-                                    <option value="Marketing">Marketing</option>
-                                    <option value="Operations">Operations</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="editPosition" class="form-label">Position</label>
-                                <input type="text" class="form-control" id="editPosition" value="HR Manager" required>
-                            </div>
-                            <div class="col-12">
-                                <label for="editBio" class="form-label">Bio</label>
-                                <textarea class="form-control" id="editBio" rows="3" placeholder="Tell us about yourself...">Experienced HR Manager with 5+ years in talent acquisition and employee relations. Passionate about creating positive workplace environments.</textarea>
-                            </div>
-                            <div class="col-12">
-                                <label for="editAddress" class="form-label">Address</label>
-                                <textarea class="form-control" id="editAddress" rows="2" placeholder="Enter your address...">123 Business Street, District 1, Ho Chi Minh City, Vietnam</textarea>
+                                <input type="email" class="form-control" id="editEmail" name="email" value="${sessionScope.user.email}" required>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" onclick="saveProfile()">
+                    <button type="submit" form="editProfileForm" class="btn btn-primary">
                         <i class="fas fa-save me-1"></i>Save Changes
                     </button>
                 </div>
@@ -710,66 +690,6 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     
-    <!-- Profile Edit Script -->
-    <script>
-        function saveProfile() {
-            // Get form data
-            const firstName = document.getElementById('editFirstName').value;
-            const lastName = document.getElementById('editLastName').value;
-            const email = document.getElementById('editEmail').value;
-            const phone = document.getElementById('editPhone').value;
-            const department = document.getElementById('editDepartment').value;
-            const position = document.getElementById('editPosition').value;
-            const bio = document.getElementById('editBio').value;
-            const address = document.getElementById('editAddress').value;
-            
-            // Update the profile display
-            document.querySelector('.user-info h5').textContent = firstName + ' ' + lastName;
-            document.querySelector('.user-info p').textContent = position;
-            
-            // Update the info rows
-            const infoRows = document.querySelectorAll('.user-info .d-flex');
-            infoRows[0].querySelector('.fw-medium').textContent = email;
-            infoRows[1].querySelector('.fw-medium').textContent = phone;
-            infoRows[2].querySelector('.fw-medium').textContent = department;
-            
-            // Show success message
-            showNotification('Profile updated successfully!', 'success');
-            
-            // Close modal
-            const modal = bootstrap.Modal.getInstance(document.getElementById('editProfileModal'));
-            modal.hide();
-        }
-        
-        function showNotification(message, type) {
-            // Create notification element
-            const notification = document.createElement('div');
-            const alertClass = type === 'success' ? 'success' : 'danger';
-            const iconClass = type === 'success' ? 'check-circle' : 'exclamation-circle';
-            
-            notification.className = 'alert alert-' + alertClass + ' alert-dismissible fade show position-fixed';
-            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
-            notification.innerHTML = 
-                '<i class="fas fa-' + iconClass + ' me-2"></i>' +
-                message +
-                '<button type="button" class="btn-close" data-bs-dismiss="alert"></button>';
-            
-            // Add to page
-            document.body.appendChild(notification);
-            
-            // Auto remove after 3 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.parentNode.removeChild(notification);
-                }
-            }, 3000);
-        }
-        
-        // Form validation
-        document.getElementById('editProfileForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            saveProfile();
-        });
-    </script>
+    <!-- Remove mock JS update; form posts to /profile -->
   </body>
 </html>

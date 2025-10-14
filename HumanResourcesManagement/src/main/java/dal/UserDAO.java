@@ -88,4 +88,23 @@ public class UserDAO extends DBContext {
         }
         return null;
     }
+
+    /**
+     * Update basic profile fields for a user. Returns true if one row affected.
+     */
+    public boolean updateProfile(User user) {
+        String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE user_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, user.getEmail());
+            ps.setString(2, user.getFirstName());
+            ps.setString(3, user.getLastName());
+            ps.setInt(4, user.getUserID());
+            int affected = ps.executeUpdate();
+            return affected == 1;
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.updateProfile: " + ex.getMessage());
+            ex.printStackTrace();
+            return false;
+        }
+    }
 }
