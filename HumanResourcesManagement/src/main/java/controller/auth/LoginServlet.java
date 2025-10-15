@@ -39,8 +39,17 @@ public class LoginServlet extends HttpServlet {
             if (authenticated != null && authenticated.isActive()) {
                 HttpSession session = request.getSession(true);
                 session.setAttribute("user", authenticated);
-                response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
-                return;
+                String role = authenticated.getRole();
+                if ("HR Manager".equals(role)) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard/hr-manager-dashboard.jsp");
+                    return;
+                } else if ("HR".equals(role)) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard/hr-dashboard.jsp");
+                    return;
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
+                    return;
+                }
             } else {
                 request.setAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng.");
                 request.getRequestDispatcher("/auth/login.jsp").forward(request, response);

@@ -2,11 +2,7 @@
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-<%-- Set admin role by default for all users --%>
-<% 
-    session.setAttribute("userRole", "HR Manager");
-    session.setAttribute("userId", 1);
-%>
+<%-- Role will be read from sessionScope.user set at login; no hardcoded defaults here --%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,7 +38,7 @@
             </li>
 
             <c:choose>
-                <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                <c:when test="${sessionScope.user != null && sessionScope.user.role == 'HR Manager'}">
                     <!-- HR Manager Menu -->
                     <li class="menu-section">HR Management</li>
                     <li>
