@@ -15,7 +15,7 @@
 <body>
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4>HR Manager</h4>
+            <h4>HR Manager Dashboard</h4>
             <p>Human Resources</p>
         </div>
 
@@ -50,7 +50,7 @@
 
             <li class="menu-section">Employee Management</li>
             <li>
-                <a href="${pageContext.request.contextPath}/employee-mgt/list-employees.jsp">
+                <a href="${pageContext.request.contextPath}/employees/list">
                     <i class="fas fa-users"></i>
                     <span>All Employees</span>
                 </a>
@@ -58,14 +58,14 @@
             <li>
                 <a href="${pageContext.request.contextPath}/employee-mgt/add-employee-information.jsp">
                     <i class="fas fa-user-plus"></i>
-                    <span>Add Employee Info</span>
+                    <span>Add Employee Information</span>
                 </a>
             </li>
 
             <li class="menu-section">Contracts & Attendance</li>
             <li>
-                <a href="${pageContext.request.contextPath}/contract-mgt/list-contracts.jsp">
-                    <i class="fas fa-file-contract"></i>
+                <a href="${pageContext.request.contextPath}/contracts/list">
+                    <i class="fas fa-file"></i>
                     <span>Contracts</span>
                 </a>
             </li>
@@ -86,7 +86,7 @@
             <li>
                 <a href="${pageContext.request.contextPath}/job-posting-mgt/list-job-postings.jsp">
                     <i class="fas fa-briefcase"></i>
-                    <span>Job Postings</span>
+                    <span> Job Postings</span>
                 </a>
             </li>
             <li>

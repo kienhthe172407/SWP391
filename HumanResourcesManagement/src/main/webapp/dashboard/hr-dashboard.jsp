@@ -30,22 +30,22 @@
 
             <li class="menu-section">Employee Management</li>
             <li>
-                <a href="${pageContext.request.contextPath}/employee-mgt/list-employees.jsp">
+                <a href="${pageContext.request.contextPath}/employees/list">
                     <i class="fas fa-users"></i>
-                    <span>Employees</span>
+                    <span>All Employees</span>
                 </a>
             </li>
             <li>
-                <a href="${pageContext.request.contextPath}/employee-mgt/add-employee-information.jsp">
+                <a href="${pageContext.request.contextPath}/employees/addInformation">
                     <i class="fas fa-user-plus"></i>
-                    <span>Add Employee Info</span>
+                    <span>Add Employee Information</span>
                 </a>
             </li>
 
             <li class="menu-section">Contracts & Attendance</li>
             <li>
-                <a href="${pageContext.request.contextPath}/contract-mgt/list-contracts.jsp">
-                    <i class="fas fa-file-contract"></i>
+                <a href="${pageContext.request.contextPath}/contracts/list">
+                    <i class="fas fa-file"></i>
                     <span>Contracts</span>
                 </a>
             </li>
@@ -55,12 +55,18 @@
                     <span>Attendance</span>
                 </a>
             </li>
+            <li>
+                <a href="#">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Leave Requests</span>
+                </a>
+            </li>
 
             <li class="menu-section">Recruitment</li>
             <li>
                 <a href="${pageContext.request.contextPath}/job-posting-mgt/list-job-postings.jsp">
                     <i class="fas fa-briefcase"></i>
-                    <span>Job Postings</span>
+                    <span> Job Postings</span>
                 </a>
             </li>
             <li>
@@ -148,10 +154,10 @@
                         <div class="card-body">
                             <p class="text-muted">View, add, and manage employee records.</p>
                             <div class="d-flex gap-2">
-                                <a href="${pageContext.request.contextPath}/employee-mgt/list-employees.jsp" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/employees/list" class="btn btn-primary">
                                     <i class="fas fa-list me-1"></i>List Employees
                                 </a>
-                                <a href="${pageContext.request.contextPath}/employee-mgt/add-employee-information.jsp" class="btn btn-success">
+                                <a href="${pageContext.request.contextPath}/employees/addInformation" class="btn btn-success">
                                     <i class="fas fa-user-plus me-1"></i>Add Employee
                                 </a>
                             </div>

@@ -21,19 +21,34 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
 </head>
 <body>
+    <c:if test="${empty requestScope.contracts}">
+        <c:redirect url="/contracts/list"/>
+    </c:if>
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4>HR Management</h4>
-            <p>Human Resources System</p>
+            <c:choose>
+                <c:when test="${sessionScope.user != null && sessionScope.user.role == 'HR Manager'}">
+                    <h4>HR Manager Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:when test="${sessionScope.user != null && sessionScope.user.role == 'HR'}">
+                    <h4>HR Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:otherwise>
+                    <h4>HR Management</h4>
+                    <p>Human Resources System</p>
+                </c:otherwise>
+            </c:choose>
         </div>
         
         <ul class="sidebar-menu">
             <li class="menu-section">Dashboard</li>
             <li>
-                <a href="${pageContext.request.contextPath}/">
+                <a href="${pageContext.request.contextPath}/${sessionScope.user != null && sessionScope.user.role == 'HR Manager' ? 'dashboard/hr-manager-dashboard.jsp' : 'dashboard/hr-dashboard.jsp'}">
                     <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+                    <span>Overview</span>
                 </a>
             </li>
 
@@ -68,12 +83,12 @@
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/employees/create">
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
                             <i class="fas fa-user-plus"></i>
-                            <span>Add Employee Info</span>
+                            <span>Add Employee Information</span>
                         </a>
                     </li>
-                    <li>
+                    <!-- <li>
                         <a href="#">
                             <i class="fas fa-user-plus"></i>
                             <span>Recruitment</span>
@@ -84,9 +99,9 @@
                             <i class="fas fa-briefcase"></i>
                             <span>Departments</span>
                         </a>
-                    </li>
+                    </li> -->
 
-                    <li class="menu-section">Contract & Attendance</li>
+                    <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list" class="active">
                             <i class="fas fa-file-contract"></i>
@@ -147,22 +162,23 @@
                     </li>
                 </c:when>
                 <c:otherwise>
-                    <!-- HR Staff Menu -->
+                    <!-- HR Staff Menu (mirror hr-dashboard.jsp) -->
+
                     <li class="menu-section">Employee Management</li>
                     <li>
-                        <a href="#">
+                        <a href="${pageContext.request.contextPath}/employees/list">
                             <i class="fas fa-users"></i>
-                            <span>Employees</span>
+                            <span>All Employees</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
                             <i class="fas fa-user-plus"></i>
-                            <span>Recruitment</span>
+                            <span>Add Employee Information</span>
                         </a>
                     </li>
 
-                    <li class="menu-section">Contract & Attendance</li>
+                    <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list" class="active">
                             <i class="fas fa-file-contract"></i>
@@ -173,6 +189,26 @@
                         <a href="#">
                             <i class="fas fa-clock"></i>
                             <span>Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Leave Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Recruitment</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-posting-mgt/list-job-postings.jsp">
+                            <i class="fas fa-briefcase"></i>
+                            <span> Job Postings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-posting-mgt/create-job-posting.jsp">
+                            <i class="fas fa-plus"></i>
+                            <span>Create Job Posting</span>
                         </a>
                     </li>
 
@@ -192,7 +228,7 @@
                 </c:otherwise>
             </c:choose>
 
-            <li class="menu-section">System</li>
+            <!-- <li class="menu-section">System</li>
             <li>
                 <a href="#">
                     <i class="fas fa-cog"></i>
@@ -204,7 +240,7 @@
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
-            </li>
+            </li> -->
         </ul>
     </div>
     
@@ -222,7 +258,7 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Home</a></li>
+                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="#">Contract & Attendance</a></li>
                 <li class="breadcrumb-item active">Contracts List</li>
             </ol>
@@ -358,20 +394,22 @@
                                                 <c:when test="${contract.contractStatus == 'Pending Approval'}">
                                                     <span class="badge badge-pending">Pending Approval</span>
                                                     <br/>
-                                                    <div class="btn-group btn-group-sm mt-1" role="group">
-                                                        <button type="button" class="btn btn-success btn-sm approve-btn"
-                                                                data-contract-id="${contract.contractID}"
-                                                                data-employee-name="${contract.employeeFullName}"
-                                                                title="Approve Contract">
-                                                            <i class="fas fa-check"></i> Approve
-                                                        </button>
-                                                        <button type="button" class="btn btn-danger btn-sm reject-btn"
-                                                                data-contract-id="${contract.contractID}"
-                                                                data-employee-name="${contract.employeeFullName}"
-                                                                title="Reject Contract">
-                                                            <i class="fas fa-times"></i> Reject
-                                                        </button>
-                                                    </div>
+                                                    <c:if test="${sessionScope.user != null && sessionScope.user.role == 'HR Manager'}">
+                                                        <div class="btn-group btn-group-sm mt-1" role="group">
+                                                            <button type="button" class="btn btn-success btn-sm approve-btn"
+                                                                    data-contract-id="${contract.contractID}"
+                                                                    data-employee-name="${contract.employeeFullName}"
+                                                                    title="Approve Contract">
+                                                                <i class="fas fa-check"></i> Approve
+                                                            </button>
+                                                            <button type="button" class="btn btn-danger btn-sm reject-btn"
+                                                                    data-contract-id="${contract.contractID}"
+                                                                    data-employee-name="${contract.employeeFullName}"
+                                                                    title="Reject Contract">
+                                                                <i class="fas fa-times"></i> Reject
+                                                            </button>
+                                                        </div>
+                                                    </c:if>
                                                 </c:when>
                                                 <c:when test="${contract.contractStatus == 'Draft'}">
                                                     <span class="badge bg-secondary">Draft</span>
@@ -407,7 +445,7 @@
                                                    class="btn-action btn-view" title="View Details">
                                                     <i class="fas fa-eye"></i>
                                                 </a>
-                                                <a href="#" class="btn-action btn-edit" title="Edit">
+                                                <a href="${pageContext.request.contextPath}/contracts/edit?id=${contract.contractID}" class="btn-action btn-edit" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
                                                 <a href="#" class="btn-action btn-delete" title="Delete"
