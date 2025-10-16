@@ -40,6 +40,19 @@ public class ViewContractDetailServlet extends HttpServlet {
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
         Integer userId = (Integer) session.getAttribute("userId");
+
+        // Derive role from authenticated user if missing
+        if (userRole == null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                userRole = ((model.User) userObj).getRole();
+                session.setAttribute("userRole", userRole);
+                if (userId == null) {
+                    userId = ((model.User) userObj).getUserId();
+                    session.setAttribute("userId", userId);
+                }
+            }
+        }
         
         // If not logged in, redirect to login
         if (userRole == null || userId == null) {

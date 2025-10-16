@@ -540,7 +540,15 @@ INSERT INTO users (username, password_hash, email, first_name, last_name, role, 
 ('ryan.miller', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ryan.miller@company.com', NULL, NULL, 'Employee', 'Active', 1),
 ('jessica.clark', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jessica.clark@company.com', NULL, NULL, 'Employee', 'Active', 1),
 ('brandon.hall', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'brandon.hall@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
-('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', NULL, NULL, 'Employee', 'Active', 1);
+('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', NULL, NULL, 'Employee', 'Active', 1),
+
+-- Additional user accounts for new employees with contracts
+('thomas.wright', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'thomas.wright@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('victoria.scott', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'victoria.scott@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('christopher.green', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'christopher.green@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('margaret.baker', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'margaret.baker@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('andrew.nelson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'andrew.nelson@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('elizabeth.carter', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'elizabeth.carter@company.com', NULL, NULL, 'Employee', 'Active', 1);
 
 -- ==============================================================================
 -- INSERT DATA: departments
@@ -592,7 +600,25 @@ INSERT INTO employees (user_id, employee_code, first_name, last_name, date_of_bi
 (12, 'EMP011', 'Jennifer', 'Thomas', '1994-02-28', 'Female', '+1-555-0121', 'jennifer.thomas.personal@email.com', '852 Poplar Street, New York, NY 10011', 'Daniel Thomas', '+1-555-0122', 5, 12, NULL, '2019-11-22', 'Active'),
 (13, 'EMP012', 'James', 'Martinez', '1990-08-17', 'Male', '+1-555-0123', 'james.martinez.personal@email.com', '963 Hickory Road, New York, NY 10012', 'Rachel Martinez', '+1-555-0124', 6, 13, NULL, '2018-10-30', 'Active'),
 (14, 'EMP013', 'Mary', 'Garcia', '1995-03-05', 'Female', '+1-555-0125', 'mary.garcia.personal@email.com', '159 Magnolia Avenue, New York, NY 10013', 'Luis Garcia', '+1-555-0126', 6, 14, 12, '2021-02-15', 'Active'),
-(15, 'EMP014', 'William', 'Rodriguez', '1984-07-11', 'Male', '+1-555-0127', 'william.rodriguez.personal@email.com', '357 Dogwood Lane, New York, NY 10014', 'Sofia Rodriguez', '+1-555-0128', 2, 4, 4, '2016-12-01', 'Terminated');
+(15, 'EMP014', 'William', 'Rodriguez', '1984-07-11', 'Male', '+1-555-0127', 'william.rodriguez.personal@email.com', '357 Dogwood Lane, New York, NY 10014', 'Sofia Rodriguez', '+1-555-0128', 2, 4, 4, '2016-12-01', 'Terminated'),
+(24, 'EMP015', 'Thomas', 'Wright', '1988-02-20', 'Male', '+1-555-0129', 'thomas.wright.personal@email.com', '456 Sycamore Street, New York, NY 10015', 'Patricia Wright', '+1-555-0130', 1, 6, 1, '2024-10-01', 'Active'),
+(25, 'EMP016', 'Victoria', 'Scott', '1991-05-14', 'Female', '+1-555-0131', 'victoria.scott.personal@email.com', '789 Chestnut Avenue, New York, NY 10016', 'James Scott', '+1-555-0132', 1, 6, 1, '2024-09-15', 'Active'),
+(26, 'EMP017', 'Christopher', 'Green', '1986-08-09', 'Male', '+1-555-0133', 'christopher.green.personal@email.com', '321 Juniper Road, New York, NY 10017', 'Linda Green', '+1-555-0134', 2, 3, 4, '2024-08-20', 'Active'),
+(27, 'EMP018', 'Margaret', 'Baker', '1989-11-22', 'Female', '+1-555-0135', 'margaret.baker.personal@email.com', '654 Laurel Drive, New York, NY 10018', 'George Baker', '+1-555-0136', 3, 8, 5, '2024-10-20', 'Active'),
+(28, 'EMP019', 'Andrew', 'Nelson', '1992-03-17', 'Male', '+1-555-0137', 'andrew.nelson.personal@email.com', '987 Olive Lane, New York, NY 10019', 'Nancy Nelson', '+1-555-0138', 4, 10, NULL, '2024-12-15', 'Active'),
+(29, 'EMP020', 'Elizabeth', 'Carter', '1985-06-11', 'Female', '+1-555-0139', 'elizabeth.carter.personal@email.com', '147 Palm Court, New York, NY 10020', 'Richard Carter', '+1-555-0140', 2, 4, 4, '2023-01-15', 'Active'),
+(30, 'EMP021', 'David', 'Mitchell', '1990-09-28', 'Male', '+1-555-0141', 'david.mitchell.personal@email.com', '258 Quince Way, New York, NY 10021', 'Helen Mitchell', '+1-555-0142', 3, 8, 5, '2022-06-01', 'Active'),
+(31, 'EMP022', 'Jennifer', 'Harris', '1987-12-05', 'Female', '+1-555-0143', 'jennifer.harris.personal@email.com', '369 Rose Place, New York, NY 10022', 'Mark Harris', '+1-555-0144', 4, 10, NULL, '2023-03-01', 'Active');
+
+-- Update employee records with user_id links
+UPDATE employees SET user_id = 24 WHERE employee_id = 24;
+UPDATE employees SET user_id = 25 WHERE employee_id = 25;
+UPDATE employees SET user_id = 26 WHERE employee_id = 26;
+UPDATE employees SET user_id = 27 WHERE employee_id = 27;
+UPDATE employees SET user_id = 28 WHERE employee_id = 28;
+UPDATE employees SET user_id = 29 WHERE employee_id = 29;
+UPDATE employees SET user_id = 30 WHERE employee_id = 30;
+UPDATE employees SET user_id = 31 WHERE employee_id = 31;
 
 -- Update department managers
 UPDATE departments SET manager_id = 1 WHERE department_id = 1; -- HR
@@ -717,37 +743,37 @@ INSERT INTO payroll_adjustments (payroll_id, employee_id, adjustment_type, amoun
 
 -- Existing Active Contracts (approved by HR Manager)
 INSERT INTO employment_contracts (employee_id, contract_number, contract_type, start_date, end_date, salary_amount, job_description, terms_and_conditions, contract_status, signed_date, approved_by, approval_comment, approved_at, created_by) VALUES
-(1, 'CTR-2015-001', 'Indefinite', '2015-01-15', NULL, 7000.00, 'Responsible for overall HR strategy, employee relations, recruitment, and team management', 'Standard employment terms including benefits, leave policy, and confidentiality agreement', 'Active', '2015-01-10', 2, 'Excellent qualifications and experience', '2015-01-12 10:00:00', 3),
-(2, 'CTR-2018-015', 'Indefinite', '2018-03-10', NULL, 3500.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment terms with 3-month probation period', 'Active', '2018-03-05', 2, 'Strong HR background, approved for immediate start', '2018-03-07 11:00:00', 3),
-(4, 'CTR-2014-008', 'Indefinite', '2014-08-20', NULL, 8000.00, 'Lead IT department, oversee infrastructure, software development, and technical projects', 'Management contract with performance bonuses and stock options', 'Active', '2014-08-15', 2, 'Exceptional technical leadership skills', '2014-08-17 10:00:00', 3),
-(5, 'CTR-2016-012', 'Indefinite', '2016-02-14', NULL, 7500.00, 'Lead sales team, develop sales strategies, and drive revenue growth', 'Management contract with commission structure', 'Active', '2016-02-10', 2, 'Proven sales track record', '2016-02-12 14:00:00', 4),
+(1, 'CTR-2015-001', 'Indefinite', '2015-01-15', NULL, 7000.00, 'Responsible for overall HR strategy, employee relations, recruitment, and team management', 'Standard employment terms including benefits, leave policy, and confidentiality agreement', 'Active', '2015-01-10', 2, 'Excellent qualifications and experience', '2015-01-12 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(2, 'CTR-2018-015', 'Indefinite', '2018-03-10', NULL, 3500.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment terms with 3-month probation period', 'Active', '2018-03-05', 2, 'Strong HR background, approved for immediate start', '2018-03-07 11:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(4, 'CTR-2014-008', 'Indefinite', '2014-08-20', NULL, 8000.00, 'Lead IT department, oversee infrastructure, software development, and technical projects', 'Management contract with performance bonuses and stock options', 'Active', '2014-08-15', 2, 'Exceptional technical leadership skills', '2014-08-17 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(5, 'CTR-2016-012', 'Indefinite', '2016-02-14', NULL, 7500.00, 'Lead sales team, develop sales strategies, and drive revenue growth', 'Management contract with commission structure', 'Active', '2016-02-10', 2, 'Proven sales track record', '2016-02-12 14:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Draft Contracts (created by different HR staff - only visible to creators)
-(6, 'CTR-2024-101', 'Indefinite', '2024-12-01', NULL, 6000.00, 'Lead technical projects, mentor junior developers, and ensure code quality', 'Standard employment with technical certifications support', 'Draft', NULL, NULL, 'Still reviewing technical requirements', NULL, 3),
-(7, 'CTR-2024-102', 'Fixed-term', '2024-11-15', '2025-11-14', 4500.00, 'Develop and maintain software applications using modern technologies', 'Fixed-term contract with renewal option based on performance', 'Draft', NULL, NULL, 'Waiting for budget approval', NULL, 3),
-(8, 'CTR-2024-103', 'Indefinite', '2024-10-20', NULL, 3200.00, 'Generate sales, maintain client relationships, and achieve sales targets', 'Standard employment with commission-based incentives', 'Draft', NULL, NULL, 'Need to finalize commission structure', NULL, 4),
-(9, 'CTR-2024-104', 'Indefinite', '2024-11-01', NULL, 3800.00, 'Business development and client acquisition in assigned territory', 'Standard employment terms with travel allowance', 'Draft', NULL, NULL, 'Reviewing territory assignments', NULL, 4),
-(10, 'CTR-2024-105', 'Fixed-term', '2024-12-15', '2025-06-14', 3000.00, 'Develop and execute marketing campaigns, analyze market trends', 'Temporary contract for holiday season campaign', 'Draft', NULL, NULL, 'Seasonal position - finalizing details', NULL, 2),
+(6, 'CTR-2024-101', 'Indefinite', '2024-12-01', NULL, 6000.00, 'Lead technical projects, mentor junior developers, and ensure code quality', 'Standard employment with technical certifications support', 'Draft', NULL, NULL, 'Still reviewing technical requirements', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(7, 'CTR-2024-102', 'Fixed-term', '2024-11-15', '2025-11-14', 4500.00, 'Develop and maintain software applications using modern technologies', 'Fixed-term contract with renewal option based on performance', 'Draft', NULL, NULL, 'Waiting for budget approval', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(8, 'CTR-2024-103', 'Indefinite', '2024-10-20', NULL, 3200.00, 'Generate sales, maintain client relationships, and achieve sales targets', 'Standard employment with commission-based incentives', 'Draft', NULL, NULL, 'Need to finalize commission structure', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(9, 'CTR-2024-104', 'Indefinite', '2024-11-01', NULL, 3800.00, 'Business development and client acquisition in assigned territory', 'Standard employment terms with travel allowance', 'Draft', NULL, NULL, 'Reviewing territory assignments', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(10, 'CTR-2024-105', 'Fixed-term', '2024-12-15', '2025-06-14', 3000.00, 'Develop and execute marketing campaigns, analyze market trends', 'Temporary contract for holiday season campaign', 'Draft', NULL, NULL, 'Seasonal position - finalizing details', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Pending Approval Contracts (submitted by HR staff, waiting for HR Manager approval)
-(11, 'CTR-2024-201', 'Indefinite', '2024-11-25', NULL, 4200.00, 'Manage accounting records, financial reporting, and tax compliance', 'Standard employment with CPA certification support and annual bonus', 'Pending Approval', NULL, NULL, 'Ready for review - candidate has excellent credentials', NULL, 3),
-(12, 'CTR-2024-202', 'Indefinite', '2024-12-10', NULL, 6500.00, 'Oversee daily operations, optimize processes, and manage operational staff', 'Management contract with performance metrics and team bonuses', 'Pending Approval', NULL, NULL, 'Urgent position - operations manager needed ASAP', NULL, 4),
-(13, 'CTR-2024-203', 'Fixed-term', '2024-11-20', '2025-05-19', 2800.00, 'Provide administrative support including scheduling, documentation, and coordination', 'Temporary contract to cover maternity leave', 'Pending Approval', NULL, NULL, 'Temporary replacement for Sarah - 6 months', NULL, 3),
-(14, 'CTR-2024-204', 'Indefinite', '2024-12-05', NULL, 5500.00, 'Software development and maintenance of internal systems', 'Standard employment with remote work options', 'Pending Approval', NULL, NULL, 'Senior developer with 8 years experience', NULL, 4),
-(1, 'CTR-2024-205', 'Fixed-term', '2025-01-15', '2025-12-31', 4800.00, 'Project management for digital transformation initiative', 'Project-based contract with completion bonuses', 'Pending Approval', NULL, NULL, 'Critical project - need experienced PM', NULL, 3),
+(11, 'CTR-2024-201', 'Indefinite', '2024-11-25', NULL, 4200.00, 'Manage accounting records, financial reporting, and tax compliance', 'Standard employment with CPA certification support and annual bonus', 'Pending Approval', NULL, NULL, 'Ready for review - candidate has excellent credentials', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(12, 'CTR-2024-202', 'Indefinite', '2024-12-10', NULL, 6500.00, 'Oversee daily operations, optimize processes, and manage operational staff', 'Management contract with performance metrics and team bonuses', 'Pending Approval', NULL, NULL, 'Urgent position - operations manager needed ASAP', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(13, 'CTR-2024-203', 'Fixed-term', '2024-11-20', '2025-05-19', 2800.00, 'Provide administrative support including scheduling, documentation, and coordination', 'Temporary contract to cover maternity leave', 'Pending Approval', NULL, NULL, 'Temporary replacement for Sarah - 6 months', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(14, 'CTR-2024-204', 'Indefinite', '2024-12-05', NULL, 5500.00, 'Software development and maintenance of internal systems', 'Standard employment with remote work options', 'Pending Approval', NULL, NULL, 'Senior developer with 8 years experience', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(15, 'CTR-2024-205', 'Fixed-term', '2025-01-15', '2025-12-31', 4800.00, 'Project management for digital transformation initiative', 'Project-based contract with completion bonuses', 'Pending Approval', NULL, NULL, 'Critical project - need experienced PM', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Rejected Contracts (rejected by HR Manager with reasons)
-(2, 'CTR-2024-301', 'Indefinite', '2024-10-01', NULL, 8500.00, 'Senior HR Business Partner role with strategic responsibilities', 'Executive level contract with stock options', 'Rejected', NULL, 2, 'Salary request exceeds budget allocation for this position. Please revise compensation package.', '2024-10-15 14:30:00', 3),
-(3, 'CTR-2024-302', 'Fixed-term', '2024-09-15', '2024-12-15', 2200.00, 'Data entry and basic administrative tasks', 'Entry level position with basic benefits', 'Rejected', NULL, 2, 'Position requirements do not match candidate qualifications. Candidate is overqualified for this role.', '2024-09-20 10:15:00', 4),
-(6, 'CTR-2024-303', 'Indefinite', '2024-08-20', NULL, 7200.00, 'Lead architect for new software platform development', 'Senior technical role with leadership responsibilities', 'Rejected', NULL, 2, 'Technical requirements not clearly defined. Please provide detailed technical specifications and team structure.', '2024-08-25 16:45:00', 3),
-(7, 'CTR-2024-304', 'Fixed-term', '2024-07-10', '2024-09-10', 3500.00, 'Temporary sales support during summer campaign', 'Short-term contract with performance incentives', 'Rejected', NULL, 2, 'Contract duration too short for effective onboarding and training. Minimum 6-month contracts required for sales positions.', '2024-07-15 11:20:00', 4),
+(16, 'CTR-2024-301', 'Indefinite', '2024-10-01', NULL, 8500.00, 'Senior HR Business Partner role with strategic responsibilities', 'Executive level contract with stock options', 'Rejected', NULL, 2, 'Salary request exceeds budget allocation for this position. Please revise compensation package.', '2024-10-15 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(17, 'CTR-2024-302', 'Fixed-term', '2024-09-15', '2024-12-15', 2200.00, 'Data entry and basic administrative tasks', 'Entry level position with basic benefits', 'Rejected', NULL, 2, 'Position requirements do not match candidate qualifications. Candidate is overqualified for this role.', '2024-09-20 10:15:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(18, 'CTR-2024-303', 'Indefinite', '2024-08-20', NULL, 7200.00, 'Lead architect for new software platform development', 'Senior technical role with leadership responsibilities', 'Rejected', NULL, 2, 'Technical requirements not clearly defined. Please provide detailed technical specifications and team structure.', '2024-08-25 16:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(19, 'CTR-2024-304', 'Fixed-term', '2024-07-10', '2024-09-10', 3500.00, 'Temporary sales support during summer campaign', 'Short-term contract with performance incentives', 'Rejected', NULL, 2, 'Contract duration too short for effective onboarding and training. Minimum 6-month contracts required for sales positions.', '2024-07-15 11:20:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Expired Contracts
-(8, 'CTR-2023-401', 'Fixed-term', '2023-01-15', '2024-01-14', 3200.00, 'Temporary customer service representative', 'One-year fixed contract with renewal option', 'Expired', '2023-01-10', 2, 'Approved for one year term', '2023-01-12 09:00:00', 3),
-(9, 'CTR-2022-402', 'Fixed-term', '2022-06-01', '2024-05-31', 4100.00, 'Project coordinator for system upgrade', 'Two-year project contract', 'Expired', '2022-05-25', 2, 'Critical project role approved', '2022-05-28 13:30:00', 4),
+(20, 'CTR-2023-401', 'Fixed-term', '2023-01-15', '2024-01-14', 3200.00, 'Temporary customer service representative', 'One-year fixed contract with renewal option', 'Expired', '2023-01-10', 2, 'Approved for one year term', '2023-01-12 09:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(21, 'CTR-2022-402', 'Fixed-term', '2022-06-01', '2024-05-31', 4100.00, 'Project coordinator for system upgrade', 'Two-year project contract', 'Expired', '2022-05-25', 2, 'Critical project role approved', '2022-05-28 13:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Terminated Contracts
-(10, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns', 'Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', 3);
+(22, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns', 'Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager'));
 
 -- ==============================================================================
 -- INSERT DATA: job_postings
