@@ -1048,6 +1048,50 @@ public class ContractDAO extends DBContext {
     }
     
     /**
+     * Update an existing contract. Only contracts in Draft status created by the same user can be edited.
+     * @param contract Contract object with updated data (must include contractID and createdBy)
+     * @return boolean success
+     */
+    public boolean updateContract(Contract contract) {
+        String sql = "UPDATE employment_contracts SET " +
+                "employee_id = ?, " +
+                "contract_number = ?, " +
+                "contract_type = ?, " +
+                "start_date = ?, " +
+                "end_date = ?, " +
+                "salary_amount = ?, " +
+                "job_description = ?, " +
+                "terms_and_conditions = ?, " +
+                "contract_status = ?, " +
+                "approval_comment = ?, " +
+                "updated_at = CURRENT_TIMESTAMP " +
+                "WHERE contract_id = ? AND created_by = ? AND contract_status = 'Draft'";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, contract.getEmployeeID());
+            ps.setString(2, contract.getContractNumber());
+            ps.setString(3, contract.getContractType());
+            ps.setDate(4, contract.getStartDate());
+            ps.setDate(5, contract.getEndDate());
+            ps.setBigDecimal(6, contract.getSalaryAmount());
+            ps.setString(7, contract.getJobDescription());
+            ps.setString(8, contract.getTermsAndConditions());
+            ps.setString(9, contract.getContractStatus());
+            ps.setString(10, contract.getApprovalComment());
+            ps.setInt(11, contract.getContractID());
+            ps.setInt(12, contract.getCreatedBy());
+
+            int affectedRows = ps.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            System.err.println("Error in updateContract: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+    
+    /**
      * Helper method to map ResultSet to Contract object
      * @param rs ResultSet from query
      * @return Contract object

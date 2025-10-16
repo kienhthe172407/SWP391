@@ -2,6 +2,7 @@ package controller.contractMgt;
 
 import dal.ContractDAO;
 import model.Contract;
+import model.User;
 import java.io.IOException;
 import java.util.List;
 import jakarta.servlet.ServletException;
@@ -36,15 +37,17 @@ public class ViewContractsServlet extends HttpServlet {
             throws ServletException, IOException {
 
         // Get user session information
-//        HttpSession session = request.getSession();
-//        String userRole = (String) session.getAttribute("userRole");
-//        Integer userId = (Integer) session.getAttribute("userId");
-//
-//        // If not logged in, redirect to login
-//        if (userRole == null || userId == null) {
-//            response.sendRedirect(request.getContextPath() + "/login");
-//            return;
-//        }
+        HttpSession session = request.getSession();
+        User user = (User) session.getAttribute("user");
+
+        // If not logged in, redirect to login
+        if (user == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+
+        String userRole = user.getRole();
+        Integer userId = user.getUserId();
 
         // Pagination parameters
         final int PAGE_SIZE = 10;
@@ -63,6 +66,13 @@ public class ViewContractsServlet extends HttpServlet {
         // Get search parameters from request
         String keyword = request.getParameter("keyword");
         String status = request.getParameter("status");
+        // Normalize status: treat "All Status" (or variants) the same as empty
+        if (status != null) {
+            status = status.trim();
+            if ("All Status".equalsIgnoreCase(status)) {
+                status = ""; // do not filter by status
+            }
+        }
 
         // Always set search params to preserve them in pagination links
         request.setAttribute("keyword", keyword != null ? keyword : "");
@@ -70,20 +80,16 @@ public class ViewContractsServlet extends HttpServlet {
 
         List<Contract> contracts;
         int totalRecords;
-
-        // Set default role as HR Manager for full access
-        String userRole = "HR Manager";
-        Integer userId = 1;
         
-        // If search parameters exist, call searchContracts with pagination
+        // If search parameters exist, call searchContracts with pagination and role filtering
         if ((keyword != null && !keyword.trim().isEmpty()) ||
             (status != null && !status.trim().isEmpty())) {
-            contracts = contractDAO.searchContracts(keyword, status, currentPage, PAGE_SIZE);
-            totalRecords = contractDAO.getTotalSearchResults(keyword, status);
+            contracts = contractDAO.searchContracts(keyword, status, currentPage, PAGE_SIZE, userRole, userId);
+            totalRecords = contractDAO.getTotalSearchResults(keyword, status, userRole, userId);
         } else {
-            // Otherwise, get all contracts with pagination
-            contracts = contractDAO.getAllContracts(currentPage, PAGE_SIZE);
-            totalRecords = contractDAO.getTotalContracts();
+            // Otherwise, get all contracts with pagination and role filtering
+            contracts = contractDAO.getAllContracts(currentPage, PAGE_SIZE, userRole, userId);
+            totalRecords = contractDAO.getTotalContracts(userRole, userId);
         }
         
         // Calculate pagination info
