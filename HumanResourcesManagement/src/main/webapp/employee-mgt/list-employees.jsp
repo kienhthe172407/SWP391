@@ -2,11 +2,7 @@
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
 <%@taglib prefix="fmt" uri="jakarta.tags.fmt"%>
 
-<%-- Set admin role by default for all users --%>
-<% 
-    session.setAttribute("userRole", "HR Manager");
-    session.setAttribute("userId", 1);
-%>
+<%-- Role comes from authenticated session; do not override here --%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -89,22 +85,45 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4>HR Management</h4>
-            <p>Human Resources System</p>
+            <c:set var="roleName" value="${sessionScope.userRole != null ? sessionScope.userRole : (sessionScope.user != null ? sessionScope.user.roleDisplayName : '')}" />
+            <c:set var="isHRManager" value="${roleName == 'HR Manager' || (sessionScope.user != null && sessionScope.user.role == 'HR_MANAGER')}" />
+            <c:set var="isHR" value="${roleName == 'HR' || (sessionScope.user != null && sessionScope.user.role == 'HR')}" />
+            <c:choose>
+                <c:when test="${isHRManager}">
+                    <h4>HR Manager Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:when test="${isHR}">
+                    <h4>HR Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:otherwise>
+                    <h4>HR Management</h4>
+                    <p>Human Resources System</p>
+                </c:otherwise>
+            </c:choose>
         </div>
         
         <ul class="sidebar-menu">
-            <li class="menu-section">Dashboard</li>
+            <!-- <li class="menu-section">Dashboard</li>
             <li>
                 <a href="${pageContext.request.contextPath}/">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-            </li>
+            </li> -->
 
             <c:choose>
-                <c:when test="${sessionScope.userRole == 'HR Manager'}">
-                    <!-- HR Manager Menu -->
+                <c:when test="${isHRManager}">
+                    <!-- HR Manager Menu (mirrors hr-manager-dashboard.jsp) -->
+                    <li class="menu-section">Dashboard</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/dashboard/hr-manager-dashboard.jsp">
+                            <i class="fas fa-home"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+
                     <li class="menu-section">HR Management</li>
                     <li>
                         <a href="#">
@@ -135,26 +154,14 @@
                     <li>
                         <a href="${pageContext.request.contextPath}/employees/addInformation">
                             <i class="fas fa-user-plus"></i>
-                            <span>Add Employee Info</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/job-postings/list">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Recruitment</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Departments</span>
+                            <span>Add Employee Information</span>
                         </a>
                     </li>
 
-                    <li class="menu-section">Contract & Attendance</li>
+                    <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list">
-                            <i class="fas fa-file-contract"></i>
+                            <i class="fas fa-file"></i>
                             <span>Contracts</span>
                         </a>
                     </li>
@@ -166,15 +173,29 @@
                     </li>
                     <li>
                         <a href="#">
-                            <i class="fas fa-calendar-alt"></i>
-                            <span>Leave Management</span>
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Leave Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Recruitment</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/list">
+                            <i class="fas fa-briefcase"></i>
+                            <span> Job Postings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/create">
+                            <i class="fas fa-plus"></i>
+                            <span>Create Job Posting</span>
                         </a>
                     </li>
 
                     <li class="menu-section">Payroll & Benefits</li>
                     <li>
                         <a href="#">
-                            <i class="fas fa-money-bill-wave"></i>
+                            <i class="fas fa-dollar-sign"></i>
                             <span>Payroll</span>
                         </a>
                     </li>
@@ -198,10 +219,24 @@
                             <span>Analytics</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-pie"></i>
+                            <span>Statistics</span>
+                        </a>
+                    </li>
                 </c:when>
 
-                <c:when test="${sessionScope.userRole == 'HR'}">
-                    <!-- HR Staff Menu -->
+                <c:when test="${isHR}">
+                    <!-- HR Staff Menu (mirrors hr-dashboard.jsp) -->
+                    <li class="menu-section">Dashboard</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/dashboard/hr-dashboard.jsp">
+                            <i class="fas fa-home"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+
                     <li class="menu-section">Employee Management</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/employees/list" class="active">
@@ -212,20 +247,14 @@
                     <li>
                         <a href="${pageContext.request.contextPath}/employees/addInformation">
                             <i class="fas fa-user-plus"></i>
-                            <span>Add Employee Info</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="${pageContext.request.contextPath}/job-postings/list">
-                            <i class="fas fa-user-plus"></i>
-                            <span>Recruitment</span>
+                            <span>Add Employee Information</span>
                         </a>
                     </li>
 
-                    <li class="menu-section">Contract & Attendance</li>
+                    <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list">
-                            <i class="fas fa-file-contract"></i>
+                            <i class="fas fa-file"></i>
                             <span>Contracts</span>
                         </a>
                     </li>
@@ -233,6 +262,40 @@
                         <a href="#">
                             <i class="fas fa-clock"></i>
                             <span>Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Leave Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Recruitment</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/list">
+                            <i class="fas fa-briefcase"></i>
+                            <span> Job Postings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/create">
+                            <i class="fas fa-plus"></i>
+                            <span>Create Job Posting</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Payroll & Benefits</li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-dollar-sign"></i>
+                            <span>Payroll</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-gift"></i>
+                            <span>Benefits</span>
                         </a>
                     </li>
                 </c:when>
@@ -275,7 +338,7 @@
                 </c:otherwise>
             </c:choose>
 
-            <li class="menu-section">System</li>
+            <!-- <li class="menu-section">System</li>
             <li>
                 <a href="#">
                     <i class="fas fa-cog"></i>
@@ -287,7 +350,7 @@
                     <i class="fas fa-sign-out-alt"></i>
                     <span>Logout</span>
                 </a>
-            </li>
+            </li> -->
         </ul>
     </div>
     
@@ -299,10 +362,20 @@
             <div class="user-info">
                 <c:if test="${sessionScope.userRole == 'HR Manager' || sessionScope.userRole == 'HR'}">
                     <a href="${pageContext.request.contextPath}/employees/addInformation" class="btn btn-primary me-3">
-                        <i class="fas fa-user-plus"></i> Add Employee Info
+                        <i class="fas fa-user-plus"></i> Add Employee Information
                     </a>
                 </c:if>
-                <span>HR Management</span>
+                <c:choose>
+                    <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                        <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR Manager"/></span>
+                    </c:when>
+                    <c:when test="${sessionScope.userRole == 'HR'}">
+                        <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR"/></span>
+                    </c:when>
+                    <c:otherwise>
+                        <span>HR Management</span>
+                    </c:otherwise>
+                </c:choose>
                 <div class="avatar">HR</div>
             </div>
         </div>
@@ -534,7 +607,7 @@
                                                    class="btn-action btn-edit" title="Edit">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                <c:if test="${sessionScope.userRole == 'HR Manager'}">
+                                                <c:if test="${sessionScope.userRole == 'HR Manager' || sessionScope.userRole == 'HR'}">
                                                     <a href="#" class="btn-action btn-delete" title="Delete"
                                                        data-employee-id="${employee.employeeID}"
                                                        data-employee-name="${employee.firstName} ${employee.lastName}">
@@ -553,7 +626,7 @@
 
             <!-- Pagination -->
             <c:if test="${totalPages > 1}">
-                <nav aria-label="Employee list pagination">
+                <nav class="mt-3" aria-label="Employee list pagination">
                     <ul class="pagination justify-content-center">
                         <!-- Previous button -->
                         <c:choose>

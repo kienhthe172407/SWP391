@@ -64,13 +64,13 @@
 
             <li class="menu-section">Recruitment</li>
             <li>
-                <a href="${pageContext.request.contextPath}/job-posting-mgt/list-job-postings.jsp">
+                <a href="${pageContext.request.contextPath}/job-postings/list">
                     <i class="fas fa-briefcase"></i>
                     <span> Job Postings</span>
                 </a>
             </li>
             <li>
-                <a href="${pageContext.request.contextPath}/job-posting-mgt/create-job-posting.jsp">
+                <a href="${pageContext.request.contextPath}/job-postings/create">
                     <i class="fas fa-plus"></i>
                     <span>Create Job Posting</span>
                 </a>
@@ -188,10 +188,10 @@
                         <div class="card-body">
                             <p class="text-muted">Create and track job postings.</p>
                             <div class="d-flex gap-2">
-                                <a href="${pageContext.request.contextPath}/job-posting-mgt/list-job-postings.jsp" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/job-postings/list" class="btn btn-primary">
                                     <i class="fas fa-list me-1"></i>Job Postings
                                 </a>
-                                <a href="${pageContext.request.contextPath}/job-posting-mgt/create-job-posting.jsp" class="btn btn-success">
+                                <a href="${pageContext.request.contextPath}/job-postings/create" class="btn btn-success">
                                     <i class="fas fa-plus me-1"></i>Create Posting
                                 </a>
                             </div>

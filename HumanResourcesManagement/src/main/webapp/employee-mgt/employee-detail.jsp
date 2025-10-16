@@ -71,146 +71,122 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4>HR Management</h4>
-            <p>Human Resources System</p>
+            <c:choose>
+                <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                    <h4>HR Manager Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:when test="${sessionScope.userRole == 'HR'}">
+                    <h4>HR Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:otherwise>
+                    <h4>HR Management</h4>
+                    <p>Human Resources System</p>
+                </c:otherwise>
+            </c:choose>
         </div>
 
         <ul class="sidebar-menu">
-            <li class="menu-section">Dashboard</li>
+            <!-- <li class="menu-section">Dashboard</li>
             <li>
                 <a href="${pageContext.request.contextPath}/">
                     <i class="fas fa-home"></i>
                     <span>Dashboard</span>
                 </a>
-            </li>
+            </li> -->
 
-            <li class="menu-section">HR Management</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-users-cog"></i>
-                    <span>HR Staff Management</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-tasks"></i>
-                    <span>Task Assignment</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Approval Queue</span>
-                </a>
-            </li>
+            <c:choose>
+                <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                    <!-- HR Manager Menu (mirror hr-manager-dashboard.jsp) -->
+                    <li class="menu-section">Dashboard</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/dashboard/hr-manager-dashboard.jsp">
+                            <i class="fas fa-home"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
 
-            <li class="menu-section">Employee Management</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/employees/list" class="active">
-                    <i class="fas fa-users"></i>
-                    <span>All Employees</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/employees/addInformation">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Add Employee</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-briefcase"></i>
-                    <span>Departments</span>
-                </a>
-            </li>
+                    <li class="menu-section">HR Management</li>
+                    <li><a href="#"><i class="fas fa-users-cog"></i><span>HR Staff Management</span></a></li>
+                    <li><a href="#"><i class="fas fa-tasks"></i><span>Task Assignment</span></a></li>
+                    <li><a href="#"><i class="fas fa-clipboard-check"></i><span>Approval Queue</span></a></li>
 
-            <li class="menu-section">Contract & Attendance</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/contracts/list">
-                    <i class="fas fa-file-contract"></i>
-                    <span>Contracts</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/contracts/create">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Create Contract</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clock"></i>
-                    <span>Attendance</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Leave Requests</span>
-                </a>
-            </li>
+                    <li class="menu-section">Employee Management</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/employees/list" class="active">
+                            <i class="fas fa-users"></i>
+                            <span>All Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Employee Information</span>
+                        </a>
+                    </li>
 
-            <li class="menu-section">Job Posting Management</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/job-postings/list">
-                    <i class="fas fa-briefcase"></i>
-                    <span>All Job Postings</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/job-postings/create">
-                    <i class="fas fa-plus-circle"></i>
-                    <span>Create Job Posting</span>
-                </a>
-            </li>
+                    <li class="menu-section">Contracts & Attendance</li>
+                    <li><a href="${pageContext.request.contextPath}/contracts/list"><i class="fas fa-file"></i><span>Contracts</span></a></li>
+                    <li><a href="#"><i class="fas fa-clock"></i><span>Attendance</span></a></li>
+                    <li><a href="#"><i class="fas fa-calendar-check"></i><span>Leave Requests</span></a></li>
 
-            <li class="menu-section">Payroll & Benefits</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Payroll</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-gift"></i>
-                    <span>Benefits</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-award"></i>
-                    <span>Bonuses</span>
-                </a>
-            </li>
+                    <li class="menu-section">Recruitment</li>
+                    <li><a href="${pageContext.request.contextPath}/job-postings/list"><i class="fas fa-briefcase"></i><span> Job Postings</span></a></li>
+                    <li><a href="${pageContext.request.contextPath}/job-postings/create"><i class="fas fa-plus"></i><span>Create Job Posting</span></a></li>
 
-            <li class="menu-section">Reports & Analytics</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Reports</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-            </li>
+                    <li class="menu-section">Payroll & Benefits</li>
+                    <li><a href="#"><i class="fas fa-dollar-sign"></i><span>Payroll</span></a></li>
+                    <li><a href="#"><i class="fas fa-gift"></i><span>Benefits</span></a></li>
 
-            <li class="menu-section">System</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-users-cog"></i>
-                    <span>User Management</span>
-                </a>
-            </li>
+                    <li class="menu-section">Reports & Analytics</li>
+                    <li><a href="#"><i class="fas fa-chart-bar"></i><span>HR Reports</span></a></li>
+                    <li><a href="#"><i class="fas fa-chart-line"></i><span>Analytics</span></a></li>
+                    <li><a href="#"><i class="fas fa-chart-pie"></i><span>Statistics</span></a></li>
+                </c:when>
+                <c:when test="${sessionScope.userRole == 'HR'}">
+                    <!-- HR Staff Menu (mirror hr-dashboard.jsp) -->
+                    <li class="menu-section">Dashboard</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/dashboard/hr-dashboard.jsp">
+                            <i class="fas fa-home"></i>
+                            <span>Overview</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Employee Management</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/employees/list" class="active">
+                            <i class="fas fa-users"></i>
+                            <span>All Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
+                            <i class="fas fa-user-plus"></i>
+                            <span>Add Employee Information</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Contracts & Attendance</li>
+                    <li><a href="${pageContext.request.contextPath}/contracts/list"><i class="fas fa-file"></i><span>Contracts</span></a></li>
+                    <li><a href="#"><i class="fas fa-clock"></i><span>Attendance</span></a></li>
+                    <li><a href="#"><i class="fas fa-calendar-check"></i><span>Leave Requests</span></a></li>
+
+                    <li class="menu-section">Recruitment</li>
+                    <li><a href="${pageContext.request.contextPath}/job-postings/list"><i class="fas fa-briefcase"></i><span> Job Postings</span></a></li>
+                    <li><a href="${pageContext.request.contextPath}/job-postings/create"><i class="fas fa-plus"></i><span>Create Job Posting</span></a></li>
+
+                    <li class="menu-section">Payroll & Benefits</li>
+                    <li><a href="#"><i class="fas fa-dollar-sign"></i><span>Payroll</span></a></li>
+                    <li><a href="#"><i class="fas fa-gift"></i><span>Benefits</span></a></li>
+                </c:when>
+                <c:otherwise>
+                    <!-- Default minimal menu -->
+                    <li class="menu-section">My Profile</li>
+                    <li><a href="#"><i class="fas fa-user"></i><span>View Profile</span></a></li>
+                </c:otherwise>
+            </c:choose>
         </ul>
     </div>
 
@@ -223,7 +199,17 @@
                 <a href="${pageContext.request.contextPath}/employees/addInformation" class="btn btn-primary me-3">
                     <i class="fas fa-user-plus"></i> Add Employee
                 </a>
-                <span>HR Management</span>
+                <c:choose>
+                    <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                        <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR Manager"/></span>
+                    </c:when>
+                    <c:when test="${sessionScope.userRole == 'HR'}">
+                        <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR"/></span>
+                    </c:when>
+                    <c:otherwise>
+                        <span>HR Management</span>
+                    </c:otherwise>
+                </c:choose>
                 <div class="avatar">HR</div>
             </div>
         </div>

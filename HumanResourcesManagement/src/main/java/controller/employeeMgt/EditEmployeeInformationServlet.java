@@ -44,10 +44,21 @@ public class EditEmployeeInformationServlet extends HttpServlet {
         // Get user session information
         HttpSession session = request.getSession();
         
-        // Set default role as HR Manager for full access (for development)
+        // Ensure role in session mirrors the authenticated user; don't force HR Manager
         if (session.getAttribute("userRole") == null) {
-            session.setAttribute("userRole", "HR Manager");
-            session.setAttribute("userId", 1);
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                String roleFromUser = ((model.User) userObj).getRole();
+                if (roleFromUser != null && !roleFromUser.isEmpty()) {
+                    session.setAttribute("userRole", roleFromUser);
+                }
+            }
+            if (session.getAttribute("userRole") == null) {
+                session.setAttribute("userRole", "HR");
+            }
+            if (session.getAttribute("userId") == null) {
+                session.setAttribute("userId", 1);
+            }
         }
         
         // Check if user has permission to edit employee records
