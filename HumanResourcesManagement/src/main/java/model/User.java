@@ -1,6 +1,7 @@
 package model;
 
 import java.sql.Timestamp;
+import java.sql.Date;
 
 /**
  * User model class
@@ -21,6 +22,9 @@ public class User {
     // Optional display names
     private String firstName;
     private String lastName;
+    private String phone;
+    private Date dateOfBirth;
+    private String gender;
 
     // Constructors
     public User() {}
@@ -148,6 +152,30 @@ public class User {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public Date getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(Date dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     // Helper methods

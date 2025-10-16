@@ -12,7 +12,7 @@ import org.mindrot.jbcrypt.BCrypt;
 public class UserDAO extends DBContext {
 
     public User getByUsername(String username) {
-        String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name FROM users WHERE username = ?";
+        String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE username = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, username);
             try (ResultSet rs = ps.executeQuery()) {
@@ -27,6 +27,9 @@ public class UserDAO extends DBContext {
                     u.setCreatedAt(rs.getTimestamp("created_at"));
                     u.setFirstName(rs.getString("first_name"));
                     u.setLastName(rs.getString("last_name"));
+                    try { u.setPhone(rs.getString("phone")); } catch (SQLException ignore) {}
+                    try { u.setDateOfBirth(rs.getDate("date_of_birth")); } catch (SQLException ignore) {}
+                    try { u.setGender(rs.getString("gender")); } catch (SQLException ignore) {}
                     return u;
                 }
             }
@@ -60,9 +63,9 @@ public class UserDAO extends DBContext {
     /**
      * Create a new user with a BCrypt-hashed password. Returns created User with userId set, or null on failure.
      */
-    public User createUser(String username, String plainPassword, String email, String role, String firstName, String lastName) {
+    public User createUser(String username, String plainPassword, String email, String role, String firstName, String lastName, String phone, java.sql.Date dateOfBirth, String gender) {
         String hashed = BCrypt.hashpw(plainPassword, BCrypt.gensalt(10));
-        String sql = "INSERT INTO users (username, password_hash, email, role, status, created_by, first_name, last_name) VALUES (?,?,?,?, 'Active', NULL, ?,?)";
+        String sql = "INSERT INTO users (username, password_hash, email, role, status, created_by, first_name, last_name, phone, date_of_birth, gender) VALUES (?,?,?,?, 'Active', NULL, ?,?,?,?,?)";
         try (PreparedStatement ps = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, username);
             ps.setString(2, hashed);
@@ -70,6 +73,9 @@ public class UserDAO extends DBContext {
             ps.setString(4, role == null ? "Employee" : role);
             ps.setString(5, firstName);
             ps.setString(6, lastName);
+            ps.setString(7, phone);
+            ps.setDate(8, dateOfBirth);
+            ps.setString(9, gender);
             int affected = ps.executeUpdate();
             if (affected == 1) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
@@ -78,6 +84,9 @@ public class UserDAO extends DBContext {
                         User u = new User(id, username, email, role == null ? "Employee" : role);
                         u.setFirstName(firstName);
                         u.setLastName(lastName);
+                        u.setPhone(phone);
+                        u.setDateOfBirth(dateOfBirth);
+                        u.setGender(gender);
                         return u;
                     }
                 }
@@ -93,12 +102,15 @@ public class UserDAO extends DBContext {
      * Update basic profile fields for a user. Returns true if one row affected.
      */
     public boolean updateProfile(User user) {
-        String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ? WHERE user_id = ?";
+        String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ?, phone = ?, date_of_birth = ?, gender = ? WHERE user_id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getFirstName());
             ps.setString(3, user.getLastName());
-            ps.setInt(4, user.getUserID());
+            ps.setString(4, user.getPhone());
+            ps.setDate(5, user.getDateOfBirth());
+            ps.setString(6, user.getGender());
+            ps.setInt(7, user.getUserID());
             int affected = ps.executeUpdate();
             return affected == 1;
         } catch (SQLException ex) {

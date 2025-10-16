@@ -104,7 +104,47 @@
                                                            placeholder="Nhập email" required>
                                                 </div>
                                             </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="dateOfBirth">Ngày sinh</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text bg-transparent border-end-0">
+                                                                <i class="fas fa-calendar"></i>
+                                                            </span>
+                                                            <input type="date" class="form-control border-start-0" id="dateOfBirth" name="dateOfBirth" required>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="gender">Giới tính</label>
+                                                        <div class="input-group">
+                                                            <span class="input-group-text bg-transparent border-end-0">
+                                                                <i class="fas fa-venus-mars"></i>
+                                                            </span>
+                                                            <select class="form-select border-start-0" id="gender" name="gender" required>
+                                                                <option value="Male">Nam</option>
+                                                                <option value="Female">Nữ</option>
+                                                                <option value="Other">Khác</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
                                             
+                                            <div class="form-group">
+                                                <label class="form-label" for="phone">Số điện thoại</label>
+                                                <div class="input-group">
+                                                    <span class="input-group-text bg-transparent border-end-0">
+                                                        <i class="fas fa-phone"></i>
+                                                    </span>
+                                                    <input type="tel" class="form-control border-start-0" id="phone" name="phone" 
+                                                           placeholder="Nhập số điện thoại" required>
+                                                </div>
+                                            </div>
+
                                             <div class="form-group">
                                                 <label class="form-label" for="username">Tên đăng nhập</label>
                                                 <div class="input-group">

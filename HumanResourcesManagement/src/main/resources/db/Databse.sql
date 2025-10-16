@@ -1,9 +1,7 @@
 -- ==============================================================================
 -- DATABASE CREATION
 -- ==============================================================================
-DROP DATABASE IF EXISTS hr_management_system;
-CREATE DATABASE hr_management_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE hr_management_system;
+
 
 -- ==============================================================================
 -- TABLE: users
@@ -16,6 +14,9 @@ CREATE TABLE users (
     email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (duy nhất)
     first_name VARCHAR(50),                                    -- Họ (tuỳ chọn)
     last_name VARCHAR(50),                                     -- Tên (tuỳ chọn)
+    phone VARCHAR(20),                                         -- Số điện thoại (tuỳ chọn)
+    date_of_birth DATE,                                        -- Ngày sinh (tuỳ chọn)
+    gender VARCHAR(10),                                        -- Giới tính (tuỳ chọn)
     role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- Vai trò người dùng
     status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Trạng thái tài khoản
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo

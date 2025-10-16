@@ -45,6 +45,22 @@
                             <input type="email" name="email" class="form-control" value="${u.email}" required />
                         </div>
                         <div class="col-md-6">
+                            <label class="form-label">Số điện thoại</label>
+                            <input type="tel" name="phone" class="form-control" value="${u.phone}" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ngày sinh</label>
+                            <input type="date" name="dateOfBirth" class="form-control" value="${u.dateOfBirth}" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Giới tính</label>
+                            <select name="gender" class="form-select">
+                                <option value="Male" ${u.gender == 'Male' ? 'selected' : ''}>Nam</option>
+                                <option value="Female" ${u.gender == 'Female' ? 'selected' : ''}>Nữ</option>
+                                <option value="Other" ${u.gender == 'Other' ? 'selected' : ''}>Khác</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
                             <label class="form-label">Họ</label>
                             <input type="text" name="lastName" class="form-control" value="${u.lastName}" />
                         </div>

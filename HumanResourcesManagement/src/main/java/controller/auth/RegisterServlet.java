@@ -21,8 +21,11 @@ public class RegisterServlet extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String confirm = request.getParameter("confirmPassword");
+        String phone = request.getParameter("phone");
+        String dob = request.getParameter("dateOfBirth"); // yyyy-MM-dd
+        String gender = request.getParameter("gender");
 
-        if (firstName == null || lastName == null || email == null || username == null || password == null || confirm == null) {
+        if (firstName == null || lastName == null || email == null || username == null || password == null || confirm == null || phone == null || dob == null || gender == null) {
             request.setAttribute("errorMessage", "Vui lòng điền đầy đủ thông tin.");
             request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
             return;
@@ -42,8 +45,27 @@ public class RegisterServlet extends HttpServlet {
         }
 
         try {
+            java.sql.Date dateOfBirth = null;
+            try {
+                dateOfBirth = java.sql.Date.valueOf(dob.trim());
+            } catch (IllegalArgumentException ex) {
+                request.setAttribute("errorMessage", "Ngày sinh không hợp lệ. Định dạng yyyy-MM-dd.");
+                request.getRequestDispatcher("/auth/register.jsp").forward(request, response);
+                return;
+            }
+
             UserDAO dao = new UserDAO();
-            User created = dao.createUser(username.trim(), password, email.trim(), "Employee", firstName.trim(), lastName.trim());
+            User created = dao.createUser(
+                    username.trim(),
+                    password,
+                    email.trim(),
+                    "Employee",
+                    firstName.trim(),
+                    lastName.trim(),
+                    phone.trim(),
+                    dateOfBirth,
+                    gender.trim()
+            );
             if (created != null) {
                 request.setAttribute("successMessage", "Đăng ký thành công. Bạn có thể đăng nhập ngay bây giờ.");
                 request.getRequestDispatcher("/auth/login.jsp").forward(request, response);

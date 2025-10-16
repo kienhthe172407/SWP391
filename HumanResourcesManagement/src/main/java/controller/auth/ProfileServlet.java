@@ -37,15 +37,33 @@ public class ProfileServlet extends HttpServlet {
         String firstName = request.getParameter("firstName");
         String lastName = request.getParameter("lastName");
         String email = request.getParameter("email");
+        String phone = request.getParameter("phone");
+        String dob = request.getParameter("dateOfBirth");
+        String gender = request.getParameter("gender");
 
         if (firstName != null) firstName = firstName.trim();
         if (lastName != null) lastName = lastName.trim();
         if (email != null) email = email.trim();
+        if (phone != null) phone = phone.trim();
+        java.sql.Date dateOfBirth = null;
+        if (dob != null && !dob.trim().isEmpty()) {
+            try {
+                dateOfBirth = java.sql.Date.valueOf(dob.trim());
+            } catch (IllegalArgumentException ex) {
+                request.setAttribute("errorMessage", "Ngày sinh không hợp lệ. Định dạng yyyy-MM-dd.");
+                request.getRequestDispatcher("/auth/profile.jsp").forward(request, response);
+                return;
+            }
+        }
+        if (gender != null) gender = gender.trim();
 
         UserDAO dao = new UserDAO();
         current.setFirstName(firstName);
         current.setLastName(lastName);
         current.setEmail(email);
+        current.setPhone(phone);
+        current.setDateOfBirth(dateOfBirth);
+        current.setGender(gender);
         boolean ok = dao.updateProfile(current);
         if (ok) {
             session.setAttribute("user", current);
