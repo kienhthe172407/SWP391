@@ -11,13 +11,8 @@ public abstract class DBContext {
         try {
             // Thông tin kết nối MySQL
             String user = "root";
-<<<<<<< HEAD
             String pass = "123456";
             String url = "jdbc:mysql://127.0.0.1:3306/hr_management_system?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
-=======
-            String pass = "Tu262004@";
-            String url = "jdbc:mysql://127.0.0.1:3306/SWP4?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
->>>>>>> ef0eee0 (Apply UI and DAO updates: profile/register servlets, DBContext, User model/DAO, and SQL data)
 
             // Load MySQL driver
             Class.forName("com.mysql.cj.jdbc.Driver");
