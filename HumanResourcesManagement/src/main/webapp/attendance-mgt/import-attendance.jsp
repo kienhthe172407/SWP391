@@ -18,7 +18,7 @@
     <!-- Global CSS -->
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
     
-    <!-- Custom Styles for Buttons -->
+    <!-- Custom Styles for Buttons and soft badges -->
     <style>
         .btn-import-attendance {
             padding-left: 2rem !important;
@@ -30,6 +30,26 @@
             padding-left: 1.5rem !important;
             padding-right: 1.5rem !important;
             white-space: nowrap !important;
+        }
+
+        /* Soft badge tones (gentle colors) */
+        .badge-soft-success { background-color: #e9f7ef; color: #1e7e34; border: 1px solid #c7ead7; }
+        .badge-soft-danger  { background-color: #fdecea; color: #a71d2a; border: 1px solid #f5c6cb; }
+        .badge-soft-warning { background-color: #fff6e5; color: #8a6d3b; border: 1px solid #ffe0b3; }
+        .badge-soft-primary { background-color: #e8f0fe; color: #1a4fb8; border: 1px solid #c9dbff; }
+        .badge-soft-info    { background-color: #e6f7fb; color: #0c5460; border: 1px solid #bde5f1; }
+
+        /* Orange solid button for Attendance Summary */
+        .btn-attn-summary {
+            background-color: #fd7e14; /* Bootstrap orange */
+            border-color: #fd7e14;
+            color: #fff;
+        }
+        .btn-attn-summary:hover,
+        .btn-attn-summary:focus {
+            background-color: #e56f0f;
+            border-color: #e56f0f;
+            color: #fff;
         }
     </style>
 </head>
@@ -246,14 +266,19 @@
             </div>
         </div>
         
-        <!-- Breadcrumb -->
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Dashboard</a></li>
-                <li class="breadcrumb-item"><a href="#">Contracts & Attendance</a></li>
-                <li class="breadcrumb-item active">Import Attendance</li>
-            </ol>
-        </nav>
+        <!-- Breadcrumb + View Attendance Summary button -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <nav aria-label="breadcrumb" class="mb-0">
+                <ol class="breadcrumb mb-0">
+                    <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Dashboard</a></li>
+                    <li class="breadcrumb-item"><a href="#">Contracts & Attendance</a></li>
+                    <li class="breadcrumb-item active">Import Attendance</li>
+                </ol>
+            </nav>
+            <a href="${pageContext.request.contextPath}/attendance/summary" class="btn btn-attn-summary mt-3 me-3">
+                <i class="fas fa-chart-line me-2"></i>View Attendance Summary
+            </a>
+        </div>
         
         <!-- Content Area -->
         <div class="content-area">
@@ -272,7 +297,8 @@
                 </div>
             </c:if>
             
-            <!-- Instructions Card -->
+            <!-- Instructions Card (hidden when previewData exists) -->
+            <c:if test="${empty previewData}">
             <div class="card mb-4">
                 <div class="card-header">
                     <i class="fas fa-info-circle me-2"></i>Import Instructions
@@ -285,14 +311,14 @@
                                 <li><strong>Download Template:</strong> Use the template below to ensure correct format</li>
                                 <li><strong>Fill Data:</strong> Complete the attendance data with the following columns:
                                     <ul class="mt-2">
-                                        <li><strong>Employee Code</strong> - The unique employee code (required)</li>
-                                        <li><strong>Attendance Date</strong> - Date in YYYY-MM-DD format (required)</li>
-                                        <li><strong>Check-in Time</strong> - Time in HH:MM:SS format (optional)</li>
-                                        <li><strong>Check-out Time</strong> - Time in HH:MM:SS format (optional)</li>
-                                        <li><strong>Status</strong> - Present, Absent, Late, Early Leave, Business Trip, or Remote (default: Present)</li>
-                                        <li><strong>Overtime Hours</strong> - Number of overtime hours (optional, default: 0)</li>
-                                    </ul>
-                                </li>
+                        <li><strong>Employee Code</strong> - The unique employee code (required)</li>
+                        <li><strong>Attendance Date</strong> - Date in YYYY-MM-DD format (required)</li>
+                        <li><strong>Check-in Time</strong> - Time in HH:MM:SS format (optional)</li>
+                        <li><strong>Check-out Time</strong> - Time in HH:MM:SS format (optional)</li>
+                        <li><strong>Status</strong> - Present, Absent, Late, Early Leave, Business Trip, or Remote (default: Present)</li>
+                        <li><strong>Overtime Hours</strong> - Number of overtime hours (optional, default: 0)</li>
+                    </ul>
+                </li>
                                 <li><strong>Save & Upload:</strong> Save as .xlsx or .xls format and upload using the form below</li>
                             </ol>
                         </div>
@@ -303,9 +329,12 @@
                             </a>
                         </div>
                     </div>
-                </div>
+        </div>
             </div>
-            
+        </c:if>
+        
+            <!-- Quick Actions removed; button moved next to breadcrumb -->
+
             <!-- Import Form Card -->
             <div class="card">
                 <div class="card-header">
@@ -314,11 +343,11 @@
                 <div class="card-body">
                     <form method="POST" enctype="multipart/form-data" id="importForm">
                         <div class="row">
-                            <div class="col-md-8">
+                            <div class="col-12">
                                 <div class="mb-0">
                                     <label for="attendanceFile" class="form-label">Select Excel File</label>
-                                    <div class="d-flex align-items-center">
-                                        <input type="file" class="form-control me-3" id="attendanceFile" name="attendanceFile" 
+                                    <div class="d-flex align-items-center w-100">
+                                        <input type="file" class="form-control me-3 flex-grow-1" id="attendanceFile" name="attendanceFile"
                                                accept=".xlsx,.xls" required onchange="updateFileName(this)">
                                         <div class="d-flex gap-2">
                                             <button type="submit" class="btn btn-primary btn-import-attendance">
@@ -336,85 +365,164 @@
                         <div id="fileName" class="text-muted mt-2"></div>
                     </form>
                 </div>
-            </div>
-            
-            <!-- Results Section -->
-            <c:if test="${not empty successCount}">
+        </div>
+        
+            <!-- Preview Table Section -->
+            <c:if test="${not empty previewData}">
                 <div class="card mt-4">
-                    <div class="card-header">
-                        <i class="fas fa-chart-bar me-2"></i>Import Results
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-table me-2"></i>Preview Imported Data</span>
+                        <span class="badge bg-primary">${previewData.totalRecords} records</span>
                     </div>
                     <div class="card-body">
-                        <div class="row mb-4">
-                            <div class="col-md-6">
-                                <div class="card bg-success text-white">
-                                    <div class="card-body text-center">
-                                        <h3 class="mb-0">${successCount}</h3>
-                                        <small>Successful Records</small>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card bg-danger text-white">
-                                    <div class="card-body text-center">
-                                        <h3 class="mb-0">${errorCount}</h3>
-                                        <small>Failed Records</small>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <c:if test="${not empty importBatchID}">
+
+                        <c:if test="${not empty previewData.importBatchID}">
                             <div class="alert alert-info">
-                                <strong>Batch ID:</strong> ${importBatchID}
-                            </div>
-                        </c:if>
-                        
-                        <!-- Success Messages -->
-                        <c:if test="${not empty successMessages}">
-                            <div class="mb-4">
-                                <h5 class="text-success">
-                                    <i class="fas fa-check-circle me-1"></i>Successful Imports
-                                </h5>
-                                <div class="table-responsive">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <c:forEach var="msg" items="${successMessages}">
-                                                <tr class="table-success">
-                                                    <td><i class="fas fa-check text-success me-2"></i>${msg}</td>
-                                                </tr>
-                                            </c:forEach>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </c:if>
-                        
-                        <!-- Error Messages -->
-                        <c:if test="${not empty errorMessages}">
-                            <div class="mb-4">
-                                <h5 class="text-danger">
-                                    <i class="fas fa-exclamation-circle me-1"></i>Failed Imports
-                                </h5>
-                                <div class="table-responsive">
-                                    <table class="table table-sm">
-                                        <tbody>
-                                            <c:forEach var="msg" items="${errorMessages}">
-                                                <tr class="table-danger">
-                                                    <td><i class="fas fa-times text-danger me-2"></i>${msg}</td>
-                                                </tr>
-                                            </c:forEach>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </c:if>
+                                <strong>Batch ID:</strong> ${previewData.importBatchID}
                     </div>
-                </div>
-            </c:if>
+                </c:if>
+                
+                        <!-- Preview Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover preview-table">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th class="text-nowrap" style="width: 5%;">Row</th>
+                                        <th class="text-nowrap" style="width: 10%;">Employee Code</th>
+                                        <th class="text-nowrap" style="width: 13%;">Employee Name</th>
+                                        <th class="text-nowrap" style="width: 10%;">Date</th>
+                                        <th class="text-nowrap" style="width: 9%;">Check-in</th>
+                                        <th class="text-nowrap" style="width: 9%;">Check-out</th>
+                                        <th class="text-nowrap" style="width: 10%;">Status</th>
+                                        <th class="text-nowrap" style="width: 8%;">Overtime</th>
+                                        <th class="text-nowrap" style="width: 8%;">Validation</th>
+                                        <th class="text-nowrap" style="width: 12%;">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:forEach var="previewRecord" items="${previewData.records}">
+                                        <tr class="${previewRecord.valid ? '' : 'table-danger'}">
+                                            <td>${previewRecord.rowNumber}</td>
+                                            <td>
+                                                <strong>${previewRecord.employeeCode}</strong>
+                                            </td>
+                                            <td>
+                                                <c:choose>
+                                                    <c:when test="${not empty previewRecord.employeeName}">
+                                                        ${previewRecord.employeeName}
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="text-muted">N/A</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <c:if test="${previewRecord.valid && previewRecord.record != null}">
+                                                    <fmt:formatDate value="${previewRecord.record.attendanceDate}" pattern="yyyy-MM-dd"/>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${previewRecord.valid && previewRecord.record != null && previewRecord.record.checkInTime != null}">
+                                                    <fmt:formatDate value="${previewRecord.record.checkInTime}" pattern="HH:mm:ss"/>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${previewRecord.valid && previewRecord.record != null && previewRecord.record.checkOutTime != null}">
+                                                    <fmt:formatDate value="${previewRecord.record.checkOutTime}" pattern="HH:mm:ss"/>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${previewRecord.valid && previewRecord.record != null}">
+                                                    <c:choose>
+                                                        <c:when test="${previewRecord.record.status == 'Present'}">
+                                                            <span class="badge badge-soft-success">Present</span>
+                                                        </c:when>
+                                                        <c:when test="${previewRecord.record.status == 'Absent'}">
+                                                            <span class="badge badge-soft-danger">Absent</span>
+                                                        </c:when>
+                                                        <c:when test="${previewRecord.record.status == 'Late'}">
+                                                            <span class="badge badge-soft-warning">Late</span>
+                                                        </c:when>
+                                                        <c:when test="${previewRecord.record.status == 'Early Leave'}">
+                                                            <span class="badge badge-soft-warning">Early Leave</span>
+                                                        </c:when>
+                                                        <c:when test="${previewRecord.record.status == 'Business Trip'}">
+                                                            <span class="badge badge-soft-info">Business Trip</span>
+                                                        </c:when>
+                                                        <c:when test="${previewRecord.record.status == 'Remote'}">
+                                                            <span class="badge badge-soft-primary">Remote</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge bg-light text-secondary">${previewRecord.record.status}</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </c:if>
+                                            </td>
+                                            <td>
+                                                <c:if test="${previewRecord.valid && previewRecord.record != null}">
+                                                    ${previewRecord.record.overtimeHours} hrs
+                                                </c:if>
+                                            </td>
+                                            <td class="text-center">
+                                                <c:choose>
+                                                    <c:when test="${previewRecord.valid}">
+                                                        <i class="fas fa-check-circle text-success" style="font-size: 1.2rem;" title="Valid"></i>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <i class="fas fa-times-circle text-danger" style="font-size: 1.2rem;" title="Invalid"></i>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </td>
+                                            <td>
+                                                <c:if test="${previewRecord.valid}">
+                                                    <span class="badge bg-success">
+                                                        <i class="fas fa-plus"></i> Insert
+                                                    </span>
+                                                </c:if>
+                                                <c:if test="${!previewRecord.valid && previewRecord.errorMessage.contains('Duplicate')}">
+                                                    <span class="badge bg-danger">
+                                                        <i class="fas fa-exclamation-triangle"></i> Duplicate
+                                                    </span>
+                                                </c:if>
+                                            </td>
+                                            
+                                        </tr>
+                                        <c:if test="${!previewRecord.valid}">
+                                            <tr class="table-danger">
+                                                <td colspan="10">
+                                                    <small class="text-danger">
+                                                        <i class="fas fa-exclamation-triangle me-1"></i>
+                                                        <strong>Error:</strong> ${previewRecord.errorMessage}
+                                                    </small>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                        </c:forEach>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+                            <a href="${pageContext.request.contextPath}/attendance/import" class="btn btn-secondary">
+                                <i class="fas fa-times me-1"></i>Cancel
+                            </a>
+                            <c:if test="${previewData.validRecords > 0}">
+                                <form method="POST" action="${pageContext.request.contextPath}/attendance/save" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-lg">
+                                        <i class="fas fa-save me-1"></i>Save
+                                    </button>
+                                </form>
+                            </c:if>
+                        </div>
+                    </div>
+            </div>
+        </c:if>
+
+            <!-- After save: only show alerts (message/error) already rendered above -->
         </div>
     </div>
-
+    
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
