@@ -1,7 +1,9 @@
 -- ==============================================================================
 -- DATABASE CREATION
 -- ==============================================================================
-
+DROP DATABASE IF EXISTS hr_management_system;
+CREATE DATABASE hr_management_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE hr_management_system;
 
 -- ==============================================================================
 -- TABLE: users
@@ -514,42 +516,72 @@ ADD FOREIGN KEY (manager_id) REFERENCES employees(employee_id) ON DELETE SET NUL
 -- INSERT DATA: users
 -- Dữ liệu người dùng hệ thống
 -- ==============================================================================
-INSERT INTO users (username, password_hash, email, first_name, last_name, role, status, created_by) VALUES
-('admin', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'admin@company.com', NULL, NULL, 'Admin', 'Active', NULL),
-('hr_manager', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.manager@company.com', NULL, NULL, 'HR Manager', 'Active', 1),
-('hr_staff1', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff1@company.com', NULL, NULL, 'HR', 'Active', 1),
-('hr_staff2', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff2@company.com', NULL, NULL, 'HR', 'Active', 1),
-('john.smith', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'john.smith@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
-('sarah.johnson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sarah.johnson@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
-('michael.brown', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'michael.brown@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('emily.davis', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'emily.davis@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('david.wilson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'david.wilson@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('lisa.anderson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'lisa.anderson@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('robert.taylor', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'robert.taylor@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('jennifer.thomas', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jennifer.thomas@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('james.martinez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'james.martinez@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('mary.garcia', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mary.garcia@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('william.rodriguez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'william.rodriguez@company.com', NULL, NULL, 'Employee', 'Inactive', 1),
+INSERT INTO users (username, password_hash, email, first_name, last_name, phone, date_of_birth, gender, role, status, created_by) VALUES
+('admin', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'admin@company.com', NULL, NULL, NULL, NULL, NULL, 'Admin', 'Active', NULL),
+('hr_manager', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.manager@company.com', NULL, NULL, NULL, NULL, NULL, 'HR Manager', 'Active', 1),
+('hr_staff1', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff1@company.com', NULL, NULL, NULL, NULL, NULL, 'HR', 'Active', 1),
+('hr_staff2', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff2@company.com', NULL, NULL, NULL, NULL, NULL, 'HR', 'Active', 1),
+('john.smith', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'john.smith@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
+('sarah.johnson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sarah.johnson@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
+('michael.brown', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'michael.brown@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('emily.davis', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'emily.davis@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('david.wilson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'david.wilson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('lisa.anderson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'lisa.anderson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('robert.taylor', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'robert.taylor@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('jennifer.thomas', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jennifer.thomas@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('james.martinez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'james.martinez@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('mary.garcia', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mary.garcia@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('william.rodriguez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'william.rodriguez@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Inactive', 1),
 
 -- Additional user accounts created by Admin (without employee records yet - for testing Create Employee functionality)
-('alex.chen', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'alex.chen@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('sophia.kim', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sophia.kim@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('daniel.lee', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'daniel.lee@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
-('rachel.white', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'rachel.white@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('kevin.park', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'kevin.park@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('amanda.jones', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'amanda.jones@company.com', NULL, NULL, 'HR', 'Active', 1),
-('ryan.miller', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ryan.miller@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('jessica.clark', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jessica.clark@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('brandon.hall', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'brandon.hall@company.com', NULL, NULL, 'Dept Manager', 'Active', 1),
-('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', NULL, NULL, 'Employee', 'Active', 1),
+('alex.chen', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'alex.chen@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('sophia.kim', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sophia.kim@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('daniel.lee', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'daniel.lee@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
+('rachel.white', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'rachel.white@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('kevin.park', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'kevin.park@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('amanda.jones', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'amanda.jones@company.com', NULL, NULL, NULL, NULL, NULL, 'HR', 'Active', 1),
+('ryan.miller', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ryan.miller@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('jessica.clark', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jessica.clark@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('brandon.hall', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'brandon.hall@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
+('nicole.adams', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nicole.adams@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
 
 -- Additional user accounts for new employees with contracts
-('thomas.wright', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'thomas.wright@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('victoria.scott', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'victoria.scott@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('christopher.green', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'christopher.green@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('margaret.baker', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'margaret.baker@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('andrew.nelson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'andrew.nelson@company.com', NULL, NULL, 'Employee', 'Active', 1),
-('elizabeth.carter', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'elizabeth.carter@company.com', NULL, NULL, 'Employee', 'Active', 1);
+('thomas.wright', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'thomas.wright@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('victoria.scott', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'victoria.scott@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('christopher.green', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'christopher.green@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('margaret.baker', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'margaret.baker@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('andrew.nelson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'andrew.nelson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('elizabeth.carter', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'elizabeth.carter@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+
+-- Additional user accounts for EMP023-EMP050
+('nathan.cooper', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'nathan.cooper@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('olivia.reed', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'olivia.reed@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('ethan.bailey', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ethan.bailey@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('sophia.rivera', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sophia.rivera@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('mason.cox', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mason.cox@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('isabella.howard', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'isabella.howard@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('logan.ward', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'logan.ward@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('mia.torres', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'mia.torres@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('lucas.peterson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'lucas.peterson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('charlotte.gray', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'charlotte.gray@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('jackson.ramirez', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jackson.ramirez@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('amelia.james', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'amelia.james@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('aiden.watson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'aiden.watson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('harper.brooks', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'harper.brooks@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('elijah.kelly', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'elijah.kelly@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('evelyn.sanders', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'evelyn.sanders@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('oliver.price', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'oliver.price@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('abigail.bennett', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'abigail.bennett@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('carter.wood', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'carter.wood@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('ella.barnes', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'ella.barnes@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('sebastian.ross', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sebastian.ross@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('scarlett.henderson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'scarlett.henderson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('henry.coleman', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'henry.coleman@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('grace.jenkins', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'grace.jenkins@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('wyatt.perry', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'wyatt.perry@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('chloe.powell', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'chloe.powell@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('jack.long', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'jack.long@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
+('lily.patterson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'lily.patterson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1);
 
 -- ==============================================================================
 -- INSERT DATA: departments
@@ -609,17 +641,37 @@ INSERT INTO employees (user_id, employee_code, first_name, last_name, date_of_bi
 (28, 'EMP019', 'Andrew', 'Nelson', '1992-03-17', 'Male', '+1-555-0137', 'andrew.nelson.personal@email.com', '987 Olive Lane, New York, NY 10019', 'Nancy Nelson', '+1-555-0138', 4, 10, NULL, '2024-12-15', 'Active'),
 (29, 'EMP020', 'Elizabeth', 'Carter', '1985-06-11', 'Female', '+1-555-0139', 'elizabeth.carter.personal@email.com', '147 Palm Court, New York, NY 10020', 'Richard Carter', '+1-555-0140', 2, 4, 4, '2023-01-15', 'Active'),
 (30, 'EMP021', 'David', 'Mitchell', '1990-09-28', 'Male', '+1-555-0141', 'david.mitchell.personal@email.com', '258 Quince Way, New York, NY 10021', 'Helen Mitchell', '+1-555-0142', 3, 8, 5, '2022-06-01', 'Active'),
-(31, 'EMP022', 'Jennifer', 'Harris', '1987-12-05', 'Female', '+1-555-0143', 'jennifer.harris.personal@email.com', '369 Rose Place, New York, NY 10022', 'Mark Harris', '+1-555-0144', 4, 10, NULL, '2023-03-01', 'Active');
+(31, 'EMP022', 'Jennifer', 'Harris', '1987-12-05', 'Female', '+1-555-0143', 'jennifer.harris.personal@email.com', '369 Rose Place, New York, NY 10022', 'Mark Harris', '+1-555-0144', 4, 10, NULL, '2023-03-01', 'Active'),
 
--- Update employee records with user_id links
-UPDATE employees SET user_id = 24 WHERE employee_id = 24;
-UPDATE employees SET user_id = 25 WHERE employee_id = 25;
-UPDATE employees SET user_id = 26 WHERE employee_id = 26;
-UPDATE employees SET user_id = 27 WHERE employee_id = 27;
-UPDATE employees SET user_id = 28 WHERE employee_id = 28;
-UPDATE employees SET user_id = 29 WHERE employee_id = 29;
-UPDATE employees SET user_id = 30 WHERE employee_id = 30;
-UPDATE employees SET user_id = 31 WHERE employee_id = 31;
+-- Additional employees EMP023-EMP050
+(32, 'EMP023', 'Nathan', 'Cooper', '1993-04-15', 'Male', '+1-555-0145', 'nathan.cooper.personal@email.com', '741 Tulip Boulevard, New York, NY 10023', 'Sarah Cooper', '+1-555-0146', 5, 12, 11, '2022-08-15', 'Active'),
+(33, 'EMP024', 'Olivia', 'Reed', '1990-07-28', 'Female', '+1-555-0147', 'olivia.reed.personal@email.com', '852 Violet Street, New York, NY 10024', 'Michael Reed', '+1-555-0148', 6, 14, 12, '2023-05-20', 'Active'),
+(34, 'EMP025', 'Ethan', 'Bailey', '1988-10-12', 'Male', '+1-555-0149', 'ethan.bailey.personal@email.com', '963 Daisy Road, New York, NY 10025', 'Emma Bailey', '+1-555-0150', 2, 4, 4, '2021-11-10', 'Active'),
+(35, 'EMP026', 'Sophia', 'Rivera', '1992-01-25', 'Female', '+1-555-0151', 'sophia.rivera.personal@email.com', '159 Lily Avenue, New York, NY 10026', 'Carlos Rivera', '+1-555-0152', 3, 8, 5, '2022-02-14', 'Active'),
+(36, 'EMP027', 'Mason', 'Cox', '1987-05-08', 'Male', '+1-555-0153', 'mason.cox.personal@email.com', '357 Iris Lane, New York, NY 10027', 'Jessica Cox', '+1-555-0154', 4, 10, 10, '2020-09-01', 'Active'),
+(37, 'EMP028', 'Isabella', 'Howard', '1991-08-19', 'Female', '+1-555-0155', 'isabella.howard.personal@email.com', '456 Orchid Court, New York, NY 10028', 'David Howard', '+1-555-0156', 5, 12, 11, '2023-01-15', 'Active'),
+(38, 'EMP029', 'Logan', 'Ward', '1989-11-30', 'Male', '+1-555-0157', 'logan.ward.personal@email.com', '789 Peony Way, New York, NY 10029', 'Amanda Ward', '+1-555-0158', 6, 14, 12, '2021-07-20', 'Active'),
+(39, 'EMP030', 'Mia', 'Torres', '1994-03-14', 'Female', '+1-555-0159', 'mia.torres.personal@email.com', '321 Jasmine Place, New York, NY 10030', 'Robert Torres', '+1-555-0160', 1, 6, 1, '2023-10-05', 'Active'),
+(40, 'EMP031', 'Lucas', 'Peterson', '1986-06-22', 'Male', '+1-555-0161', 'lucas.peterson.personal@email.com', '654 Azalea Boulevard, New York, NY 10031', 'Michelle Peterson', '+1-555-0162', 2, 3, 4, '2020-04-12', 'Active'),
+(41, 'EMP032', 'Charlotte', 'Gray', '1990-09-05', 'Female', '+1-555-0163', 'charlotte.gray.personal@email.com', '987 Camellia Street, New York, NY 10032', 'Thomas Gray', '+1-555-0164', 3, 8, 5, '2022-12-01', 'Active'),
+(42, 'EMP033', 'Jackson', 'Ramirez', '1993-12-18', 'Male', '+1-555-0165', 'jackson.ramirez.personal@email.com', '147 Gardenia Road, New York, NY 10033', 'Maria Ramirez', '+1-555-0166', 4, 10, 10, '2021-03-15', 'Active'),
+(43, 'EMP034', 'Amelia', 'James', '1988-02-27', 'Female', '+1-555-0167', 'amelia.james.personal@email.com', '258 Begonia Avenue, New York, NY 10034', 'Daniel James', '+1-555-0168', 5, 12, 11, '2023-06-20', 'Active'),
+(44, 'EMP035', 'Aiden', 'Watson', '1991-05-11', 'Male', '+1-555-0169', 'aiden.watson.personal@email.com', '369 Carnation Lane, New York, NY 10035', 'Rachel Watson', '+1-555-0170', 6, 14, 12, '2022-09-10', 'Active'),
+(45, 'EMP036', 'Harper', 'Brooks', '1987-08-24', 'Female', '+1-555-0171', 'harper.brooks.personal@email.com', '741 Sunflower Court, New York, NY 10036', 'Kevin Brooks', '+1-555-0172', 1, 6, 1, '2021-12-05', 'Active'),
+(46, 'EMP037', 'Elijah', 'Kelly', '1992-11-07', 'Male', '+1-555-0173', 'elijah.kelly.personal@email.com', '852 Marigold Way, New York, NY 10037', 'Laura Kelly', '+1-555-0174', 2, 4, 4, '2023-02-18', 'Active'),
+(47, 'EMP038', 'Evelyn', 'Sanders', '1989-01-20', 'Female', '+1-555-0175', 'evelyn.sanders.personal@email.com', '963 Zinnia Place, New York, NY 10038', 'Mark Sanders', '+1-555-0176', 3, 8, 5, '2020-11-22', 'Active'),
+(48, 'EMP039', 'Oliver', 'Price', '1994-04-03', 'Male', '+1-555-0177', 'oliver.price.personal@email.com', '159 Petunia Boulevard, New York, NY 10039', 'Jennifer Price', '+1-555-0178', 4, 10, 10, '2022-05-30', 'Active'),
+(49, 'EMP040', 'Abigail', 'Bennett', '1990-07-16', 'Female', '+1-555-0179', 'abigail.bennett.personal@email.com', '357 Hibiscus Street, New York, NY 10040', 'Christopher Bennett', '+1-555-0180', 5, 12, 11, '2021-08-14', 'Active'),
+(50, 'EMP041', 'Carter', 'Wood', '1988-10-29', 'Male', '+1-555-0181', 'carter.wood.personal@email.com', '456 Lavender Road, New York, NY 10041', 'Stephanie Wood', '+1-555-0182', 6, 14, 12, '2023-03-25', 'Active'),
+(51, 'EMP042', 'Ella', 'Barnes', '1993-01-12', 'Female', '+1-555-0183', 'ella.barnes.personal@email.com', '789 Primrose Avenue, New York, NY 10042', 'Andrew Barnes', '+1-555-0184', 1, 6, 1, '2022-07-08', 'Active'),
+(52, 'EMP043', 'Sebastian', 'Ross', '1986-04-25', 'Male', '+1-555-0185', 'sebastian.ross.personal@email.com', '321 Bluebell Lane, New York, NY 10043', 'Nicole Ross', '+1-555-0186', 2, 3, 4, '2020-10-15', 'Active'),
+(53, 'EMP044', 'Scarlett', 'Henderson', '1991-07-08', 'Female', '+1-555-0187', 'scarlett.henderson.personal@email.com', '654 Foxglove Court, New York, NY 10044', 'Brandon Henderson', '+1-555-0188', 3, 8, 5, '2023-04-12', 'Active'),
+(54, 'EMP045', 'Henry', 'Coleman', '1989-10-21', 'Male', '+1-555-0189', 'henry.coleman.personal@email.com', '987 Snapdragon Way, New York, NY 10045', 'Melissa Coleman', '+1-555-0190', 4, 10, 10, '2021-06-28', 'Active'),
+(55, 'EMP046', 'Grace', 'Jenkins', '1992-12-04', 'Female', '+1-555-0191', 'grace.jenkins.personal@email.com', '147 Daffodil Place, New York, NY 10046', 'Timothy Jenkins', '+1-555-0192', 5, 12, 11, '2022-11-16', 'Active'),
+(56, 'EMP047', 'Wyatt', 'Perry', '1987-02-17', 'Male', '+1-555-0193', 'wyatt.perry.personal@email.com', '258 Crocus Boulevard, New York, NY 10047', 'Angela Perry', '+1-555-0194', 6, 14, 12, '2023-08-22', 'Active'),
+(57, 'EMP048', 'Chloe', 'Powell', '1990-05-30', 'Female', '+1-555-0195', 'chloe.powell.personal@email.com', '369 Hyacinth Street, New York, NY 10048', 'Patrick Powell', '+1-555-0196', 1, 6, 1, '2021-01-10', 'Active'),
+(58, 'EMP049', 'Jack', 'Long', '1994-08-13', 'Male', '+1-555-0197', 'jack.long.personal@email.com', '741 Poppy Road, New York, NY 10049', 'Samantha Long', '+1-555-0198', 2, 4, 4, '2022-03-05', 'Active'),
+(59, 'EMP050', 'Lily', 'Patterson', '1988-11-26', 'Female', '+1-555-0199', 'lily.patterson.personal@email.com', '852 Buttercup Avenue, New York, NY 10050', 'Gregory Patterson', '+1-555-0200', 3, 8, 5, '2023-09-18', 'Active');
 
 -- Update department managers
 UPDATE departments SET manager_id = 1 WHERE department_id = 1; -- HR

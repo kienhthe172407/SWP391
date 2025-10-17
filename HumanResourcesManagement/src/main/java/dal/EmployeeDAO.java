@@ -82,6 +82,41 @@ public class EmployeeDAO extends DBContext {
     }
 
     /**
+     * Get employee by employee code
+     * @param employeeCode Employee code
+     * @return Employee if found, null otherwise
+     */
+    public Employee getEmployeeByCode(String employeeCode) {
+        String sql = "SELECT e.employee_id, e.user_id, e.employee_code, e.first_name, e.last_name, " +
+                     "e.date_of_birth, e.gender, e.phone_number, e.personal_email, " +
+                     "e.home_address, e.emergency_contact_name, e.emergency_contact_phone, " +
+                     "e.department_id, e.position_id, e.manager_id, e.hire_date, e.employment_status, " +
+                     "e.created_at, e.updated_at, " +
+                     "d.department_name, p.position_name, " +
+                     "CONCAT(m.first_name, ' ', m.last_name) AS manager_name " +
+                     "FROM employees e " +
+                     "LEFT JOIN departments d ON e.department_id = d.department_id " +
+                     "LEFT JOIN positions p ON e.position_id = p.position_id " +
+                     "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
+                     "WHERE e.employee_code = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, employeeCode);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToEmployee(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getEmployeeByCode: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Get all employees with pagination (for HR/HR Manager)
      * @param page Current page number
      * @param pageSize Number of records per page

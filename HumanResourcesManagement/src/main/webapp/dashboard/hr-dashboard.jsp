@@ -50,7 +50,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/attendance/import">
                     <i class="fas fa-clock"></i>
                     <span>Attendance</span>
                 </a>
@@ -193,6 +193,23 @@
                                 </a>
                                 <a href="${pageContext.request.contextPath}/job-postings/create" class="btn btn-success">
                                     <i class="fas fa-plus me-1"></i>Create Posting
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header"><i class="fas fa-clock me-2"></i>Attendance Management</div>
+                        <div class="card-body">
+                            <p class="text-muted">Import and manage employee attendance records.</p>
+                            <div class="d-flex gap-2">
+                                <a href="${pageContext.request.contextPath}/attendance/import" class="btn btn-primary">
+                                    <i class="fas fa-upload me-1"></i>Attendance
+                                </a>
+                                <a href="#" class="btn btn-secondary">
+                                    <i class="fas fa-list me-1"></i>View Records
                                 </a>
                             </div>
                         </div>
