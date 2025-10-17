@@ -47,6 +47,37 @@ public class AttendanceDAO extends DBContext {
     }
     
     /**
+     * Get attendance record by attendance ID
+     * @param attendanceID Attendance ID
+     * @return AttendanceRecord if found, null otherwise
+     */
+    public AttendanceRecord getAttendanceById(int attendanceID) {
+        String sql = "SELECT ar.attendance_id, ar.employee_id, ar.attendance_date, " +
+                     "ar.check_in_time, ar.check_out_time, ar.status, ar.overtime_hours, " +
+                     "ar.is_manual_adjustment, ar.adjustment_reason, ar.adjusted_by, " +
+                     "ar.adjusted_at, ar.import_batch_id, ar.created_at, ar.updated_at, " +
+                     "e.employee_code, CONCAT(e.first_name, ' ', e.last_name) AS employee_name " +
+                     "FROM attendance_records ar " +
+                     "LEFT JOIN employees e ON ar.employee_id = e.employee_id " +
+                     "WHERE ar.attendance_id = ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, attendanceID);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToAttendanceRecord(rs);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting attendance record by ID: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
      * Get attendance record by employee ID and date
      * @param employeeID Employee ID
      * @param attendanceDate Attendance date
@@ -61,11 +92,11 @@ public class AttendanceDAO extends DBContext {
                      "FROM attendance_records ar " +
                      "LEFT JOIN employees e ON ar.employee_id = e.employee_id " +
                      "WHERE ar.employee_id = ? AND ar.attendance_date = ?";
-        
+
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, employeeID);
             ps.setDate(2, attendanceDate);
-            
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return mapResultSetToAttendanceRecord(rs);
@@ -75,7 +106,7 @@ public class AttendanceDAO extends DBContext {
             System.err.println("Error getting attendance record: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return null;
     }
     
