@@ -38,11 +38,18 @@ public class ViewJobPostingsServlet extends HttpServlet {
 
         // Get user session information
         HttpSession session = request.getSession();
-        
-        // Set default role as HR Manager for full access (for development)
-        if (session.getAttribute("userRole") == null) {
-            session.setAttribute("userRole", "HR Manager");
-            session.setAttribute("userId", 1);
+        String userRole = (String) session.getAttribute("userRole");
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userRole == null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                userRole = ((model.User) userObj).getRole();
+                session.setAttribute("userRole", userRole);
+                if (userId == null) {
+                    userId = ((model.User) userObj).getUserId();
+                    session.setAttribute("userId", userId);
+                }
+            }
         }
 
         // Pagination parameters

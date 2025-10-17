@@ -40,11 +40,18 @@ public class EditJobPostingServlet extends HttpServlet {
 
         // Get user session information
         HttpSession session = request.getSession();
-        
-        // Set default role as HR Manager for full access (for development)
-        if (session.getAttribute("userRole") == null) {
-            session.setAttribute("userRole", "HR Manager");
-            session.setAttribute("userId", 1);
+        String userRole = (String) session.getAttribute("userRole");
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userRole == null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                userRole = ((model.User) userObj).getRole();
+                session.setAttribute("userRole", userRole);
+                if (userId == null) {
+                    userId = ((model.User) userObj).getUserId();
+                    session.setAttribute("userId", userId);
+                }
+            }
         }
 
         // Get job ID from request parameter
@@ -108,10 +115,19 @@ public class EditJobPostingServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
         
-        // Set default role and user ID if not set (for development)
-        if (session.getAttribute("userId") == null) {
-            session.setAttribute("userId", 1);
-            session.setAttribute("userRole", "HR Manager");
+        // Ensure role/userId from authenticated user
+        Integer userIdPost = (Integer) session.getAttribute("userId");
+        String rolePost = (String) session.getAttribute("userRole");
+        if (rolePost == null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                rolePost = ((model.User) userObj).getRole();
+                session.setAttribute("userRole", rolePost);
+                if (userIdPost == null) {
+                    userIdPost = ((model.User) userObj).getUserId();
+                    session.setAttribute("userId", userIdPost);
+                }
+            }
         }
 
         // Get job ID from request parameter
