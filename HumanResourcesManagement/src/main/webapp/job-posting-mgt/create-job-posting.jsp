@@ -1,11 +1,7 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@taglib prefix="c" uri="jakarta.tags.core"%>
 
-<%-- Set admin role by default for all users --%>
-<% 
-    session.setAttribute("userRole", "HR Manager");
-    session.setAttribute("userId", 1);
-%>
+<%-- Role comes from authenticated session; do not override here --%>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -114,21 +110,36 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="sidebar-header">
-            <h4>HR Management</h4>
-            <p>Human Resources System</p>
+            <c:set var="roleName" value="${sessionScope.userRole != null ? sessionScope.userRole : (sessionScope.user != null ? sessionScope.user.roleDisplayName : '')}" />
+            <c:set var="isHRManager" value="${roleName == 'HR Manager' || (sessionScope.user != null && (sessionScope.user.role == 'HR_MANAGER' || sessionScope.user.role == 'HR Manager'))}" />
+            <c:set var="isHR" value="${roleName == 'HR' || (sessionScope.user != null && (sessionScope.user.role == 'HR' || sessionScope.user.role == 'HR_STAFF'))}" />
+            <c:choose>
+                <c:when test="${isHRManager}">
+                    <h4>HR Manager Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:when test="${isHR}">
+                    <h4>HR Dashboard</h4>
+                    <p>Human Resources</p>
+                </c:when>
+                <c:otherwise>
+                    <h4>HR Management</h4>
+                    <p>Human Resources System</p>
+                </c:otherwise>
+            </c:choose>
         </div>
         
         <ul class="sidebar-menu">
             <li class="menu-section">Dashboard</li>
             <li>
-                <a href="${pageContext.request.contextPath}/">
+                <a href="${pageContext.request.contextPath}/${isHRManager ? 'dashboard/hr-manager-dashboard.jsp' : 'dashboard/hr-dashboard.jsp'}">
                     <i class="fas fa-home"></i>
-                    <span>Dashboard</span>
+                    <span>Overview</span>
                 </a>
             </li>
 
             <c:choose>
-                <c:when test="${sessionScope.userRole == 'HR Manager'}">
+                <c:when test="${isHRManager}">
                     <!-- HR Manager Menu -->
                     <li class="menu-section">HR Management</li>
                     <li>
@@ -152,25 +163,19 @@
 
                     <li class="menu-section">Employee Management</li>
                     <li>
-                        <a href="#">
+                        <a href="${pageContext.request.contextPath}/employees/list">
                             <i class="fas fa-users"></i>
                             <span>All Employees</span>
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/job-postings/list" class="active">
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
                             <i class="fas fa-user-plus"></i>
-                            <span>Recruitment</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-briefcase"></i>
-                            <span>Departments</span>
+                            <span>Add Employee Information</span>
                         </a>
                     </li>
 
-                    <li class="menu-section">Contract & Attendance</li>
+                    <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list">
                             <i class="fas fa-file-contract"></i>
@@ -187,6 +192,20 @@
                         <a href="#">
                             <i class="fas fa-calendar-check"></i>
                             <span>Leave Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Recruitment</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/list" class="active">
+                            <i class="fas fa-briefcase"></i>
+                            <span> Job Postings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/create">
+                            <i class="fas fa-plus"></i>
+                            <span>Create Job Posting</span>
                         </a>
                     </li>
 
@@ -231,22 +250,22 @@
                     </li>
                 </c:when>
                 <c:otherwise>
-                    <!-- HR Staff Menu -->
+                    <!-- HR Staff Menu (mirror hr-dashboard.jsp) -->
                     <li class="menu-section">Employee Management</li>
                     <li>
-                        <a href="#">
+                        <a href="${pageContext.request.contextPath}/employees/list">
                             <i class="fas fa-users"></i>
-                            <span>Employees</span>
+                            <span>All Employees</span>
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/job-postings/list" class="active">
+                        <a href="${pageContext.request.contextPath}/employees/addInformation">
                             <i class="fas fa-user-plus"></i>
-                            <span>Recruitment</span>
+                            <span>Add Employee Information</span>
                         </a>
                     </li>
 
-                    <li class="menu-section">Contract & Attendance</li>
+                    <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list">
                             <i class="fas fa-file-contract"></i>
@@ -257,6 +276,26 @@
                         <a href="#">
                             <i class="fas fa-clock"></i>
                             <span>Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Leave Requests</span>
+                        </a>
+                    </li>
+
+                    <li class="menu-section">Recruitment</li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/list" class="active">
+                            <i class="fas fa-briefcase"></i>
+                            <span> Job Postings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="${pageContext.request.contextPath}/job-postings/create">
+                            <i class="fas fa-plus"></i>
+                            <span>Create Job Posting</span>
                         </a>
                     </li>
 
@@ -276,19 +315,7 @@
                 </c:otherwise>
             </c:choose>
 
-            <li class="menu-section">System</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-cog"></i>
-                    <span>Settings</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
+            
         </ul>
     </div>
     
