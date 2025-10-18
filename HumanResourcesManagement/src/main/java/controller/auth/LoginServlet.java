@@ -40,13 +40,29 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession(true);
                 session.setAttribute("user", authenticated);
                 String role = authenticated.getRole();
-                if ("HR Manager".equals(role)) {
+                LOGGER.info("User role: " + role); // Debug logging
+                if ("Admin".equals(role)) {
+                    LOGGER.info("Redirecting Admin to: /dashboard/admin-dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/admin-dashboard.jsp");
+                    return;
+                } else if ("HR Manager".equals(role)) {
+                    LOGGER.info("Redirecting HR Manager to: /dashboard/hr-manager-dashboard.jsp");
                     response.sendRedirect(request.getContextPath() + "/dashboard/hr-manager-dashboard.jsp");
                     return;
                 } else if ("HR".equals(role)) {
+                    LOGGER.info("Redirecting HR to: /dashboard/hr-dashboard.jsp");
                     response.sendRedirect(request.getContextPath() + "/dashboard/hr-dashboard.jsp");
                     return;
+                } else if ("Employee".equals(role)) {
+                    LOGGER.info("Redirecting Employee to: /dashboard/employee-dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/employee-dashboard.jsp");
+                    return;
+                } else if ("Dept Manager".equals(role)) {
+                    LOGGER.info("Redirecting Dept Manager to: /dashboard/dept-manager-dashboard.jsp");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/dept-manager-dashboard.jsp");
+                    return;
                 } else {
+                    LOGGER.info("Redirecting other role (" + role + ") to: /manager/home.jsp");
                     response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
                     return;
                 }

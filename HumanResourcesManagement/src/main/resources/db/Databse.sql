@@ -521,8 +521,8 @@ INSERT INTO users (username, password_hash, email, first_name, last_name, phone,
 ('hr_manager', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.manager@company.com', NULL, NULL, NULL, NULL, NULL, 'HR Manager', 'Active', 1),
 ('hr_staff1', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff1@company.com', NULL, NULL, NULL, NULL, NULL, 'HR', 'Active', 1),
 ('hr_staff2', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'hr.staff2@company.com', NULL, NULL, NULL, NULL, NULL, 'HR', 'Active', 1),
-('john.smith', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'john.smith@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
-('sarah.johnson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'sarah.johnson@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
+('dept_manager1', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'dept_manager1@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
+('dept_manager2', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'dept_manager2@company.com', NULL, NULL, NULL, NULL, NULL, 'Dept Manager', 'Active', 1),
 ('michael.brown', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'michael.brown@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
 ('emily.davis', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'emily.davis@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
 ('david.wilson', '$2y$10$XqWKz9F5YrWcY5RhHn9mN.XvQGN6m7FhPzKxGZ1/abcdefghijk', 'david.wilson@company.com', NULL, NULL, NULL, NULL, NULL, 'Employee', 'Active', 1),
@@ -623,8 +623,8 @@ INSERT INTO employees (user_id, employee_code, first_name, last_name, date_of_bi
 (2, 'EMP001', 'Alice', 'Thompson', '1985-03-15', 'Female', '+1-555-0101', 'alice.thompson@email.com', '123 Main Street, New York, NY 10001', 'Bob Thompson', '+1-555-0102', 1, 5, NULL, '2015-01-15', 'Active'),
 (3, 'EMP002', 'Mark', 'Williams', '1990-07-22', 'Male', '+1-555-0103', 'mark.williams@email.com', '456 Oak Avenue, New York, NY 10002', 'Susan Williams', '+1-555-0104', 1, 6, 1, '2018-03-10', 'Active'),
 (4, 'EMP003', 'Patricia', 'Martinez', '1988-11-30', 'Female', '+1-555-0105', 'patricia.martinez@email.com', '789 Pine Road, New York, NY 10003', 'Carlos Martinez', '+1-555-0106', 1, 6, 1, '2019-06-01', 'Active'),
-(5, 'EMP004', 'John', 'Smith', '1982-05-18', 'Male', '+1-555-0107', 'john.smith.personal@email.com', '321 Elm Street, New York, NY 10004', 'Jane Smith', '+1-555-0108', 2, 2, NULL, '2014-08-20', 'Active'),
-(6, 'EMP005', 'Sarah', 'Johnson', '1987-09-25', 'Female', '+1-555-0109', 'sarah.johnson.personal@email.com', '654 Maple Drive, New York, NY 10005', 'Mike Johnson', '+1-555-0110', 3, 7, NULL, '2016-02-14', 'Active'),
+(5, 'EMP004', 'John', 'Smith', '1982-05-18', 'Male', '+1-555-0107', 'dept_manager1.personal@email.com', '321 Elm Street, New York, NY 10004', 'Jane Smith', '+1-555-0108', 2, 2, NULL, '2014-08-20', 'Active'),
+(6, 'EMP005', 'Sarah', 'Johnson', '1987-09-25', 'Female', '+1-555-0109', 'dept_manager2.personal@email.com', '654 Maple Drive, New York, NY 10005', 'Mike Johnson', '+1-555-0110', 3, 7, NULL, '2016-02-14', 'Active'),
 (7, 'EMP006', 'Michael', 'Brown', '1992-01-12', 'Male', '+1-555-0111', 'michael.brown.personal@email.com', '987 Cedar Lane, New York, NY 10006', 'Laura Brown', '+1-555-0112', 2, 3, 4, '2019-04-15', 'Active'),
 (8, 'EMP007', 'Emily', 'Davis', '1991-04-08', 'Female', '+1-555-0113', 'emily.davis.personal@email.com', '147 Birch Court, New York, NY 10007', 'Tom Davis', '+1-555-0114', 2, 4, 4, '2020-01-20', 'Active'),
 (9, 'EMP008', 'David', 'Wilson', '1989-12-03', 'Male', '+1-555-0115', 'david.wilson.personal@email.com', '258 Spruce Way, New York, NY 10008', 'Emma Wilson', '+1-555-0116', 3, 8, 5, '2018-07-11', 'Active'),
@@ -937,7 +937,7 @@ TRUE);
 -- Dữ liệu log hoạt động (ví dụ)
 -- ==============================================================================
 INSERT INTO audit_logs (user_id, action_type, table_name, record_id, old_values, new_values, ip_address, user_agent) VALUES
-(1, 'CREATE', 'users', 5, NULL, '{"username": "john.smith", "email": "john.smith@company.com", "role": "Dept Manager"}', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'),
+(1, 'CREATE', 'users', 5, NULL, '{"username": "dept_manager1", "email": "dept_manager1@company.com", "role": "Dept Manager"}', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'),
 (2, 'UPDATE', 'employees', 2, '{"phone_number": "+1-555-0103"}', '{"phone_number": "+1-555-0104"}', '192.168.1.101', 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)'),
 (5, 'APPROVE', 'requests', 1, '{"request_status": "Pending"}', '{"request_status": "Approved", "reviewed_by": 5}', '192.168.1.102', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'),
 (1, 'DELETE', 'users', 15, '{"username": "william.rodriguez", "status": "Active"}', '{"status": "Inactive"}', '192.168.1.100', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'),
@@ -1221,87 +1221,10 @@ CREATE INDEX idx_task_assignment ON tasks(assigned_to, task_status, due_date);
 -- ==============================================================================
 -- STORED PROCEDURES: Các thủ tục hỗ trợ nghiệp vụ
 -- ==============================================================================
+-- Note: Salary calculation is now handled in Java application layer for better
+-- flexibility and integration with benefit_types and deduction_types configuration
 
--- Procedure: Tính lương tự động cho một nhân viên trong tháng
 DELIMITER //
-
-CREATE PROCEDURE sp_calculate_monthly_salary(
-    IN p_employee_id INT,
-    IN p_payroll_month DATE,
-    IN p_calculated_by INT
-)
-BEGIN
-    DECLARE v_base_salary DECIMAL(12,2);
-    DECLARE v_total_allowances DECIMAL(10,2);
-    DECLARE v_working_days INT;
-    DECLARE v_absent_days INT;
-    DECLARE v_late_days INT;
-    DECLARE v_overtime_hours DECIMAL(6,2);
-    DECLARE v_overtime_pay DECIMAL(10,2);
-    DECLARE v_gross_salary DECIMAL(12,2);
-    DECLARE v_total_deductions DECIMAL(10,2);
-    DECLARE v_net_salary DECIMAL(12,2);
-    
-    -- Lấy thông tin lương cơ bản và phụ cấp
-    SELECT 
-        base_salary,
-        (position_allowance + housing_allowance + transportation_allowance + meal_allowance + other_allowances)
-    INTO v_base_salary, v_total_allowances
-    FROM salary_components
-    WHERE employee_id = p_employee_id AND is_active = TRUE
-    LIMIT 1;
-    
-    -- Tính số ngày làm việc, vắng, đi muộn và giờ làm thêm
-    SELECT 
-        COUNT(CASE WHEN status IN ('Present', 'Late', 'Remote', 'Business Trip') THEN 1 END),
-        COUNT(CASE WHEN status = 'Absent' THEN 1 END),
-        COUNT(CASE WHEN status = 'Late' THEN 1 END),
-        COALESCE(SUM(overtime_hours), 0)
-    INTO v_working_days, v_absent_days, v_late_days, v_overtime_hours
-    FROM attendance_records
-    WHERE employee_id = p_employee_id 
-        AND DATE_FORMAT(attendance_date, '%Y-%m-01') = p_payroll_month;
-    
-    -- Tính lương làm thêm (giả sử 1.5x lương giờ)
-    SET v_overtime_pay = (v_base_salary / 176) * 1.5 * v_overtime_hours; -- 176 giờ = 22 ngày * 8 giờ
-    
-    -- Tính tổng lương gộp
-    SET v_gross_salary = v_base_salary + v_total_allowances + v_overtime_pay;
-    
-    -- Tính khấu trừ (thuế + bảo hiểm - ví dụ 22.65%)
-    SET v_total_deductions = v_gross_salary * 0.2265;
-    
-    -- Tính lương thực nhận
-    SET v_net_salary = v_gross_salary - v_total_deductions;
-    
-    -- Insert hoặc update bảng lương
-    INSERT INTO monthly_payroll (
-        employee_id, payroll_month, base_salary, total_allowances, overtime_pay,
-        total_bonus, total_benefits, total_deductions, gross_salary, net_salary,
-        working_days, absent_days, late_days, overtime_hours, status,
-        calculated_by, calculated_at
-    ) VALUES (
-        p_employee_id, p_payroll_month, v_base_salary, v_total_allowances, v_overtime_pay,
-        0, 0, v_total_deductions, v_gross_salary, v_net_salary,
-        v_working_days, v_absent_days, v_late_days, v_overtime_hours, 'Calculated',
-        p_calculated_by, NOW()
-    )
-    ON DUPLICATE KEY UPDATE
-        base_salary = v_base_salary,
-        total_allowances = v_total_allowances,
-        overtime_pay = v_overtime_pay,
-        total_deductions = v_total_deductions,
-        gross_salary = v_gross_salary,
-        net_salary = v_net_salary,
-        working_days = v_working_days,
-        absent_days = v_absent_days,
-        late_days = v_late_days,
-        overtime_hours = v_overtime_hours,
-        status = 'Calculated',
-        calculated_by = p_calculated_by,
-        calculated_at = NOW();
-        
-END //
 
 -- Procedure: Phê duyệt yêu cầu
 CREATE PROCEDURE sp_approve_request(

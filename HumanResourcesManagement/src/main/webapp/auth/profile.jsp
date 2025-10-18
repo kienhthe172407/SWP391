@@ -11,7 +11,43 @@
     <script src="https://kit.fontawesome.com/a2e0e6ad65.js" crossorigin="anonymous"></script>
 </head>
 <body>
-<jsp:include page="/includes/navbar.jsp" />
+    <!-- Simple Header -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-user-circle me-2"></i>HR Management System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <c:choose>
+                    <c:when test="${sessionScope.user.role == 'Admin'}">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/dashboard/admin-dashboard.jsp">
+                            <i class="fas fa-tachometer-alt me-1"></i>Admin Dashboard
+                        </a>
+                    </c:when>
+                    <c:when test="${sessionScope.user.role == 'HR Manager'}">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/dashboard/hr-manager-dashboard.jsp">
+                            <i class="fas fa-tachometer-alt me-1"></i>HR Manager Dashboard
+                        </a>
+                    </c:when>
+                    <c:when test="${sessionScope.user.role == 'HR'}">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/dashboard/hr-dashboard.jsp">
+                            <i class="fas fa-tachometer-alt me-1"></i>HR Dashboard
+                        </a>
+                    </c:when>
+                    <c:when test="${sessionScope.user.role == 'Dept Manager'}">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/dashboard/dept-manager-dashboard.jsp">
+                            <i class="fas fa-tachometer-alt me-1"></i>Dept Manager Dashboard
+                        </a>
+                    </c:when>
+                    <c:when test="${sessionScope.user.role == 'Employee'}">
+                        <a class="nav-link" href="${pageContext.request.contextPath}/dashboard/employee-dashboard.jsp">
+                            <i class="fas fa-tachometer-alt me-1"></i>Employee Dashboard
+                        </a>
+                    </c:when>
+                </c:choose>
+            </div>
+        </div>
+    </nav>
 
 <div class="container py-4">
     <div class="row justify-content-center">
@@ -19,7 +55,26 @@
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                     <span><i class="fas fa-id-card me-2"></i>Hồ sơ cá nhân</span>
-                    <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/manager/home.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại</a>
+                    <c:choose>
+                        <c:when test="${sessionScope.user.role == 'Admin'}">
+                            <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/dashboard/admin-dashboard.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'HR Manager'}">
+                            <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/dashboard/hr-manager-dashboard.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'HR'}">
+                            <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/dashboard/hr-dashboard.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'Dept Manager'}">
+                            <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/dashboard/dept-manager-dashboard.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'Employee'}">
+                            <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/dashboard/employee-dashboard.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại Dashboard</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="btn btn-light btn-sm" href="${pageContext.request.contextPath}/manager/home.jsp"><i class="fas fa-arrow-left me-1"></i>Quay lại</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 <div class="card-body">
                     <c:set var="u" value="${sessionScope.user}" />
@@ -82,8 +137,34 @@
                     </form>
                 </div>
                 <div class="card-footer d-flex justify-content-end">
-                    <a class="btn btn-outline-secondary me-2" href="${pageContext.request.contextPath}/auth/change-password.jsp"><i class="fas fa-key me-1"></i>Đổi mật khẩu</a>
-                    <a class="btn btn-primary" href="${pageContext.request.contextPath}/manager/home.jsp"><i class="fas fa-home me-1"></i>Trang chủ</a>
+                    <c:choose>
+                        <c:when test="${sessionScope.user.role == 'Employee'}">
+                            <a class="btn btn-outline-secondary me-2" href="${pageContext.request.contextPath}/auth/change-password.jsp"><i class="fas fa-key me-1"></i>Đổi mật khẩu</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="btn btn-outline-secondary me-2" href="${pageContext.request.contextPath}/auth/change-password.jsp"><i class="fas fa-key me-1"></i>Đổi mật khẩu</a>
+                        </c:otherwise>
+                    </c:choose>
+                    <c:choose>
+                        <c:when test="${sessionScope.user.role == 'Admin'}">
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/dashboard/admin-dashboard.jsp"><i class="fas fa-home me-1"></i>Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'HR Manager'}">
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/dashboard/hr-manager-dashboard.jsp"><i class="fas fa-home me-1"></i>Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'HR'}">
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/dashboard/hr-dashboard.jsp"><i class="fas fa-home me-1"></i>Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'Dept Manager'}">
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/dashboard/dept-manager-dashboard.jsp"><i class="fas fa-home me-1"></i>Dashboard</a>
+                        </c:when>
+                        <c:when test="${sessionScope.user.role == 'Employee'}">
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/dashboard/employee-dashboard.jsp"><i class="fas fa-home me-1"></i>Dashboard</a>
+                        </c:when>
+                        <c:otherwise>
+                            <a class="btn btn-primary" href="${pageContext.request.contextPath}/manager/home.jsp"><i class="fas fa-home me-1"></i>Trang chủ</a>
+                        </c:otherwise>
+                    </c:choose>
                 </div>
             </div>
         </div>

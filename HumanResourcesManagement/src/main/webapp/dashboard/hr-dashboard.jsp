@@ -78,15 +78,15 @@
 
             <li class="menu-section">Payroll & Benefits</li>
             <li>
-                <a href="#">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Payroll</span>
+                <a href="${pageContext.request.contextPath}/salary/manage-benefits-deductions">
+                    <i class="fas fa-gift"></i>
+                    <span>Benefits & Deductions</span>
                 </a>
             </li>
             <li>
-                <a href="#">
-                    <i class="fas fa-gift"></i>
-                    <span>Benefits</span>
+                <a href="${pageContext.request.contextPath}/salary/import">
+                    <i class="fas fa-dollar-sign"></i>
+                    <span>Payroll</span>
                 </a>
             </li>
         </ul>
@@ -97,7 +97,29 @@
             <h1>HR Dashboard</h1>
             <div class="user-info">
                 <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR"/></span>
-                <div class="avatar">HR</div>
+                <div class="dropdown">
+                    <button class="btn dropdown-toggle avatar" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        HR
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                        <li>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
+                                <i class="fas fa-user me-2"></i>Profile
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/auth/change-password.jsp">
+                                <i class="fas fa-key me-2"></i>Change Password
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
+                                <i class="fas fa-sign-out-alt me-2"></i>Logout
+                            </a>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
 
