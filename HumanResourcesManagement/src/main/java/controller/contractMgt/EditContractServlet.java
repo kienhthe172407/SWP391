@@ -71,11 +71,20 @@ public class EditContractServlet extends HttpServlet {
                 return;
             }
 
-            // Permission: HR and HR Manager can edit any contract
+            // Permission: HR and HR Manager can edit contracts
             if (!"HR".equals(role) && !"HR Manager".equals(role)) {
                 session.setAttribute("errorMessage", "Access denied.");
                 response.sendRedirect(request.getContextPath() + "/contracts/list");
                 return;
+            }
+
+            // Check Draft contract ownership - only creator can edit Draft contracts
+            if ("Draft".equals(contract.getContractStatus())) {
+                if (!contract.getCreatedBy().equals(currentUserId)) {
+                    session.setAttribute("errorMessage", "You can only edit Draft contracts that you created.");
+                    response.sendRedirect(request.getContextPath() + "/contracts/detail?id=" + contractId);
+                    return;
+                }
             }
 
             // Populate employees for dropdown
@@ -137,11 +146,20 @@ public class EditContractServlet extends HttpServlet {
                 return;
             }
 
-            // Permission: HR and HR Manager can edit any contract
+            // Permission: HR and HR Manager can edit contracts
             if (!"HR".equals(rolePost) && !"HR Manager".equals(rolePost)) {
                 session.setAttribute("errorMessage", "Access denied.");
                 response.sendRedirect(request.getContextPath() + "/contracts/list");
                 return;
+            }
+
+            // Check Draft contract ownership - only creator can edit Draft contracts
+            if ("Draft".equals(existing.getContractStatus())) {
+                if (!existing.getCreatedBy().equals(currentUserId)) {
+                    session.setAttribute("errorMessage", "You can only edit Draft contracts that you created.");
+                    response.sendRedirect(request.getContextPath() + "/contracts/detail?id=" + contractId);
+                    return;
+                }
             }
 
             // Read form values
@@ -189,11 +207,16 @@ public class EditContractServlet extends HttpServlet {
             updated.setJobDescription(jobDescription);
             updated.setTermsAndConditions(termsAndConditions);
 
-            // Maintain Draft unless user unchecks draft (submit for approval)
+            // Set contract status based on role and draft checkbox
             if ("true".equals(saveDraft)) {
                 updated.setContractStatus("Draft");
             } else {
-                updated.setContractStatus("Pending Approval");
+                // HR Manager can directly activate contracts, HR needs approval
+                if ("HR Manager".equals(rolePost)) {
+                    updated.setContractStatus("Active");
+                } else {
+                    updated.setContractStatus("Pending Approval");
+                }
             }
 
             updated.setApprovalComment(approvalComment);
@@ -201,15 +224,17 @@ public class EditContractServlet extends HttpServlet {
             boolean success = contractDAO.updateContract(updated);
 
             if (success) {
-                if ("Pending Approval".equals(updated.getContractStatus())) {
-                    session.setAttribute("successMessage", "Contract submitted for HR Manager approval!");
-                } else {
+                if ("Draft".equals(updated.getContractStatus())) {
                     session.setAttribute("successMessage", "Contract saved as draft successfully!");
+                } else if ("Active".equals(updated.getContractStatus())) {
+                    session.setAttribute("successMessage", "Contract activated successfully!");
+                } else {
+                    session.setAttribute("successMessage", "Contract submitted for HR Manager approval!");
                 }
                 response.sendRedirect(request.getContextPath() + "/contracts/detail?id=" + contractId);
             } else {
                 // reload form with errors
-                request.setAttribute("errorMessage", "Failed to update contract. Make sure it is Draft and owned by you.");
+                request.setAttribute("errorMessage", "Failed to update contract. Please check your permissions.");
                 List<Employee> employees = employeeDAO.getAllActiveEmployees();
                 request.setAttribute("employees", employees);
                 request.setAttribute("contract", updated);

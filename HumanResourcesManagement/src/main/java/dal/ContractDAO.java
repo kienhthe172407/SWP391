@@ -1048,11 +1048,31 @@ public class ContractDAO extends DBContext {
     }
     
     /**
-     * Update an existing contract. Only contracts in Draft status created by the same user can be edited.
+     * Update an existing contract. 
+     * - For Draft contracts: only creator can edit
+     * - For other statuses: HR and HR Manager can edit
      * @param contract Contract object with updated data (must include contractID and createdBy)
      * @return boolean success
      */
     public boolean updateContract(Contract contract) {
+        // First check if contract exists and get its current status
+        Contract existingContract = getContractById(contract.getContractID());
+        if (existingContract == null) {
+            System.out.println("Contract not found: " + contract.getContractID());
+            return false;
+        }
+        
+        // Check permissions based on contract status
+        if ("Draft".equals(existingContract.getContractStatus())) {
+            // For Draft contracts, only creator can edit
+            if (!existingContract.getCreatedBy().equals(contract.getCreatedBy())) {
+                System.out.println("Draft contract can only be edited by creator. Contract created by: " + 
+                    existingContract.getCreatedBy() + ", Current user: " + contract.getCreatedBy());
+                return false;
+            }
+        }
+        // For non-Draft contracts, HR and HR Manager can edit (no additional check needed)
+        
         String sql = "UPDATE employment_contracts SET " +
                 "employee_id = ?, " +
                 "contract_number = ?, " +
@@ -1065,7 +1085,7 @@ public class ContractDAO extends DBContext {
                 "contract_status = ?, " +
                 "approval_comment = ?, " +
                 "updated_at = CURRENT_TIMESTAMP " +
-                "WHERE contract_id = ? AND created_by = ? AND contract_status = 'Draft'";
+                "WHERE contract_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contract.getEmployeeID());
@@ -1079,9 +1099,10 @@ public class ContractDAO extends DBContext {
             ps.setString(9, contract.getContractStatus());
             ps.setString(10, contract.getApprovalComment());
             ps.setInt(11, contract.getContractID());
-            ps.setInt(12, contract.getCreatedBy());
 
             int affectedRows = ps.executeUpdate();
+            System.out.println("Update contract affected rows: " + affectedRows + " for contract ID: " + contract.getContractID() + 
+                " with status: " + existingContract.getContractStatus());
             return affectedRows > 0;
         } catch (SQLException e) {
             System.err.println("Error in updateContract: " + e.getMessage());

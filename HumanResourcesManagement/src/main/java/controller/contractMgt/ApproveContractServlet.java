@@ -36,9 +36,21 @@ public class ApproveContractServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Get current user role from session
+        // Get current user role from session (robustly populate from user object if missing)
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
+        Integer currentUserId = (Integer) session.getAttribute("userId");
+        if (userRole == null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                userRole = ((model.User) userObj).getRole();
+                session.setAttribute("userRole", userRole);
+                if (currentUserId == null) {
+                    currentUserId = ((model.User) userObj).getUserId();
+                    session.setAttribute("userId", currentUserId);
+                }
+            }
+        }
         
         // Check if user is HR Manager
         if (userRole == null || !userRole.equals("HR Manager")) {
@@ -148,10 +160,21 @@ public class ApproveContractServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Get current user from session
+        // Get current user from session (robustly populate from user object if missing)
         HttpSession session = request.getSession();
         String userRole = (String) session.getAttribute("userRole");
         Integer currentUserId = (Integer) session.getAttribute("userId");
+        if (userRole == null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof model.User) {
+                userRole = ((model.User) userObj).getRole();
+                session.setAttribute("userRole", userRole);
+                if (currentUserId == null) {
+                    currentUserId = ((model.User) userObj).getUserId();
+                    session.setAttribute("userId", currentUserId);
+                }
+            }
+        }
         
         // Check if user is HR Manager
         if (userRole == null || !userRole.equals("HR Manager") || currentUserId == null) {
