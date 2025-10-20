@@ -73,10 +73,11 @@
                                                         <i class="fas fa-key"></i>
                                                     </span>
                                                     <input type="password" class="form-control border-start-0" id="newPassword" name="newPassword" 
-                                                           placeholder="Nhập mật khẩu mới" required>
+                                                           placeholder="Nhập mật khẩu mới" required minlength="8" title="Mật khẩu phải có ít nhất 8 ký tự">
                                                 </div>
                                                 <div class="password-strength" id="passwordStrength"></div>
                                                 <small class="form-text text-muted">Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt</small>
+                                                <div id="newPasswordError" class="text-danger small mt-1" style="display:none;">Mật khẩu phải có ít nhất 8 ký tự.</div>
                                             </div>
                                             <div class="form-group">
                                                 <label class="form-label" for="confirmPassword">Xác nhận mật khẩu mới</label>
@@ -85,7 +86,7 @@
                                                         <i class="fas fa-check-double"></i>
                                                     </span>
                                                     <input type="password" class="form-control border-start-0" id="confirmPassword" name="confirmPassword" 
-                                                           placeholder="Nhập lại mật khẩu mới" required>
+                                                           placeholder="Nhập lại mật khẩu mới" required minlength="8" title="Mật khẩu phải có ít nhất 8 ký tự">
                                                 </div>
                                             </div>
                                             <button type="submit" class="btn btn-primary btn-block mt-4">
@@ -94,7 +95,7 @@
                                         </form>
                                         <hr>
                                         <div class="auth-links">
-                                            <a href="${pageContext.request.contextPath}/dashboard">
+                                            <a id="backHomeLink" href="#">
                                                 <i class="fas fa-arrow-left me-1"></i> Quay lại trang chủ
                                             </a>
                                         </div>
@@ -116,6 +117,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const passwordInput = document.getElementById('newPassword');
             const strengthIndicator = document.getElementById('passwordStrength');
+            const newPasswordError = document.getElementById('newPasswordError');
             
             passwordInput.addEventListener('input', function() {
                 const password = passwordInput.value;
@@ -124,6 +126,11 @@
                 // Check password length
                 if (password.length >= 8) {
                     strength += 1;
+                    newPasswordError.style.display = 'none';
+                    passwordInput.setCustomValidity('');
+                } else {
+                    newPasswordError.style.display = 'block';
+                    passwordInput.setCustomValidity('Mật khẩu phải có ít nhất 8 ký tự');
                 }
                 
                 // Check for uppercase letters
@@ -163,13 +170,31 @@
             // Check password match
             const confirmInput = document.getElementById('confirmPassword');
             confirmInput.addEventListener('input', function() {
-                if (confirmInput.value === passwordInput.value) {
+                if (confirmInput.value.length < 8) {
+                    confirmInput.setCustomValidity('Mật khẩu phải có ít nhất 8 ký tự');
+                } else if (confirmInput.value === passwordInput.value) {
                     confirmInput.setCustomValidity('');
                 } else {
                     confirmInput.setCustomValidity('Mật khẩu không khớp');
                 }
             });
         });
+        
+        // Dynamic back-to-home link based on role from session (server-side render fallback to /)
+        (function() {
+            try {
+                var role = "${sessionScope.user.role}";
+                var ctx = "${pageContext.request.contextPath}";
+                var href = ctx + "/";
+                if (role === 'Admin') href = ctx + "/dashboard/admin-dashboard.jsp";
+                else if (role === 'HR Manager') href = ctx + "/dashboard/hr-manager-dashboard.jsp";
+                else if (role === 'HR') href = ctx + "/dashboard/hr-dashboard.jsp";
+                else if (role === 'Dept Manager') href = ctx + "/dashboard/dept-manager-dashboard.jsp";
+                else href = ctx + "/dashboard/employee-dashboard.jsp";
+                var link = document.getElementById('backHomeLink');
+                if (link) link.setAttribute('href', href);
+            } catch (e) {}
+        })();
     </script>
 </body>
 </html>

@@ -36,7 +36,7 @@
                                     <div class="p-5">
                                         <div class="text-center">
                                             <h1 class="auth-title">Quên mật khẩu?</h1>
-                                            <p class="auth-subtitle">Nhập email đã đăng ký để nhận hướng dẫn đặt lại mật khẩu</p>
+                                            <p class="auth-subtitle">Vui lòng nhập đầy đủ thông tin hồ sơ. Hệ thống sẽ đặt lại mật khẩu về 12345678</p>
                                         </div>
                                         
                                         <!-- Show error message if any -->
@@ -66,8 +66,49 @@
                                                            placeholder="Nhập email đã đăng ký" required>
                                                 </div>
                                             </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="firstName">Họ</label>
+                                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Nhập họ" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="lastName">Tên</label>
+                                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Nhập tên" required>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="phone">Số điện thoại</label>
+                                                        <input type="text" class="form-control" id="phone" name="phone" placeholder="0123456789" required>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <label class="form-label" for="dateOfBirth">Ngày sinh</label>
+                                                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="form-label" for="gender">Giới tính</label>
+                                                <select class="form-select" id="gender" name="gender">
+                                                    <option value="">-- Chọn --</option>
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                    <option value="Khác">Khác</option>
+                                                </select>
+                                            </div>
+
                                             <button type="submit" class="btn btn-primary btn-block mt-4">
-                                                Gửi yêu cầu <i class="fas fa-paper-plane ms-2"></i>
+                                                Xác nhận đặt lại mật khẩu <i class="fas fa-paper-plane ms-2"></i>
                                             </button>
                                         </form>
                                         <hr>

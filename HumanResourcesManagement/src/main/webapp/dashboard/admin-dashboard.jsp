@@ -30,27 +30,15 @@
 
             <li class="menu-section">User Management</li>
             <li>
-                <a href="${pageContext.request.contextPath}/admin/users">
+                <a href="${pageContext.request.contextPath}/list-users">
                     <i class="fas fa-users"></i>
                     <span>All Users</span>
                 </a>
             </li>
             <li>
-                <a href="${pageContext.request.contextPath}/admin/create-user">
+                <a href="${pageContext.request.contextPath}/create-user">
                     <i class="fas fa-user-plus"></i>
                     <span>Create User</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/admin/edit-user">
-                    <i class="fas fa-user-edit"></i>
-                    <span>Edit User</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/admin/deactivate-user">
-                    <i class="fas fa-user-times"></i>
-                    <span>Deactivate User</span>
                 </a>
             </li>
 
@@ -222,10 +210,10 @@
                         <div class="card-body">
                             <p class="text-muted">Create, edit, and manage user accounts across the system.</p>
                             <div class="d-flex gap-2">
-                                <a href="${pageContext.request.contextPath}/admin/users" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/list-users" class="btn btn-primary">
                                     <i class="fas fa-list me-1"></i>View All Users
                                 </a>
-                                <a href="${pageContext.request.contextPath}/admin/create-user" class="btn btn-success">
+                                <a href="${pageContext.request.contextPath}/create-user" class="btn btn-success">
                                     <i class="fas fa-user-plus me-1"></i>Create User
                                 </a>
                             </div>
@@ -408,7 +396,7 @@
                         <div class="card-body">
                             <div class="row g-2">
                                 <div class="col-md-3">
-                                    <a href="${pageContext.request.contextPath}/admin/create-user" class="btn btn-outline-primary w-100">
+                                    <a href="${pageContext.request.contextPath}/create-user" class="btn btn-outline-primary w-100">
                                         <i class="fas fa-user-plus me-2"></i>Create New User
                                     </a>
                                 </div>
