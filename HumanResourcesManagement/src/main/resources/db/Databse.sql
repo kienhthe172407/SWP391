@@ -7,23 +7,23 @@ USE hr_management_system;
 
 -- ==============================================================================
 -- TABLE: users
--- Bảng quản lý tài khoản người dùng hệ thống
+-- User account management table for the system
 -- ==============================================================================
 CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,                    -- ID người dùng (khóa chính)
-    username VARCHAR(50) UNIQUE NOT NULL,                      -- Tên đăng nhập (duy nhất)
-    password_hash VARCHAR(255) NOT NULL,                       -- Mật khẩu đã mã hóa
-    email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (duy nhất)
-    first_name VARCHAR(50),                                    -- Họ (tuỳ chọn)
-    last_name VARCHAR(50),                                     -- Tên (tuỳ chọn)
-    phone VARCHAR(20),                                         -- Số điện thoại (tuỳ chọn)
-    date_of_birth DATE,                                        -- Ngày sinh (tuỳ chọn)
-    gender VARCHAR(10),                                        -- Giới tính (tuỳ chọn)
-    role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- Vai trò người dùng
-    status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Trạng thái tài khoản
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
-    last_login TIMESTAMP NULL,                                 -- Lần đăng nhập cuối
+    user_id INT PRIMARY KEY AUTO_INCREMENT,                    -- User ID (primary key)
+    username VARCHAR(50) UNIQUE NOT NULL,                      -- Username (unique)
+    password_hash VARCHAR(255) NOT NULL,                       -- Encrypted password
+    email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (unique)
+    first_name VARCHAR(50),                                    -- First name (optional)
+    last_name VARCHAR(50),                                     -- Last name (optional)
+    phone VARCHAR(20),                                         -- Phone number (optional)
+    date_of_birth DATE,                                        -- Date of birth (optional)
+    gender VARCHAR(10),                                        -- Gender (optional)
+    role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- User role
+    status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Account status
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Creation time
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Update time
+    last_login TIMESTAMP NULL,                                 -- Last login time
     created_by INT,                                            -- Người tạo tài khoản
     INDEX idx_username (username),                             -- Index cho tìm kiếm username
     INDEX idx_email (email),                                   -- Index cho tìm kiếm email
