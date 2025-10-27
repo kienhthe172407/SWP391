@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Global CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -355,6 +355,7 @@
                                     <th>Job Title</th>
                                     <th>Department</th>
                                     <th>Positions</th>
+                                    <th>Applications</th>
                                     <th>Salary Range</th>
                                     <th>Deadline</th>
                                     <th>Status</th>
@@ -395,9 +396,22 @@
                                             <span class="badge bg-info">${jobPosting.numberOfPositions}</span>
                                         </td>
                                         <td>
+                                            <c:set var="appCount" value="${applicationCounts[jobPosting.jobId]}" />
+                                            <c:choose>
+                                                <c:when test="${appCount != null && appCount > 0}">
+                                                    <span class="badge bg-primary">
+                                                        <i class="fas fa-users me-1"></i>${appCount}
+                                                    </span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge bg-secondary">0</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
                                             <c:choose>
                                                 <c:when test="${jobPosting.salaryRangeFrom != null && jobPosting.salaryRangeTo != null}">
-                                                    <fmt:formatNumber value="${jobPosting.salaryRangeFrom}" type="currency" currencySymbol="$" /> - 
+                                                    <fmt:formatNumber value="${jobPosting.salaryRangeFrom}" type="currency" currencySymbol="$" /> -
                                                     <fmt:formatNumber value="${jobPosting.salaryRangeTo}" type="currency" currencySymbol="$" />
                                                 </c:when>
                                                 <c:when test="${jobPosting.salaryRangeFrom != null}">

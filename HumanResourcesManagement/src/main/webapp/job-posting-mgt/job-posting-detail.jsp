@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Global CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
     
     <style>
         .detail-card {
@@ -582,7 +582,7 @@
                                             <fmt:formatDate value="${jobPosting.updatedAt}" pattern="dd/MM/yyyy HH:mm"/>
                                         </c:when>
                                         <c:when test="${jobPosting.createdAt != null}">
-                                            <fmt:formatDate value="${jobPosting.createdAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                            <fmt:formatDate value="${jobPosting.createdAt}" pattern="dd/MM/yyyy HH:mm:ss"/>
                                         </c:when>
                                         <c:otherwise>
                                             <span class="text-muted">Not available</span>
