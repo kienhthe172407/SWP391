@@ -10,7 +10,7 @@
     <title>Employee Dashboard - HR Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
 </head>
 <body>
     <div class="sidebar">
@@ -36,6 +36,12 @@
                 </a>
             </li>
             <li>
+                <a href="${pageContext.request.contextPath}/employee/my-contract">
+                    <i class="fas fa-file-contract"></i>
+                    <span>My Contract</span>
+                </a>
+            </li>
+            <li>
                 <a href="${pageContext.request.contextPath}/auth/change-password.jsp">
                     <i class="fas fa-key"></i>
                     <span>Change Password</span>
@@ -44,19 +50,13 @@
 
             <li class="menu-section">Leave & Requests</li>
             <li>
-                <a href="#">
-                    <i class="fas fa-calendar-times"></i>
-                    <span>Leave Requests</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/request/submit">
                     <i class="fas fa-file-alt"></i>
                     <span>Personal Requests</span>
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/request/list">
                     <i class="fas fa-history"></i>
                     <span>Request History</span>
                 </a>
@@ -210,10 +210,10 @@
                         <div class="card-body">
                             <p class="text-muted">Submit leave requests and track your leave balance.</p>
                             <div class="d-flex gap-2">
-                                <a href="#" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/request/submit" class="btn btn-primary">
                                     <i class="fas fa-plus me-1"></i>New Leave Request
                                 </a>
-                                <a href="#" class="btn btn-secondary">
+                                <a href="${pageContext.request.contextPath}/request/list" class="btn btn-secondary">
                                     <i class="fas fa-list me-1"></i>Leave History
                                 </a>
                             </div>
@@ -244,10 +244,10 @@
                         <div class="card-body">
                             <p class="text-muted">Submit various personal requests and track their status.</p>
                             <div class="d-flex gap-2">
-                                <a href="#" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/request/submit" class="btn btn-primary">
                                     <i class="fas fa-plus me-1"></i>New Request
                                 </a>
-                                <a href="#" class="btn btn-secondary">
+                                <a href="${pageContext.request.contextPath}/request/list" class="btn btn-secondary">
                                     <i class="fas fa-history me-1"></i>Request History
                                 </a>
                             </div>
@@ -299,18 +299,19 @@
                             <div class="list-group list-group-flush">
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <i class="fas fa-check-circle text-success me-2"></i>
-                                        <strong>Task Completed:</strong> Monthly Report Review
-                                        <small class="text-muted d-block">2 hours ago</small>
+                                        <i class="fas fa-calendar-plus text-primary me-2"></i>
+                                        <strong>Recent Request:</strong> Check your latest submissions
+                                        <small class="text-muted d-block">View all requests</small>
                                     </div>
+                                    <a href="${pageContext.request.contextPath}/request/list" class="btn btn-sm btn-outline-primary">View</a>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
-                                        <i class="fas fa-calendar-plus text-primary me-2"></i>
-                                        <strong>Leave Request:</strong> Annual Leave (Dec 15-20)
-                                        <small class="text-muted d-block">1 day ago</small>
+                                        <i class="fas fa-plus-circle text-success me-2"></i>
+                                        <strong>Submit Request:</strong> Create new leave or personal request
+                                        <small class="text-muted d-block">Quick access</small>
                                     </div>
-                                    <span class="badge badge-pending">Pending</span>
+                                    <a href="${pageContext.request.contextPath}/request/submit" class="btn btn-sm btn-outline-success">Submit</a>
                                 </div>
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div>
@@ -333,19 +334,23 @@
                                     <div class="d-flex align-items-start">
                                         <i class="fas fa-info-circle text-info me-2 mt-1"></i>
                                         <div>
-                                            <small class="text-muted">System</small>
-                                            <p class="mb-1 small">Your leave request has been approved.</p>
-                                            <small class="text-muted">2 hours ago</small>
+                                            <small class="text-muted">Request</small>
+                                            <p class="mb-1 small">Check your request status updates</p>
+                                            <small class="text-muted">
+                                                <a href="${pageContext.request.contextPath}/request/list" class="text-decoration-none">View requests</a>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="list-group-item">
                                     <div class="d-flex align-items-start">
-                                        <i class="fas fa-tasks text-warning me-2 mt-1"></i>
+                                        <i class="fas fa-calendar-plus text-primary me-2 mt-1"></i>
                                         <div>
-                                            <small class="text-muted">Task</small>
-                                            <p class="mb-1 small">New task assigned: Project Review</p>
-                                            <small class="text-muted">1 day ago</small>
+                                            <small class="text-muted">Quick Action</small>
+                                            <p class="mb-1 small">Submit a new request</p>
+                                            <small class="text-muted">
+                                                <a href="${pageContext.request.contextPath}/request/submit" class="text-decoration-none">Create request</a>
+                                            </small>
                                         </div>
                                     </div>
                                 </div>

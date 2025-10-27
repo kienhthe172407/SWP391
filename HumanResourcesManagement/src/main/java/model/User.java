@@ -185,7 +185,8 @@ public class User {
 
     public String getRoleDisplayName() {
         switch (role) {
-            case "HR Manager": return "HR Manager";
+            case "HR Manager":
+            case "HR_MANAGER": return "HR Manager";
             case "HR": return "HR Staff";
             case "Dept Manager": return "Department Manager";
             case "Employee": return "Employee";
