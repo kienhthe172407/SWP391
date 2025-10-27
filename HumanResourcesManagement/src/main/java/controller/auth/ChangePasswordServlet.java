@@ -37,12 +37,12 @@ public class ChangePasswordServlet extends HttpServlet {
 
         // Validate inputs
         if (newPassword == null || newPassword.length() < 8) {
-            request.setAttribute("errorMessage", "Mật khẩu phải có ít nhất 8 ký tự.");
+            request.setAttribute("errorMessage", "Password must be at least 8 characters long.");
             request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);
             return;
         }
         if (confirmPassword == null || !newPassword.equals(confirmPassword)) {
-            request.setAttribute("errorMessage", "Xác nhận mật khẩu không khớp.");
+            request.setAttribute("errorMessage", "Password confirmation does not match.");
             request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);
             return;
         }
@@ -51,14 +51,14 @@ public class ChangePasswordServlet extends HttpServlet {
         if (currentUser.getPasswordHash() != null) {
             try {
                 if (!BCrypt.checkpw(currentPassword, currentUser.getPasswordHash())) {
-                    request.setAttribute("errorMessage", "Mật khẩu hiện tại không đúng.");
+                    request.setAttribute("errorMessage", "Current password is incorrect.");
                     request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);
                     return;
                 }
             } catch (IllegalArgumentException e) {
                 // Fallback in case stored hash isn't BCrypt (legacy)
                 if (!currentPassword.equals(currentUser.getPasswordHash())) {
-                    request.setAttribute("errorMessage", "Mật khẩu hiện tại không đúng.");
+request.setAttribute("errorMessage", "Current password is incorrect.");
                     request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);
                     return;
                 }
@@ -71,9 +71,9 @@ public class ChangePasswordServlet extends HttpServlet {
             // Update session user hash to avoid re-login issues
             currentUser.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt(10)));
             session.setAttribute("user", currentUser);
-            request.setAttribute("successMessage", "Cập nhật mật khẩu thành công.");
+            request.setAttribute("successMessage", "Password updated successfully.");
         } else {
-            request.setAttribute("errorMessage", "Cập nhật mật khẩu thất bại. Vui lòng thử lại.");
+            request.setAttribute("errorMessage", "Password update failed. Please try again.");
         }
 
         request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);

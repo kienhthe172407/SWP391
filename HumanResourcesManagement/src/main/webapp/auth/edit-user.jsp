@@ -1,11 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sửa thông tin người dùng</title>
+    <title>Edit User Information</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/auth.css">
     <style>
@@ -25,7 +25,7 @@
         function validateForm() {
             const email = document.getElementById('email').value;
             if (!email || email.indexOf('@') === -1) {
-                alert('Email không hợp lệ');
+                alert('Invalid email');
                 return false;
             }
             return true;
@@ -34,15 +34,15 @@
 </head>
 <body>
 <div class="container">
-    <a href="${pageContext.request.contextPath}/list-users" style="text-decoration:none; color:#2d89ef">← Quay lại danh sách</a>
-    <h2 style="margin:10px 0 16px">Sửa thông tin người dùng</h2>
+    <a href="${pageContext.request.contextPath}/list-users" style="text-decoration:none; color:#2d89ef">← Back to list</a>
+    <h2 style="margin:10px 0 16px">Edit User Information</h2>
 
     <c:if test="${not empty errorMessage}">
         <div class="alert alert-error">${errorMessage}</div>
     </c:if>
 
     <c:if test="${empty editUser}">
-        <div class="alert alert-error">Không có dữ liệu người dùng.</div>
+        <div class="alert alert-error">No user data available.</div>
     </c:if>
 
     <c:if test="${not empty editUser}">
@@ -62,38 +62,38 @@
 
             <div class="row">
                 <div class="col">
-                    <label>Họ</label>
+                    <label>First Name</label>
                     <input name="firstName" type="text" value="${editUser.firstName}" />
                 </div>
                 <div class="col">
-                    <label>Tên</label>
+                    <label>Last Name</label>
                     <input name="lastName" type="text" value="${editUser.lastName}" />
                 </div>
             </div>
 
             <div class="row">
                 <div class="col">
-                    <label>Số điện thoại</label>
+                    <label>Phone Number</label>
                     <input name="phone" type="text" value="${editUser.phone}" />
                 </div>
                 <div class="col">
-                    <label>Ngày sinh</label>
+                    <label>Date of Birth</label>
                     <input name="dateOfBirth" type="date" value="${editUser.dateOfBirth}" />
                 </div>
             </div>
 
             <div class="row">
                 <div class="col">
-                    <label>Giới tính</label>
+                    <label>Gender</label>
                     <select name="gender">
-                        <option value="" ${empty editUser.gender ? 'selected' : ''}>-- Chọn --</option>
-                        <option value="Nam" ${editUser.gender == 'Nam' ? 'selected' : ''}>Nam</option>
-                        <option value="Nữ" ${editUser.gender == 'Nữ' ? 'selected' : ''}>Nữ</option>
-                        <option value="Khác" ${editUser.gender == 'Khác' ? 'selected' : ''}>Khác</option>
+                        <option value="" ${empty editUser.gender ? 'selected' : ''}>-- Select --</option>
+                        <option value="Male" ${editUser.gender == 'Male' ? 'selected' : ''}>Male</option>
+                        <option value="Female" ${editUser.gender == 'Female' ? 'selected' : ''}>Female</option>
+                        <option value="Other" ${editUser.gender == 'Other' ? 'selected' : ''}>Other</option>
                     </select>
                 </div>
                 <div class="col">
-                    <label>Vai trò</label>
+                    <label>Role</label>
                     <select name="role" required>
                         <option value="Admin" ${editUser.role == 'Admin' ? 'selected' : ''}>Admin</option>
                         <option value="HR Manager" ${editUser.role == 'HR Manager' ? 'selected' : ''}>HR Manager</option>
@@ -106,7 +106,7 @@
 
             <div class="row">
                 <div class="col">
-                    <label>Trạng thái</label>
+                    <label>Status</label>
                     <select name="status" required>
                         <option value="Active" ${editUser.status == 'Active' ? 'selected' : ''}>Active</option>
                         <option value="Inactive" ${editUser.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
@@ -115,8 +115,8 @@
             </div>
 
             <div class="actions">
-                <button class="btn btn-primary" type="submit">Lưu thay đổi</button>
-                <a class="btn btn-secondary" href="${pageContext.request.contextPath}/list-users">Hủy</a>
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+                <a class="btn btn-secondary" href="${pageContext.request.contextPath}/list-users">Cancel</a>
             </div>
         </form>
     </c:if>

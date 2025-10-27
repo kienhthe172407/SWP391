@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quên mật khẩu - Hệ thống Quản lý Nhân sự</title>
+    <title>Forgot Password - Human Resources Management System</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -27,16 +27,16 @@
                                          style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white;">
                                         <div class="text-center mb-5">
                                             <i class="fas fa-unlock-alt fa-5x mb-4"></i>
-                                            <h3>Khôi phục mật khẩu</h3>
-                                            <p class="mt-3">Chúng tôi sẽ gửi hướng dẫn đặt lại mật khẩu đến email của bạn</p>
+                                            <h3>Password Recovery</h3>
+                                            <p class="mt-3">We will send password reset instructions to your email</p>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="col-lg-7">
                                     <div class="p-5">
                                         <div class="text-center">
-                                            <h1 class="auth-title">Quên mật khẩu?</h1>
-                                            <p class="auth-subtitle">Vui lòng nhập đầy đủ thông tin hồ sơ. Hệ thống sẽ đặt lại mật khẩu về 12345678</p>
+                                            <h1 class="auth-title">Forgot Password?</h1>
+                                            <p class="auth-subtitle">Please enter your complete profile information. The system will reset your password to 12345678</p>
                                         </div>
                                         
                                         <!-- Show error message if any -->
@@ -63,21 +63,21 @@
                                                         <i class="fas fa-envelope"></i>
                                                     </span>
                                                     <input type="email" class="form-control border-start-0" id="email" name="email" 
-                                                           placeholder="Nhập email đã đăng ký" required>
+                                                           placeholder="Enter registered email" required>
                                                 </div>
                                             </div>
 
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="firstName">Họ</label>
-                                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Nhập họ" required>
+                                                        <label class="form-label" for="firstName">First Name</label>
+                                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="lastName">Tên</label>
-                                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Nhập tên" required>
+                                                        <label class="form-label" for="lastName">Last Name</label>
+                                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" required>
                                                     </div>
                                                 </div>
                                             </div>
@@ -85,36 +85,36 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="phone">Số điện thoại</label>
+                                                        <label class="form-label" for="phone">Phone Number</label>
                                                         <input type="text" class="form-control" id="phone" name="phone" placeholder="0123456789" required>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="dateOfBirth">Ngày sinh</label>
+                                                        <label class="form-label" for="dateOfBirth">Date of Birth</label>
                                                         <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
                                                     </div>
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label" for="gender">Giới tính</label>
+                                                <label class="form-label" for="gender">Gender</label>
                                                 <select class="form-select" id="gender" name="gender">
-                                                    <option value="">-- Chọn --</option>
-                                                    <option value="Nam">Nam</option>
-                                                    <option value="Nữ">Nữ</option>
-                                                    <option value="Khác">Khác</option>
+                                                    <option value="">-- Select --</option>
+                                                    <option value="Male">Male</option>
+                                                    <option value="Female">Female</option>
+                                                    <option value="Other">Other</option>
                                                 </select>
                                             </div>
 
                                             <button type="submit" class="btn btn-primary btn-block mt-4">
-                                                Xác nhận đặt lại mật khẩu <i class="fas fa-paper-plane ms-2"></i>
+                                                Confirm Password Reset <i class="fas fa-paper-plane ms-2"></i>
                                             </button>
                                         </form>
                                         <hr>
                                         <div class="auth-links">
                                             <a href="${pageContext.request.contextPath}/auth/login.jsp">
-                                                <i class="fas fa-arrow-left me-1"></i> Quay lại trang đăng nhập
+                                                <i class="fas fa-arrow-left me-1"></i> Back to login page
                                             </a>
                                         </div>
                                     </div>

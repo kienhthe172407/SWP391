@@ -178,7 +178,7 @@ public class UserDAO extends DBContext {
      */
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users ORDER BY created_at DESC";
+        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users ORDER BY user_id ASC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -213,7 +213,7 @@ public class UserDAO extends DBContext {
      */
     public List<User> getUsersByRole(String role) {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE role = ? ORDER BY created_at DESC";
+        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE role = ? ORDER BY user_id ASC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, role);
@@ -369,5 +369,114 @@ public class UserDAO extends DBContext {
         }
         
         return null;
+    }
+    
+    /**
+     * Đếm tổng số người dùng
+     */
+    public int getTotalUsers() {
+        String sql = "SELECT COUNT(*) FROM users";
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.getTotalUsers: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return 0;
+    }
+    
+    /**
+     * Lấy danh sách người dùng theo trang
+     */
+    public List<User> getUsersByPage(int page, int pageSize) {
+        List<User> users = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender " +
+                    "FROM users ORDER BY user_id ASC LIMIT ? OFFSET ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserID(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                    user.setRole(rs.getString("role"));
+                    user.setStatus(rs.getString("status"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    user.setFirstName(rs.getString("first_name"));
+                    user.setLastName(rs.getString("last_name"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setDateOfBirth(rs.getDate("date_of_birth"));
+                    user.setGender(rs.getString("gender"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.getUsersByPage: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Lấy danh sách người dùng theo role với phân trang
+     */
+    public List<User> getUsersByRoleAndPage(String role, int page, int pageSize) {
+        List<User> users = new ArrayList<>();
+        int offset = (page - 1) * pageSize;
+        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender " +
+                    "FROM users WHERE role = ? ORDER BY user_id ASC LIMIT ? OFFSET ?";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, role);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, offset);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserID(rs.getInt("user_id"));
+                    user.setUsername(rs.getString("username"));
+                    user.setEmail(rs.getString("email"));
+                    user.setRole(rs.getString("role"));
+                    user.setStatus(rs.getString("status"));
+                    user.setCreatedAt(rs.getTimestamp("created_at"));
+                    user.setFirstName(rs.getString("first_name"));
+                    user.setLastName(rs.getString("last_name"));
+                    user.setPhone(rs.getString("phone"));
+                    user.setDateOfBirth(rs.getDate("date_of_birth"));
+                    user.setGender(rs.getString("gender"));
+                    users.add(user);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.getUsersByRoleAndPage: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return users;
+    }
+    
+    /**
+     * Đếm số lượng users theo role
+     */
+    public int countUsersByRole(String role) {
+        String sql = "SELECT COUNT(*) FROM users WHERE role = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, role);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.countUsersByRole: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return 0;
     }
 }

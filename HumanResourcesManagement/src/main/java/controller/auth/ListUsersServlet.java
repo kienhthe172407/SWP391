@@ -39,19 +39,31 @@ public class ListUsersServlet extends HttpServlet {
         String searchTerm = request.getParameter("search");
         String roleFilter = request.getParameter("role");
         String statusFilter = request.getParameter("status");
+        String pageParam = request.getParameter("page");
+        
+        // Xử lý phân trang
+        int page = 1;
+        int pageSize = 10;
+        if (pageParam != null) {
+            try {
+                page = Integer.parseInt(pageParam);
+                if (page < 1) page = 1;
+            } catch (NumberFormatException e) {
+                page = 1;
+            }
+        }
         
         List<User> users;
+        int totalUsers;
+        int totalPages;
         
         try {
-            // Lấy danh sách người dùng dựa trên các bộ lọc
+            // Lấy tất cả người dùng theo filter
             if (searchTerm != null && !searchTerm.trim().isEmpty()) {
-                // Tìm kiếm theo từ khóa
                 users = userDAO.searchUsers(searchTerm.trim());
             } else if (roleFilter != null && !roleFilter.trim().isEmpty()) {
-                // Lọc theo vai trò
                 users = userDAO.getUsersByRole(roleFilter);
             } else {
-                // Lấy tất cả người dùng
                 users = userDAO.getAllUsers();
             }
             
@@ -62,11 +74,28 @@ public class ListUsersServlet extends HttpServlet {
                     .collect(java.util.stream.Collectors.toList());
             }
             
+            // Tính tổng số và phân trang trong memory
+            totalUsers = users.size();
+            totalPages = (int) Math.ceil((double) totalUsers / pageSize);
+            if (page > totalPages && totalPages > 0) page = totalPages;
+            
+            // Phân trang kết quả
+            int fromIndex = (page - 1) * pageSize;
+            int toIndex = Math.min(fromIndex + pageSize, totalUsers);
+            if (fromIndex < totalUsers) {
+                users = users.subList(fromIndex, toIndex);
+            } else {
+                users = new java.util.ArrayList<>();
+            }
+            
             // Đặt dữ liệu vào request
             request.setAttribute("users", users);
             request.setAttribute("searchTerm", searchTerm);
             request.setAttribute("roleFilter", roleFilter);
             request.setAttribute("statusFilter", statusFilter);
+            request.setAttribute("currentPage", page);
+            request.setAttribute("totalPages", totalPages);
+            request.setAttribute("totalUsers", totalUsers);
             
             // Hiển thị trang danh sách
             request.getRequestDispatcher("/auth/list-users.jsp").forward(request, response);

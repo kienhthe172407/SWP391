@@ -15,8 +15,8 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
 /**
- * Servlet để tạo tài khoản người dùng mới từ admin
- * Chỉ admin mới có thể truy cập chức năng này
+ * Servlet for creating new user accounts by admin
+ * Only admin can access this functionality
  */
 @WebServlet(name = "CreateUserServlet", urlPatterns = {"/create-user"})
 public class CreateUserServlet extends HttpServlet {
@@ -27,17 +27,17 @@ public class CreateUserServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // Kiểm tra quyền admin
+        // Check admin permission
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         
         if (currentUser == null || !"Admin".equals(currentUser.getRole())) {
-            // Nếu không phải admin, chuyển về trang đăng nhập
+            // If not admin, redirect to login page
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
         
-        // Hiển thị form tạo tài khoản
+        // Display create account form
         request.getRequestDispatcher("/auth/create-user.jsp").forward(request, response);
     }
     
@@ -45,7 +45,7 @@ public class CreateUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // Kiểm tra quyền admin
+        // Check admin permission
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         
@@ -54,7 +54,7 @@ public class CreateUserServlet extends HttpServlet {
             return;
         }
         
-        // Lấy dữ liệu từ form
+        // Get data from form
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         String confirmPassword = request.getParameter("confirmPassword");
@@ -66,39 +66,39 @@ public class CreateUserServlet extends HttpServlet {
         String dateOfBirthStr = request.getParameter("dateOfBirth");
         String gender = request.getParameter("gender");
         
-        // Biến để lưu thông báo lỗi
+        // Variables to store error messages
         String errorMessage = "";
         String successMessage = "";
         
         try {
-            // Kiểm tra dữ liệu đầu vào
+            // Validate input data
             if (username == null || username.trim().isEmpty()) {
-                errorMessage += "Tên đăng nhập không được để trống.<br>";
+                errorMessage += "Username cannot be empty.<br>";
             }
             if (password == null || password.trim().isEmpty()) {
-                errorMessage += "Mật khẩu không được để trống.<br>";
+                errorMessage += "Password cannot be empty.<br>";
             }
             if (confirmPassword == null || !confirmPassword.equals(password)) {
-                errorMessage += "Xác nhận mật khẩu không khớp.<br>";
+                errorMessage += "Password confirmation does not match.<br>";
             }
             if (email == null || email.trim().isEmpty()) {
-                errorMessage += "Email không được để trống.<br>";
+                errorMessage += "Email cannot be empty.<br>";
             }
             if (role == null || role.trim().isEmpty()) {
-                errorMessage += "Vai trò không được để trống.<br>";
+                errorMessage += "Role cannot be empty.<br>";
             }
             
-            // Kiểm tra độ dài mật khẩu
+            // Check password length
             if (password != null && password.length() < 6) {
-                errorMessage += "Mật khẩu phải có ít nhất 6 ký tự.<br>";
+                errorMessage += "Password must be at least 6 characters long.<br>";
             }
             
-            // Kiểm tra email có đúng định dạng không (kiểm tra cơ bản)
+            // Check email format (basic validation)
             if (email != null && !email.contains("@")) {
-                errorMessage += "Email không đúng định dạng.<br>";
+                errorMessage += "Email format is invalid.<br>";
             }
             
-            // Nếu có lỗi, hiển thị lại form với thông báo lỗi
+            // If there are errors, display form again with error messages
             if (!errorMessage.isEmpty()) {
                 request.setAttribute("errorMessage", errorMessage);
                 request.setAttribute("username", username);
@@ -113,10 +113,10 @@ public class CreateUserServlet extends HttpServlet {
                 return;
             }
             
-            // Kiểm tra username đã tồn tại chưa
+            // Check if username already exists
             User existingUser = userDAO.getByUsername(username.trim());
             if (existingUser != null) {
-                errorMessage = "Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.";
+                errorMessage = "Username already exists. Please choose a different username.";
                 request.setAttribute("errorMessage", errorMessage);
                 request.setAttribute("username", username);
                 request.setAttribute("email", email);
@@ -130,7 +130,7 @@ public class CreateUserServlet extends HttpServlet {
                 return;
             }
             
-            // Chuyển đổi ngày sinh
+            // Convert date of birth
             Date dateOfBirth = null;
             if (dateOfBirthStr != null && !dateOfBirthStr.trim().isEmpty()) {
                 try {
@@ -138,11 +138,11 @@ public class CreateUserServlet extends HttpServlet {
                     java.util.Date utilDate = sdf.parse(dateOfBirthStr);
                     dateOfBirth = new Date(utilDate.getTime());
                 } catch (ParseException e) {
-                    errorMessage += "Ngày sinh không đúng định dạng.<br>";
+                    errorMessage += "Date of birth format is invalid.<br>";
                 }
             }
             
-            // Tạo tài khoản mới
+            // Create new account
             User newUser = userDAO.createUser(
                 username.trim(),
                 password,
@@ -156,10 +156,10 @@ public class CreateUserServlet extends HttpServlet {
             );
             
             if (newUser != null) {
-                successMessage = "Tạo tài khoản thành công! Tên đăng nhập: " + newUser.getUsername();
+                successMessage = "Account created successfully! Username: " + newUser.getUsername();
                 request.setAttribute("successMessage", successMessage);
             } else {
-                errorMessage = "Có lỗi xảy ra khi tạo tài khoản. Vui lòng thử lại.";
+                errorMessage = "An error occurred while creating the account. Please try again.";
                 request.setAttribute("errorMessage", errorMessage);
                 request.setAttribute("username", username);
                 request.setAttribute("email", email);
@@ -172,7 +172,7 @@ public class CreateUserServlet extends HttpServlet {
             }
             
         } catch (Exception e) {
-            errorMessage = "Có lỗi xảy ra: " + e.getMessage();
+            errorMessage = "An error occurred: " + e.getMessage();
             request.setAttribute("errorMessage", errorMessage);
             request.setAttribute("username", username);
             request.setAttribute("email", email);
@@ -184,7 +184,7 @@ public class CreateUserServlet extends HttpServlet {
             request.setAttribute("gender", gender);
         }
         
-        // Hiển thị lại form
+        // Display form again
         request.getRequestDispatcher("/auth/create-user.jsp").forward(request, response);
     }
 }

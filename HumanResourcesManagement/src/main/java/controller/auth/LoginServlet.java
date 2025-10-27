@@ -17,7 +17,7 @@ import java.util.logging.Logger;
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-
+// dang nhap bang tai khoan va password
     private static final Logger LOGGER = Logger.getLogger(LoginServlet.class.getName());
 
     @Override

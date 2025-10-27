@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng ký tài khoản - Hệ thống Quản lý Nhân sự</title>
+    <title>Register Account - Human Resources Management System</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
@@ -25,20 +25,20 @@
                                 <div class="col-lg-6 d-none d-lg-block bg-login-image">
                                     <div class="p-5 h-100 d-flex flex-column justify-content-center" 
                                          style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white;">
-                                        <h1 class="display-4 mb-4">Tham gia cùng chúng tôi</h1>
-                                        <p class="lead">Tạo tài khoản để truy cập đầy đủ các tính năng của hệ thống quản lý nhân sự</p>
+                                        <h1 class="display-4 mb-4">Join Us</h1>
+                                        <p class="lead">Create an account to access all features of the human resources management system</p>
                                         <div class="mt-5">
                                             <div class="d-flex align-items-center mb-3">
                                                 <i class="fas fa-check-circle me-3"></i>
-                                                <span>Quản lý thông tin cá nhân</span>
+                                                <span>Manage personal information</span>
                                             </div>
                                             <div class="d-flex align-items-center mb-3">
                                                 <i class="fas fa-check-circle me-3"></i>
-                                                <span>Theo dõi hợp đồng lao động</span>
+                                                <span>Track employment contracts</span>
                                             </div>
                                             <div class="d-flex align-items-center">
                                                 <i class="fas fa-check-circle me-3"></i>
-                                                <span>Truy cập báo cáo và thống kê</span>
+                                                <span>Access reports and statistics</span>
                                             </div>
                                         </div>
                                     </div>
@@ -46,8 +46,8 @@
                                 <div class="col-lg-6">
                                     <div class="p-5">
                                         <div class="text-center">
-                                            <h1 class="auth-title">Đăng ký tài khoản</h1>
-                                            <p class="auth-subtitle">Điền thông tin để tạo tài khoản mới</p>
+                                            <h1 class="auth-title">Register Account</h1>
+                                            <p class="auth-subtitle">Fill in the information to create a new account</p>
                                         </div>
                                         
                                         <!-- Show error message if any -->
@@ -70,25 +70,25 @@
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="firstName">Họ</label>
+                                                        <label class="form-label" for="firstName">First Name</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text bg-transparent border-end-0">
                                                                 <i class="fas fa-user"></i>
                                                             </span>
                                                             <input type="text" class="form-control border-start-0" id="firstName" name="firstName" 
-                                                                   placeholder="Nhập họ" required>
+                                                                   placeholder="Enter first name" required>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="lastName">Tên</label>
+                                                        <label class="form-label" for="lastName">Last Name</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text bg-transparent border-end-0">
                                                                 <i class="fas fa-user"></i>
                                                             </span>
                                                             <input type="text" class="form-control border-start-0" id="lastName" name="lastName" 
-                                                                   placeholder="Nhập tên" required>
+                                                                   placeholder="Enter last name" required>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -101,14 +101,14 @@
                                                         <i class="fas fa-envelope"></i>
                                                     </span>
                                                     <input type="email" class="form-control border-start-0" id="email" name="email" 
-                                                           placeholder="Nhập email" required>
+                                                           placeholder="Enter email" required>
                                                 </div>
                                             </div>
 
                                             <div class="row">
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="dateOfBirth">Ngày sinh</label>
+                                                        <label class="form-label" for="dateOfBirth">Date of Birth</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text bg-transparent border-end-0">
                                                                 <i class="fas fa-calendar"></i>
@@ -119,15 +119,15 @@
                                                 </div>
                                                 <div class="col-md-6">
                                                     <div class="form-group">
-                                                        <label class="form-label" for="gender">Giới tính</label>
+                                                        <label class="form-label" for="gender">Gender</label>
                                                         <div class="input-group">
                                                             <span class="input-group-text bg-transparent border-end-0">
                                                                 <i class="fas fa-venus-mars"></i>
                                                             </span>
                                                             <select class="form-select border-start-0" id="gender" name="gender" required>
-                                                                <option value="Male">Nam</option>
-                                                                <option value="Female">Nữ</option>
-                                                                <option value="Other">Khác</option>
+                                                                <option value="Male">Male</option>
+                                                                <option value="Female">Female</option>
+                                                                <option value="Other">Other</option>
                                                             </select>
                                                         </div>
                                                     </div>
@@ -135,48 +135,48 @@
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label class="form-label" for="phone">Số điện thoại</label>
+                                                <label class="form-label" for="phone">Phone Number</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-transparent border-end-0">
                                                         <i class="fas fa-phone"></i>
                                                     </span>
                                                     <input type="tel" class="form-control border-start-0" id="phone" name="phone" 
-                                                           placeholder="Nhập số điện thoại" required>
+                                                           placeholder="Enter phone number" required>
                                                 </div>
                                             </div>
 
                                             <div class="form-group">
-                                                <label class="form-label" for="username">Tên đăng nhập</label>
+                                                <label class="form-label" for="username">Username</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-transparent border-end-0">
                                                         <i class="fas fa-at"></i>
                                                     </span>
                                                     <input type="text" class="form-control border-start-0" id="username" name="username" 
-                                                           placeholder="Nhập tên đăng nhập" required>
+                                                           placeholder="Enter username" required>
                                                 </div>
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label class="form-label" for="password">Mật khẩu</label>
+                                                <label class="form-label" for="password">Password</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-transparent border-end-0">
                                                         <i class="fas fa-lock"></i>
                                                     </span>
                                                     <input type="password" class="form-control border-start-0" id="password" name="password" 
-                                                           placeholder="Nhập mật khẩu" required>
+                                                           placeholder="Enter password" required>
                                                 </div>
                                                 <div class="password-strength" id="passwordStrength"></div>
-                                                <small class="form-text text-muted">Mật khẩu phải có ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt</small>
+                                                <small class="form-text text-muted">Password must be at least 8 characters long, including uppercase, lowercase, numbers and special characters</small>
                                             </div>
                                             
                                             <div class="form-group">
-                                                <label class="form-label" for="confirmPassword">Xác nhận mật khẩu</label>
+                                                <label class="form-label" for="confirmPassword">Confirm Password</label>
                                                 <div class="input-group">
                                                     <span class="input-group-text bg-transparent border-end-0">
                                                         <i class="fas fa-check-double"></i>
                                                     </span>
                                                     <input type="password" class="form-control border-start-0" id="confirmPassword" name="confirmPassword" 
-                                                           placeholder="Nhập lại mật khẩu" required>
+                                                           placeholder="Re-enter password" required>
                                                 </div>
                                             </div>
                                             
@@ -184,19 +184,19 @@
                                                 <div class="form-check">
                                                     <input class="form-check-input" type="checkbox" id="agreeTerms" name="agreeTerms" required>
                                                     <label class="form-check-label" for="agreeTerms">
-                                                        Tôi đồng ý với <a href="#" class="text-primary">Điều khoản sử dụng</a> và <a href="#" class="text-primary">Chính sách bảo mật</a>
+                                                        I agree to the <a href="#" class="text-primary">Terms of Service</a> and <a href="#" class="text-primary">Privacy Policy</a>
                                                     </label>
                                                 </div>
                                             </div>
                                             
                                             <button type="submit" class="btn btn-primary btn-block">
-                                                Đăng ký <i class="fas fa-user-plus ms-2"></i>
+                                                Register <i class="fas fa-user-plus ms-2"></i>
                                             </button>
                                         </form>
                                         <hr>
                                         <div class="auth-links">
                                             <a href="${pageContext.request.contextPath}/auth/login.jsp">
-                                                <i class="fas fa-arrow-left me-1"></i> Quay lại trang đăng nhập
+                                                <i class="fas fa-arrow-left me-1"></i> Back to login page
                                             </a>
                                         </div>
                                     </div>
@@ -267,7 +267,7 @@
                 if (confirmInput.value === passwordInput.value) {
                     confirmInput.setCustomValidity('');
                 } else {
-                    confirmInput.setCustomValidity('Mật khẩu không khớp');
+                    confirmInput.setCustomValidity('Passwords do not match');
                 }
             });
         });
