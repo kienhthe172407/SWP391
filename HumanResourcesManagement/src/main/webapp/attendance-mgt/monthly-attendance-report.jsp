@@ -7,7 +7,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Attendance Summary - HR Management System</title>
+    <title>Monthly Attendance Report - HR Management System</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,12 +18,12 @@
     <!-- Global CSS -->
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
     
-    <!-- Custom Styles (soft tone to match system) -->
+    <!-- Custom Styles -->
     <style>
         .filter-section {
             background-color: #f8f9fa;
             border-radius: 0.375rem;
-            padding: 1.5rem 0; /* remove left/right padding */
+            padding: 1.5rem 0;
             margin-bottom: 1.5rem;
         }
         .text-nowrap { white-space: nowrap; }
@@ -87,8 +87,6 @@
                             <span>Add Employee Information</span>
                         </a>
                     </li>
-                </a>
-            </li>
             
                     <li class="menu-section">Contracts & Attendance</li>
                     <li>
@@ -125,18 +123,6 @@
                     </li>
 
                     <li class="menu-section">Payroll & Benefits</li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-dollar-sign"></i><span>Payroll</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-gift"></i><span>Benefits</span>
-                        </a>
-                    </li>
-
-                    <li class="menu-section">Payroll & Benefits</li>
                     <li><a href="#"><i class="fas fa-dollar-sign"></i><span>Payroll</span></a></li>
                     <li><a href="#"><i class="fas fa-gift"></i><span>Benefits</span></a></li>
 
@@ -167,23 +153,26 @@
                             <span>Add Employee Information</span>
                         </a>
                     </li>
-                </a>
-            </li>
             
                     <li class="menu-section">Contracts & Attendance</li>
                     <li>
                         <a href="${pageContext.request.contextPath}/contracts/list">
-                            <i class="fas fa-file-contract"></i><span>Contracts</span>
+                            <i class="fas fa-file-contract"></i>
+                            <span>Contracts</span>
                         </a>
                     </li>
                     <li>
-                        <a href="${pageContext.request.contextPath}/attendance/summary" class="active">
-                            <i class="fas fa-clock"></i><span>Attendance</span>
+                        <a href="${pageContext.request.contextPath}/attendance/import" class="active">
+                    <i class="fas fa-clock"></i>
+
+                            <span>Attendance</span>
                         </a>
                     </li>
+                    
                     <li>
                         <a href="#">
-                            <i class="fas fa-calendar-check"></i><span>Leave Requests</span>
+                            <i class="fas fa-calendar-check"></i>
+                            <span>Leave Requests</span>
                         </a>
                     </li>
 
@@ -220,7 +209,7 @@
     <div class="main-content">
         <!-- Top Header -->
         <div class="top-header">
-            <h1>Attendance Summary</h1>
+            <h1>Monthly Attendance Report</h1>
                 <div class="user-info">
                 <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR"/></span>
                 <div class="avatar">HR</div>
@@ -232,7 +221,7 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Dashboard</a></li>
                 <li class="breadcrumb-item"><a href="#">Contracts & Attendance</a></li>
-                <li class="breadcrumb-item active">Attendance Summary</li>
+                <li class="breadcrumb-item active">Monthly Attendance Report</li>
             </ol>
         </nav>
 
@@ -254,12 +243,38 @@
                 </div>
                 <c:remove var="errorMessage" scope="session"/>
             </c:if>
-            
+
             <!-- Filter Section -->
             <div class="filter-section">
-                <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filter Attendance Records</h5>
-                <form method="GET" action="${pageContext.request.contextPath}/attendance/summary" id="filterForm">
+                <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filter Monthly Report</h5>
+                <form method="GET" action="${pageContext.request.contextPath}/attendance/monthly-report" id="filterForm">
                     <div class="row g-3">
+                        <div class="col-md-2">
+                            <label for="year" class="form-label">Year</label>
+                            <select class="form-select" id="year" name="year">
+                                <c:forEach var="y" begin="2020" end="2030">
+                                    <option value="${y}" ${filterYear == y ? 'selected' : ''}>${y}</option>
+                                </c:forEach>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="month" class="form-label">Month</label>
+                            <select class="form-select" id="month" name="month">
+                                <option value="">All Months</option>
+                                <option value="1" ${filterMonth == 1 ? 'selected' : ''}>January</option>
+                                <option value="2" ${filterMonth == 2 ? 'selected' : ''}>February</option>
+                                <option value="3" ${filterMonth == 3 ? 'selected' : ''}>March</option>
+                                <option value="4" ${filterMonth == 4 ? 'selected' : ''}>April</option>
+                                <option value="5" ${filterMonth == 5 ? 'selected' : ''}>May</option>
+                                <option value="6" ${filterMonth == 6 ? 'selected' : ''}>June</option>
+                                <option value="7" ${filterMonth == 7 ? 'selected' : ''}>July</option>
+                                <option value="8" ${filterMonth == 8 ? 'selected' : ''}>August</option>
+                                <option value="9" ${filterMonth == 9 ? 'selected' : ''}>September</option>
+                                <option value="10" ${filterMonth == 10 ? 'selected' : ''}>October</option>
+                                <option value="11" ${filterMonth == 11 ? 'selected' : ''}>November</option>
+                                <option value="12" ${filterMonth == 12 ? 'selected' : ''}>December</option>
+                            </select>
+                        </div>
                         <div class="col-md-3">
                             <label for="employeeCode" class="form-label">Employee</label>
                             <select class="form-select" id="employeeCode" name="employeeCode">
@@ -282,20 +297,12 @@
                                 </c:forEach>
                             </select>
                         </div>
-                        <div class="col-md-2">
-                            <label for="startDate" class="form-label">Start Date</label>
-                            <input type="date" class="form-control" id="startDate" name="startDate" value="${filterStartDate}">
-                        </div>
-                        <div class="col-md-2">
-                            <label for="endDate" class="form-label">End Date</label>
-                            <input type="date" class="form-control" id="endDate" name="endDate" value="${filterEndDate}">
-                        </div>
                         <div class="col-md-2 d-flex align-items-end">
                             <div class="d-flex w-100 gap-2">
                                 <button type="submit" class="btn btn-primary flex-fill">
                                     <i class="fas fa-search me-1"></i>Filter
                                 </button>
-                                <a href="${pageContext.request.contextPath}/attendance/summary" class="btn btn-outline-secondary flex-fill text-nowrap">
+                                <a href="${pageContext.request.contextPath}/attendance/monthly-report" class="btn btn-outline-secondary flex-fill text-nowrap">
                                     <i class="fas fa-redo me-1"></i>Reset
                                 </a>
                             </div>
@@ -303,121 +310,26 @@
                     </div>
                 </form>
             </div>
-            
-            <!-- Attendance Summary Section -->
-            <c:if test="${(not empty summary) and ((not empty filterEmployeeCode) or (not empty filterDepartmentId))}">
-                <div class="card mb-3">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>
-                            <i class="fas fa-chart-pie me-2"></i>
-                            Attendance Summary
-                            <c:choose>
-                                <c:when test="${not empty filterEmployeeCode}">
-                                    <span class="text-muted">(by Employee)</span>
-                                </c:when>
-                                <c:when test="${empty filterEmployeeCode and not empty filterDepartmentId}">
-                                    <span class="text-muted">(by Department)</span>
-                                </c:when>
-                            </c:choose>
-                        </span>
-                        <small class="text-muted">
-                            <c:if test="${not empty filterStartDate || not empty filterEndDate}">
-                                Range: ${empty filterStartDate ? '...' : filterStartDate} - ${empty filterEndDate ? '...' : filterEndDate}
-                            </c:if>
-                            <c:if test="${not empty filterDepartmentId}">
-                                &nbsp;· Dept:
-                                <c:forEach var="d" items="${departments}">
-                                    <c:if test="${d.departmentId == filterDepartmentId}">${d.departmentName}</c:if>
-                                </c:forEach>
-                            </c:if>
-                            <c:if test="${not empty filterEmployeeCode}">
-                                &nbsp;· Emp:
-                                <c:forEach var="e" items="${employees}">
-                                    <c:if test="${e.employeeCode == filterEmployeeCode}">${e.firstName} ${e.lastName}</c:if>
-                                </c:forEach>
-                            </c:if>
-                        </small>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-3">
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Total Days</div>
-                                    <div class="fs-5 fw-bold">${summary.totalDays}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Present</div>
-                                    <div class="fs-5 fw-bold"><span class="badge badge-soft-success">${summary.presentDays}</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Late</div>
-                                    <div class="fs-5 fw-bold"><span class="badge badge-soft-warning">${summary.lateDays}</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Absent</div>
-                                    <div class="fs-5 fw-bold"><span class="badge badge-soft-danger">${summary.absentDays}</span></div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Overtime Hours</div>
-                                    <div class="fs-5 fw-bold"><fmt:formatNumber value="${summary.totalOvertimeHours}" maxFractionDigits="1"/> hrs</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Working Days</div>
-                                    <div class="fs-5 fw-bold">${summary.workingDays}</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Attendance Rate</div>
-                                    <div class="fs-5 fw-bold"><fmt:formatNumber value="${summary.attendanceRate}" maxFractionDigits="1"/>%</div>
-                                </div>
-                            </div>
-                            <div class="col-6 col-md-3">
-                                <div class="p-3 border rounded h-100">
-                                    <div class="text-muted small">Manual Adjustments</div>
-                                    <div class="fs-5 fw-bold">${summary.manualAdjustments}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </c:if>
-            <c:if test="${empty filterEmployeeCode and empty filterDepartmentId}">
-                <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
-                    <i class="fas fa-info-circle me-2"></i>
-                    Please select an Employee or a Department to view the aggregated Attendance Summary. Otherwise, the system will only display detailed records.
-                </div>
-            </c:if>
-            
-            <!-- Attendance Records Table -->
+
+            <!-- Monthly Records Table -->
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
-                    <span><i class="fas fa-table me-2"></i>Attendance Records</span>
+                    <span><i class="fas fa-calendar-alt me-2"></i>Monthly Attendance Records</span>
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-light text-dark">${totalRecords} total records</span>
-                        <c:if test="${not empty attendanceRecords}">
+                        <c:if test="${not empty monthlyRecords}">
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-download me-1"></i>Export
                                 </button>
                                 <ul class="dropdown-menu">
                                     <li>
-                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/attendance/export?format=xlsx&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}&startDate=${filterStartDate}&endDate=${filterEndDate}">
+                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/attendance/export-monthly?format=xlsx&month=${filterMonth}&year=${filterYear}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}">
                                             <i class="fas fa-file-excel text-success me-2"></i>Excel (.xlsx)
                                         </a>
                                     </li>
                                     <li>
-                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/attendance/export?format=pdf&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}&startDate=${filterStartDate}&endDate=${filterEndDate}">
+                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/attendance/export-monthly?format=pdf&month=${filterMonth}&year=${filterYear}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}">
                                             <i class="fas fa-file-pdf text-danger me-2"></i>PDF (.pdf)
                                         </a>
                                     </li>
@@ -428,10 +340,10 @@
                 </div>
                 <div class="card-body">
                     <c:choose>
-                        <c:when test="${empty attendanceRecords}">
+                        <c:when test="${empty monthlyRecords}">
                             <div class="text-center py-5">
                                 <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                <p class="text-muted">No attendance records found matching your filters.</p>
+                                <p class="text-muted">No monthly attendance records found matching your filters.</p>
                             </div>
                         </c:when>
                         <c:otherwise>
@@ -440,93 +352,46 @@
                                     <thead class="table-dark">
                                         <tr>
                                             <th class="text-nowrap" style="width: 5%;">#</th>
-                                            <th class="text-nowrap" style="width: 12%;">Employee Code</th>
-                                            <th class="text-nowrap" style="width: 18%;">Employee Name</th>
-                                            <th class="text-nowrap" style="width: 12%;">Date</th>
-                                            <th class="text-nowrap" style="width: 10%;">Check-in</th>
-                                            <th class="text-nowrap" style="width: 10%;">Check-out</th>
-                                            <th class="text-nowrap" style="width: 12%;">Status</th>
+                                            <th class="text-nowrap" style="width: 10%;">Employee Code</th>
+                                            <th class="text-nowrap" style="width: 15%;">Employee Name</th>
+                                            <th class="text-nowrap" style="width: 12%;">Department</th>
+                                            <th class="text-nowrap" style="width: 8%;">Month</th>
+                                            <th class="text-nowrap" style="width: 7%;">Present</th>
+                                            <th class="text-nowrap" style="width: 7%;">Absent</th>
+                                            <th class="text-nowrap" style="width: 7%;">Late</th>
+                                            <th class="text-nowrap" style="width: 7%;">Remote</th>
                                             <th class="text-nowrap" style="width: 8%;">Overtime</th>
-                                            <th class="text-nowrap" style="width: 10%;">Adjustment</th>
-                                            <th class="text-nowrap" style="width: 10%;">Actions</th>
+                                            <th class="text-nowrap" style="width: 7%;">Total Days</th>
+                                            <th class="text-nowrap" style="width: 7%;">Rate</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <c:forEach var="record" items="${attendanceRecords}" varStatus="status">
+                                        <c:forEach var="record" items="${monthlyRecords}" varStatus="status">
                                             <tr>
                                                 <td>${(currentPage - 1) * pageSize + status.index + 1}</td>
                                                 <td><strong>${record.employeeCode}</strong></td>
                                                 <td>${record.employeeName}</td>
+                                                <td>${record.departmentName}</td>
+                                                <td>${record.attendanceMonth}</td>
+                                                <td><span class="badge badge-soft-success">${record.presentDays}</span></td>
+                                                <td><span class="badge badge-soft-danger">${record.absentDays}</span></td>
+                                                <td><span class="badge badge-soft-warning">${record.lateDays}</span></td>
+                                                <td><span class="badge badge-soft-primary">${record.remoteDays}</span></td>
+                                                <td><fmt:formatNumber value="${record.totalOvertimeHours}" maxFractionDigits="1"/> hrs</td>
+                                                <td>${record.totalWorkingDays}</td>
                                                 <td>
-                                                    <fmt:formatDate value="${record.attendanceDate}" pattern="yyyy-MM-dd"/>
-                                                </td>
-                                                <td>
+                                                    <c:set var="rate" value="${record.attendanceRate}" />
                                                     <c:choose>
-                                                        <c:when test="${record.checkInTime != null}">
-                                                            <fmt:formatDate value="${record.checkInTime}" pattern="HH:mm:ss"/>
+                                                        <c:when test="${rate >= 95}">
+                                                            <span class="badge badge-soft-success"><fmt:formatNumber value="${rate}" maxFractionDigits="1"/>%</span>
+                                                        </c:when>
+                                                        <c:when test="${rate >= 80}">
+                                                            <span class="badge badge-soft-warning"><fmt:formatNumber value="${rate}" maxFractionDigits="1"/>%</span>
                                                         </c:when>
                                                         <c:otherwise>
-                                                            <span class="text-muted">-</span>
+                                                            <span class="badge badge-soft-danger"><fmt:formatNumber value="${rate}" maxFractionDigits="1"/>%</span>
                                                         </c:otherwise>
                                                     </c:choose>
-                                                </td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${record.checkOutTime != null}">
-                                                            <fmt:formatDate value="${record.checkOutTime}" pattern="HH:mm:ss"/>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="text-muted">-</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${record.status == 'Present'}">
-                                                            <span class="badge badge-soft-success">Present</span>
-                                                        </c:when>
-                                                        <c:when test="${record.status == 'Absent'}">
-                                                            <span class="badge badge-soft-danger">Absent</span>
-                                                        </c:when>
-                                                        <c:when test="${record.status == 'Late'}">
-                                                            <span class="badge badge-soft-warning">Late</span>
-                                                        </c:when>
-                                                        <c:when test="${record.status == 'Early Leave'}">
-                                                            <span class="badge badge-soft-warning">Early Leave</span>
-                                                        </c:when>
-                                                        <c:when test="${record.status == 'Business Trip'}">
-                                                            <span class="badge badge-soft-info">Business Trip</span>
-                                                        </c:when>
-                                                        <c:when test="${record.status == 'Remote'}">
-                                                            <span class="badge badge-soft-primary">Remote</span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="badge bg-light text-secondary">${record.status}</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <fmt:formatNumber value="${record.overtimeHours}" maxFractionDigits="1"/> hrs
-                                                </td>
-                                                <td>
-                                                    <c:choose>
-                                                        <c:when test="${record.isManualAdjustment}">
-                                                            <span class="badge bg-warning text-dark"
-                                                                  title="${record.adjustmentReason}">
-                                                                <i class="fas fa-edit"></i> Manual
-                                                            </span>
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <span class="text-muted">-</span>
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </td>
-                                                <td>
-                                                    <a href="${pageContext.request.contextPath}/attendance/adjust?id=${record.attendanceID}"
-                                                       class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 text-nowrap"
-                                                       title="Adjust this record">
-                                                        <i class="fas fa-edit me-1"></i> Edit
-                                                    </a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -540,7 +405,7 @@
                                     <ul class="pagination justify-content-center">
                                         <!-- Previous Button -->
                                         <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                            <a class="page-link" href="?page=${currentPage - 1}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}&startDate=${filterStartDate}&endDate=${filterEndDate}">
+                                            <a class="page-link" href="?page=${currentPage - 1}&month=${filterMonth}&year=${filterYear}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}">
                                                 <i class="fas fa-chevron-left"></i> Previous
                                             </a>
                                         </li>
@@ -555,7 +420,7 @@
                                                 </c:when>
                                                 <c:when test="${i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2)}">
                                                     <li class="page-item">
-                                                        <a class="page-link" href="?page=${i}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}&startDate=${filterStartDate}&endDate=${filterEndDate}">
+                                                        <a class="page-link" href="?page=${i}&month=${filterMonth}&year=${filterYear}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}">
                                                             ${i}
                                                         </a>
                                                     </li>
@@ -570,7 +435,7 @@
 
                                         <!-- Next Button -->
                                         <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                            <a class="page-link" href="?page=${currentPage + 1}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}&startDate=${filterStartDate}&endDate=${filterEndDate}">
+                                            <a class="page-link" href="?page=${currentPage + 1}&month=${filterMonth}&year=${filterYear}&employeeCode=${filterEmployeeCode}&departmentId=${filterDepartmentId}">
                                                 Next <i class="fas fa-chevron-right"></i>
                                             </a>
                                         </li>
@@ -599,3 +464,4 @@
     </script>
 </body>
 </html>
+
