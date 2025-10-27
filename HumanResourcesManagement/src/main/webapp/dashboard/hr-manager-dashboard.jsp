@@ -56,7 +56,7 @@
                 </a>
             </li>
             <li>
-                <a href="${pageContext.request.contextPath}/employee-mgt/add-employee-information.jsp">
+                <a href="${pageContext.request.contextPath}/employees/addInformation">
                     <i class="fas fa-user-plus"></i>
                     <span>Add Employee Information</span>
                 </a>

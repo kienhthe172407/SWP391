@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Global CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
 </head>
 <body>
     <c:if test="${empty requestScope.contracts}">

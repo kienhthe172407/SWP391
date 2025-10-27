@@ -176,6 +176,44 @@ public class AttendanceDAO extends DBContext {
     }
     
     /**
+     * Get attendance records for a specific employee within a date range
+     * Used for salary calculation
+     * @param employeeID Employee ID
+     * @param startDate Start date of the range
+     * @param endDate End date of the range
+     * @return List of AttendanceRecord for the employee in the date range
+     */
+    public List<AttendanceRecord> getAttendanceByEmployeeAndDateRange(int employeeID, Date startDate, Date endDate) {
+        List<AttendanceRecord> records = new ArrayList<>();
+        String sql = "SELECT ar.attendance_id, ar.employee_id, ar.attendance_date, " +
+                     "ar.check_in_time, ar.check_out_time, ar.status, ar.overtime_hours, " +
+                     "ar.is_manual_adjustment, ar.adjustment_reason, ar.adjusted_by, " +
+                     "ar.adjusted_at, ar.import_batch_id, ar.created_at, ar.updated_at, " +
+                     "e.employee_code, CONCAT(e.first_name, ' ', e.last_name) AS employee_name " +
+                     "FROM attendance_records ar " +
+                     "JOIN employees e ON ar.employee_id = e.employee_id " +
+                     "WHERE ar.employee_id = ? AND ar.attendance_date BETWEEN ? AND ? " +
+                     "ORDER BY ar.attendance_date";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, employeeID);
+            ps.setDate(2, startDate);
+            ps.setDate(3, endDate);
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                AttendanceRecord record = mapResultSetToAttendanceRecord(rs);
+                records.add(record);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting attendance by employee and date range: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return records;
+    }
+
+    /**
      * Get attendance records with filters and pagination
      * @param employeeCode Employee code filter (optional)
      * @param departmentId Department ID filter (optional)
@@ -396,6 +434,142 @@ public class AttendanceDAO extends DBContext {
     }
 
     /**
+     * Get monthly attendance records from view with filters and pagination
+     * @param month Month number (1-12), null for all months
+     * @param year Year (e.g., 2024), null for all years
+     * @param departmentId Department ID filter (optional)
+     * @param employeeCode Employee code filter (optional)
+     * @param page Current page number
+     * @param pageSize Number of records per page
+     * @return List of MonthlyAttendanceSummary
+     */
+    public List<model.MonthlyAttendanceSummary> getMonthlyAttendanceRecords(Integer month, Integer year,
+                                                                             Integer departmentId, String employeeCode,
+                                                                             int page, int pageSize) {
+        List<model.MonthlyAttendanceSummary> records = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+            "SELECT employee_id, employee_code, employee_name, department_name, " +
+            "attendance_month, present_days, absent_days, late_days, early_leave_days, " +
+            "business_trip_days, remote_days, total_overtime_hours, total_working_days " +
+            "FROM vw_monthly_attendance_summary " +
+            "WHERE 1=1 "
+        );
+
+        // Add filters
+        if (month != null && year != null) {
+            sql.append("AND attendance_month = ? ");
+        } else if (year != null) {
+            sql.append("AND YEAR(STR_TO_DATE(CONCAT(attendance_month, '-01'), '%Y-%m-%d')) = ? ");
+        }
+
+        if (departmentId != null && departmentId > 0) {
+            sql.append("AND employee_id IN (SELECT employee_id FROM employees WHERE department_id = ?) ");
+        }
+
+        if (employeeCode != null && !employeeCode.trim().isEmpty()) {
+            sql.append("AND employee_code = ? ");
+        }
+
+        sql.append("ORDER BY attendance_month DESC, employee_code ASC ");
+        sql.append("LIMIT ? OFFSET ?");
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            if (month != null && year != null) {
+                String monthStr = String.format("%04d-%02d", year, month);
+                ps.setString(paramIndex++, monthStr);
+            } else if (year != null) {
+                ps.setInt(paramIndex++, year);
+            }
+
+            if (departmentId != null && departmentId > 0) {
+                ps.setInt(paramIndex++, departmentId);
+            }
+
+            if (employeeCode != null && !employeeCode.trim().isEmpty()) {
+                ps.setString(paramIndex++, employeeCode);
+            }
+
+            ps.setInt(paramIndex++, pageSize);
+            ps.setInt(paramIndex++, (page - 1) * pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    records.add(mapResultSetToMonthlyAttendanceSummary(rs));
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting monthly attendance records: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return records;
+    }
+
+    /**
+     * Get total count of monthly attendance records with filters
+     * @param month Month number (1-12), null for all months
+     * @param year Year (e.g., 2024), null for all years
+     * @param departmentId Department ID filter (optional)
+     * @param employeeCode Employee code filter (optional)
+     * @return int total count
+     */
+    public int getTotalMonthlyAttendanceRecords(Integer month, Integer year,
+                                                Integer departmentId, String employeeCode) {
+        StringBuilder sql = new StringBuilder(
+            "SELECT COUNT(*) as total " +
+            "FROM vw_monthly_attendance_summary " +
+            "WHERE 1=1 "
+        );
+
+        // Add filters
+        if (month != null && year != null) {
+            sql.append("AND attendance_month = ? ");
+        } else if (year != null) {
+            sql.append("AND YEAR(STR_TO_DATE(CONCAT(attendance_month, '-01'), '%Y-%m-%d')) = ? ");
+        }
+
+        if (departmentId != null && departmentId > 0) {
+            sql.append("AND employee_id IN (SELECT employee_id FROM employees WHERE department_id = ?) ");
+        }
+
+        if (employeeCode != null && !employeeCode.trim().isEmpty()) {
+            sql.append("AND employee_code = ? ");
+        }
+
+        try (PreparedStatement ps = connection.prepareStatement(sql.toString())) {
+            int paramIndex = 1;
+
+            if (month != null && year != null) {
+                String monthStr = String.format("%04d-%02d", year, month);
+                ps.setString(paramIndex++, monthStr);
+            } else if (year != null) {
+                ps.setInt(paramIndex++, year);
+            }
+
+            if (departmentId != null && departmentId > 0) {
+                ps.setInt(paramIndex++, departmentId);
+            }
+
+            if (employeeCode != null && !employeeCode.trim().isEmpty()) {
+                ps.setString(paramIndex++, employeeCode);
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("total");
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error getting total monthly attendance records: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    /**
      * Map ResultSet to AttendanceRecord object
      * @param rs ResultSet from database query
      * @return AttendanceRecord object
@@ -420,6 +594,30 @@ public class AttendanceDAO extends DBContext {
         record.setEmployeeCode(rs.getString("employee_code"));
         record.setEmployeeName(rs.getString("employee_name"));
         return record;
+    }
+
+    /**
+     * Map ResultSet to MonthlyAttendanceSummary object
+     * @param rs ResultSet from database query
+     * @return MonthlyAttendanceSummary object
+     * @throws SQLException
+     */
+    private model.MonthlyAttendanceSummary mapResultSetToMonthlyAttendanceSummary(ResultSet rs) throws SQLException {
+        model.MonthlyAttendanceSummary summary = new model.MonthlyAttendanceSummary();
+        summary.setEmployeeId(rs.getInt("employee_id"));
+        summary.setEmployeeCode(rs.getString("employee_code"));
+        summary.setEmployeeName(rs.getString("employee_name"));
+        summary.setDepartmentName(rs.getString("department_name"));
+        summary.setAttendanceMonth(rs.getString("attendance_month"));
+        summary.setPresentDays(rs.getInt("present_days"));
+        summary.setAbsentDays(rs.getInt("absent_days"));
+        summary.setLateDays(rs.getInt("late_days"));
+        summary.setEarlyLeaveDays(rs.getInt("early_leave_days"));
+        summary.setBusinessTripDays(rs.getInt("business_trip_days"));
+        summary.setRemoteDays(rs.getInt("remote_days"));
+        summary.setTotalOvertimeHours(rs.getDouble("total_overtime_hours"));
+        summary.setTotalWorkingDays(rs.getInt("total_working_days"));
+        return summary;
     }
 }
 

@@ -10,7 +10,7 @@
     <title>Department Manager Dashboard - HR Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
 </head>
 <body>
     <div class="sidebar">
@@ -56,13 +56,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
-                    <i class="fas fa-calendar-times"></i>
-                    <span>Leave Requests</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/request/manager/list">
                     <i class="fas fa-file-alt"></i>
                     <span>Employee Requests</span>
                 </a>
@@ -216,10 +210,10 @@
                         <div class="card-body">
                             <p class="text-muted">Review and approve employee requests and leave applications.</p>
                             <div class="d-flex gap-2">
-                                <a href="#" class="btn btn-primary">
+                                <a href="${pageContext.request.contextPath}/request/manager/list" class="btn btn-primary">
                                     <i class="fas fa-inbox me-1"></i>Pending Approvals
                                 </a>
-                                <a href="#" class="btn btn-success">
+                                <a href="${pageContext.request.contextPath}/request/manager/list" class="btn btn-success">
                                     <i class="fas fa-check me-1"></i>Quick Approve
                                 </a>
                             </div>
@@ -267,11 +261,11 @@
                         <div class="card-body">
                             <p class="text-muted">Review and approve leave requests from team members.</p>
                             <div class="d-flex gap-2">
-                                <a href="#" class="btn btn-primary">
-                                    <i class="fas fa-calendar-check me-1"></i>Leave Requests
+                                <a href="${pageContext.request.contextPath}/request/manager/list" class="btn btn-primary">
+                                    <i class="fas fa-calendar-check me-1"></i>Employee Requests
                                 </a>
-                                <a href="#" class="btn btn-secondary">
-                                    <i class="fas fa-calendar-alt me-1"></i>Calendar View
+                                <a href="${pageContext.request.contextPath}/request/manager/list" class="btn btn-secondary">
+                                    <i class="fas fa-calendar-alt me-1"></i>Request Calendar
                                 </a>
                             </div>
                         </div>
@@ -408,7 +402,7 @@
                                     </a>
                                 </div>
                                 <div class="col-md-3">
-                                    <a href="#" class="btn btn-outline-success w-100">
+                                    <a href="${pageContext.request.contextPath}/request/manager/list" class="btn btn-outline-success w-100">
                                         <i class="fas fa-check me-2"></i>Approve All Pending
                                     </a>
                                 </div>

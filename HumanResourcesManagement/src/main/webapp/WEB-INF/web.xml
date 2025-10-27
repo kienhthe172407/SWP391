@@ -37,9 +37,48 @@
         <url-pattern>/change-password</url-pattern>
     </servlet-mapping>
     
+    <!-- Default Servlet for Static Resources -->
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.css</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.js</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.png</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.jpg</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.jpeg</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.gif</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.ico</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.woff</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>default</servlet-name>
+        <url-pattern>*.woff2</url-pattern>
+    </servlet-mapping>
+
     <!-- Welcome File List -->
     <welcome-file-list>
-        <welcome-file>auth/login.jsp</welcome-file>
+        <welcome-file>index.html</welcome-file>
+        <welcome-file>home</welcome-file>
     </welcome-file-list>
     
     <servlet>
@@ -187,6 +226,26 @@
     <servlet-mapping>
         <servlet-name>ViewEmployeeDetailServlet</servlet-name>
         <url-pattern>/employees/detail</url-pattern>
+    </servlet-mapping>
+
+    <!-- Public Job Application Servlets (Guest Access) -->
+
+    <servlet>
+        <servlet-name>ViewPublicJobDetailServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.ViewPublicJobDetailServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ViewPublicJobDetailServlet</servlet-name>
+        <url-pattern>/jobs/detail</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>SubmitJobApplicationServlet</servlet-name>
+        <servlet-class>controller.jobPostingMgt.SubmitJobApplicationServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>SubmitJobApplicationServlet</servlet-name>
+        <url-pattern>/jobs/apply</url-pattern>
     </servlet-mapping>
 
     <!-- Development Tools section removed -->

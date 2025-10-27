@@ -1,11 +1,13 @@
 package controller.jobPostingMgt;
 
+import dal.JobApplicationDAO;
 import dal.JobPostingDAO;
 import model.JobPosting;
 import model.Department;
 import model.Position;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -103,7 +105,11 @@ public class ViewJobPostingsServlet extends HttpServlet {
         // Get departments and positions for filter dropdowns
         List<Department> departments = jobPostingDAO.getAllDepartments();
         List<Position> positions = jobPostingDAO.getAllPositions();
-        
+
+        // Get application counts for all jobs
+        JobApplicationDAO jobApplicationDAO = new JobApplicationDAO();
+        Map<Integer, Integer> applicationCounts = jobApplicationDAO.getApplicationCountsForAllJobs();
+
         // Set attributes for display in JSP
         request.setAttribute("jobPostings", jobPostings);
         request.setAttribute("currentPage", currentPage);
@@ -113,7 +119,8 @@ public class ViewJobPostingsServlet extends HttpServlet {
         request.setAttribute("jobStatuses", jobStatuses);
         request.setAttribute("departments", departments);
         request.setAttribute("positions", positions);
-        
+        request.setAttribute("applicationCounts", applicationCounts);
+
         // Forward to JSP page
         request.getRequestDispatcher("/job-posting-mgt/list-job-postings.jsp").forward(request, response);
     }
