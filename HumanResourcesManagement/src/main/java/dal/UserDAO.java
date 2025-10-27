@@ -374,7 +374,7 @@ public class UserDAO extends DBContext {
     /**
      * Get all users from database
      */
-    public java.util.List<User> getAllUsers() {
+    public java.util.List<User> getAllUser() {
         java.util.List<User> users = new java.util.ArrayList<>();
         String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users ORDER BY username";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
