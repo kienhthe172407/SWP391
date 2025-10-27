@@ -12,7 +12,7 @@
     <!-- Google Fonts - Nunito -->
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link href="${pageContext.request.contextPath}/css/auth.css" rel="stylesheet">
+    <link href="<%= request.getContextPath() %>/css/auth.css" rel="stylesheet">
 </head>
 <body class="auth-page">
     <div class="auth-container">
