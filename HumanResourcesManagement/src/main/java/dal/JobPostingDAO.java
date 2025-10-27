@@ -672,7 +672,69 @@ public class JobPostingDAO extends DBContext {
         jobPosting.setDepartmentName(rs.getString("department_name"));
         jobPosting.setPositionName(rs.getString("position_name"));
         jobPosting.setPosterName(rs.getString("poster_name"));
-        
+
         return jobPosting;
+    }
+
+    /**
+     * Get open job postings for public home page
+     * Only returns jobs with 'Open' status and deadline not passed
+     * @param page Current page number
+     * @param pageSize Number of records per page
+     * @return List of open job postings
+     */
+    public List<JobPosting> getOpenJobPostings(int page, int pageSize) {
+        List<JobPosting> jobPostings = new ArrayList<>();
+
+        String sql = "SELECT jp.*, d.department_name, p.position_name, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS poster_name " +
+                     "FROM job_postings jp " +
+                     "LEFT JOIN departments d ON jp.department_id = d.department_id " +
+                     "LEFT JOIN positions p ON jp.position_id = p.position_id " +
+                     "LEFT JOIN users u ON jp.posted_by = u.user_id " +
+                     "LEFT JOIN employees e ON u.user_id = e.user_id " +
+                     "WHERE jp.job_status = 'Open' " +
+                     "AND (jp.application_deadline IS NULL OR jp.application_deadline >= CURDATE()) " +
+                     "ORDER BY jp.posted_date DESC, jp.job_id DESC " +
+                     "LIMIT ? OFFSET ?";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, (page - 1) * pageSize);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    JobPosting jobPosting = mapJobPosting(rs);
+                    jobPostings.add(jobPosting);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getOpenJobPostings: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return jobPostings;
+    }
+
+    /**
+     * Get total count of open job postings
+     * @return Total number of open job postings
+     */
+    public int getTotalOpenJobPostings() {
+        String sql = "SELECT COUNT(*) FROM job_postings " +
+                     "WHERE job_status = 'Open' " +
+                     "AND (application_deadline IS NULL OR application_deadline >= CURDATE())";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getTotalOpenJobPostings: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return 0;
     }
 }
