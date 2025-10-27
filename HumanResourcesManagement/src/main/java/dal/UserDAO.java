@@ -370,4 +370,36 @@ public class UserDAO extends DBContext {
         
         return null;
     }
+    
+    /**
+     * Get all users from database
+     */
+    public java.util.List<User> getAllUsers() {
+        java.util.List<User> users = new java.util.ArrayList<>();
+        String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users ORDER BY username";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    User u = new User();
+                    u.setUserID(rs.getInt("user_id"));
+                    u.setUsername(rs.getString("username"));
+                    u.setPasswordHash(rs.getString("password_hash"));
+                    u.setEmail(rs.getString("email"));
+                    u.setRole(rs.getString("role"));
+                    u.setStatus(rs.getString("status"));
+                    u.setCreatedAt(rs.getTimestamp("created_at"));
+                    u.setFirstName(rs.getString("first_name"));
+                    u.setLastName(rs.getString("last_name"));
+                    try { u.setPhone(rs.getString("phone")); } catch (SQLException ignore) {}
+                    try { u.setDateOfBirth(rs.getDate("date_of_birth")); } catch (SQLException ignore) {}
+                    try { u.setGender(rs.getString("gender")); } catch (SQLException ignore) {}
+                    users.add(u);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.getAllUsers: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return users;
+    }
 }
