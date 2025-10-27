@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Global CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
 </head>
 <body>
     <!-- Sidebar -->
@@ -390,7 +390,7 @@
                                 <p class="mb-2"><strong>Approved/Rejected At:</strong> <fmt:formatDate value="${contract.approvedAt}" pattern="dd/MM/yyyy HH:mm"/></p>
                             </c:if>
                             
-                            <p class="mb-2"><strong>Created At:</strong> <fmt:formatDate value="${contract.createdAt}" pattern="dd/MM/yyyy HH:mm"/></p>
+                            <p class="mb-2"><strong>Created At:</strong> <fmt:formatDate value="${contract.createdAt}" pattern="dd/MM/yyyy HH:mm:ss"/></p>
                             
                             <c:if test="${contract.updatedAt != null}">
                                 <p class="mb-0"><strong>Last Updated:</strong> <fmt:formatDate value="${contract.updatedAt}" pattern="dd/MM/yyyy HH:mm"/></p>
