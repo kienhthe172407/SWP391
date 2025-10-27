@@ -7,23 +7,23 @@ USE hr_management_system;
 
 -- ==============================================================================
 -- TABLE: users
--- User account management table for the system
+-- Bảng quản lý tài khoản người dùng hệ thống
 -- ==============================================================================
 CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,                    -- User ID (primary key)
-    username VARCHAR(50) UNIQUE NOT NULL,                      -- Username (unique)
-    password_hash VARCHAR(255) NOT NULL,                       -- Encrypted password
-    email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (unique)
-    first_name VARCHAR(50),                                    -- First name (optional)
-    last_name VARCHAR(50),                                     -- Last name (optional)
-    phone VARCHAR(20),                                         -- Phone number (optional)
-    date_of_birth DATE,                                        -- Date of birth (optional)
-    gender VARCHAR(10),                                        -- Gender (optional)
-    role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- User role
-    status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Account status
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Creation time
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Update time
-    last_login TIMESTAMP NULL,                                 -- Last login time
+    user_id INT PRIMARY KEY AUTO_INCREMENT,                    -- ID người dùng (khóa chính)
+    username VARCHAR(50) UNIQUE NOT NULL,                      -- Tên đăng nhập (duy nhất)
+    password_hash VARCHAR(255) NOT NULL,                       -- Mật khẩu đã mã hóa
+    email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (duy nhất)
+    first_name VARCHAR(50),                                    -- Họ (tuỳ chọn)
+    last_name VARCHAR(50),                                     -- Tên (tuỳ chọn)
+    phone VARCHAR(20),                                         -- Số điện thoại (tuỳ chọn)
+    date_of_birth DATE,                                        -- Ngày sinh (tuỳ chọn)
+    gender VARCHAR(10),                                        -- Giới tính (tuỳ chọn)
+    role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- Vai trò người dùng
+    status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Trạng thái tài khoản
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    last_login TIMESTAMP NULL,                                 -- Lần đăng nhập cuối
     created_by INT,                                            -- Người tạo tài khoản
     INDEX idx_username (username),                             -- Index cho tìm kiếm username
     INDEX idx_email (email),                                   -- Index cho tìm kiếm email
@@ -826,7 +826,58 @@ INSERT INTO employment_contracts (employee_id, contract_number, contract_type, s
 (21, 'CTR-2022-402', 'Fixed-term', '2022-06-01', '2024-05-31', 4100.00, 'Project coordinator for system upgrade', 'Two-year project contract', 'Expired', '2022-05-25', 2, 'Critical project role approved', '2022-05-28 13:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Terminated Contracts
-(22, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns', 'Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager'));
+(22, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns', 'Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Additional Active Contracts for Employee Role Users (for testing)
+-- Software Engineers
+(7, 'CTR-2020-001', 'Indefinite', '2020-01-20', NULL, 4200.00, 'Develop and maintain software applications using modern technologies and frameworks', 'Standard employment with technical training support and annual performance bonuses', 'Active', '2020-01-15', 2, 'Strong technical background, approved for immediate start', '2020-01-17 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(8, 'CTR-2020-002', 'Indefinite', '2020-01-20', NULL, 3800.00, 'Frontend development using React, Vue.js and modern web technologies', 'Standard employment with flexible working hours and remote work options', 'Active', '2020-01-18', 2, 'Excellent frontend skills, team player', '2020-01-20 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+
+-- Sales Representatives
+(9, 'CTR-2018-001', 'Indefinite', '2018-07-11', NULL, 3200.00, 'Generate sales leads, maintain client relationships, and achieve monthly sales targets', 'Standard employment with commission structure and quarterly bonuses', 'Active', '2018-07-08', 2, 'Proven sales track record, excellent communication skills', '2018-07-10 09:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(10, 'CTR-2020-003', 'Indefinite', '2020-09-05', NULL, 3100.00, 'Business development and client acquisition in assigned territory', 'Standard employment with travel allowance and performance incentives', 'Active', '2020-09-02', 2, 'Strong business development background', '2020-09-04 11:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+
+-- Marketing Specialists
+(11, 'CTR-2017-001', 'Indefinite', '2017-05-18', NULL, 3600.00, 'Develop and execute marketing campaigns, analyze market trends and customer behavior', 'Standard employment with creative project bonuses and professional development support', 'Active', '2017-05-15', 2, 'Creative marketing professional with digital expertise', '2017-05-17 13:20:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Finance Specialists
+(12, 'CTR-2019-001', 'Indefinite', '2019-11-22', NULL, 4100.00, 'Manage accounting records, financial reporting, and ensure tax compliance', 'Standard employment with CPA certification support and annual bonus', 'Active', '2019-11-19', 2, 'Strong accounting background with CPA eligibility', '2019-11-21 15:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+
+-- Operations Specialists
+(13, 'CTR-2018-002', 'Indefinite', '2018-10-30', NULL, 3900.00, 'Oversee daily operations, optimize processes, and coordinate with various departments', 'Standard employment with process improvement bonuses and leadership development', 'Active', '2018-10-27', 2, 'Operations expert with process optimization experience', '2018-10-29 10:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(14, 'CTR-2021-001', 'Indefinite', '2021-02-15', NULL, 3500.00, 'Support daily operations, maintain documentation, and assist with process improvements', 'Standard employment with training opportunities and performance reviews', 'Active', '2021-02-12', 2, 'Detail-oriented professional with strong organizational skills', '2021-02-14 16:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+
+-- Additional HR Specialists
+(15, 'CTR-2024-001', 'Indefinite', '2024-10-01', NULL, 3400.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment with HR certification support and professional development', 'Active', '2024-09-28', 2, 'Recent graduate with strong HR foundation', '2024-09-30 12:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(16, 'CTR-2024-002', 'Indefinite', '2024-09-15', NULL, 3300.00, 'Assist with HR operations, maintain employee records, and support recruitment activities', 'Standard employment with mentorship program and career advancement opportunities', 'Active', '2024-09-12', 2, 'Entry-level HR professional with growth potential', '2024-09-14 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+
+-- IT Support Specialists
+(17, 'CTR-2024-003', 'Indefinite', '2024-08-20', NULL, 3700.00, 'Provide technical support, maintain IT infrastructure, and assist with system implementations', 'Standard employment with technical training and certification support', 'Active', '2024-08-17', 2, 'Technical support specialist with strong troubleshooting skills', '2024-08-19 11:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(18, 'CTR-2024-004', 'Indefinite', '2024-10-20', NULL, 3600.00, 'Develop and maintain software applications, participate in code reviews and technical discussions', 'Standard employment with agile development practices and continuous learning', 'Active', '2024-10-17', 2, 'Software developer with modern technology stack experience', '2024-10-19 15:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Sales Team Members
+(19, 'CTR-2024-005', 'Indefinite', '2024-12-15', NULL, 3200.00, 'Generate new business opportunities, maintain existing client relationships, and achieve sales targets', 'Standard employment with competitive commission structure and sales incentives', 'Active', '2024-12-12', 2, 'Sales professional with strong client relationship skills', '2024-12-14 09:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(20, 'CTR-2023-001', 'Indefinite', '2023-01-15', NULL, 3400.00, 'Business development and market expansion in assigned regions', 'Standard employment with territory management and growth bonuses', 'Active', '2023-01-12', 2, 'Business development specialist with market expansion experience', '2023-01-14 13:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Marketing Team Members
+(21, 'CTR-2023-002', 'Indefinite', '2023-03-01', NULL, 3500.00, 'Create marketing content, manage social media presence, and analyze campaign performance', 'Standard employment with creative project bonuses and digital marketing training', 'Active', '2023-02-26', 2, 'Digital marketing specialist with content creation expertise', '2023-02-28 16:20:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(22, 'CTR-2023-003', 'Indefinite', '2023-06-01', NULL, 3800.00, 'Develop marketing strategies, coordinate campaigns, and analyze market research data', 'Standard employment with strategic planning bonuses and leadership development', 'Active', '2023-05-29', 2, 'Marketing strategist with analytical and creative skills', '2023-05-31 10:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Finance Team Members
+(23, 'CTR-2022-001', 'Indefinite', '2022-08-15', NULL, 4000.00, 'Prepare financial reports, assist with budgeting, and ensure compliance with accounting standards', 'Standard employment with financial analysis training and professional development', 'Active', '2022-08-12', 2, 'Financial analyst with strong analytical and reporting skills', '2022-08-14 14:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(24, 'CTR-2022-002', 'Indefinite', '2022-11-01', NULL, 3900.00, 'Manage accounts payable and receivable, process invoices, and maintain financial records', 'Standard employment with accounting software training and process improvement opportunities', 'Active', '2022-10-29', 2, 'Accounting specialist with attention to detail and accuracy', '2022-10-31 12:30:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Operations Team Members
+(25, 'CTR-2021-002', 'Indefinite', '2021-07-20', NULL, 3600.00, 'Coordinate daily operations, manage inventory, and optimize workflow processes', 'Standard employment with operations management training and efficiency bonuses', 'Active', '2021-07-17', 2, 'Operations coordinator with process optimization experience', '2021-07-19 15:15:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(26, 'CTR-2021-003', 'Indefinite', '2021-10-05', NULL, 3400.00, 'Support operational activities, maintain documentation, and assist with quality control', 'Standard employment with quality management training and continuous improvement focus', 'Active', '2021-10-02', 2, 'Operations support specialist with quality focus', '2021-10-04 11:20:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Additional IT Team Members
+(27, 'CTR-2020-004', 'Indefinite', '2020-04-12', NULL, 4100.00, 'Backend development using Java, Python, and database technologies', 'Standard employment with backend architecture training and performance bonuses', 'Active', '2020-04-09', 2, 'Backend developer with strong database and API skills', '2020-04-11 13:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(28, 'CTR-2020-005', 'Indefinite', '2020-11-22', NULL, 3800.00, 'Full-stack development with focus on web applications and user experience', 'Standard employment with full-stack development training and project bonuses', 'Active', '2020-11-19', 2, 'Full-stack developer with modern web technologies expertise', '2020-11-21 16:10:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+
+-- Additional Sales Team Members
+(29, 'CTR-2019-002', 'Indefinite', '2019-08-14', NULL, 3300.00, 'Customer relationship management, sales support, and client retention', 'Standard employment with CRM training and customer service bonuses', 'Active', '2019-08-11', 2, 'Sales support specialist with strong customer service skills', '2019-08-13 14:25:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(30, 'CTR-2019-003', 'Indefinite', '2019-12-01', NULL, 3500.00, 'Lead generation, sales prospecting, and territory management', 'Standard employment with sales training and lead generation bonuses', 'Active', '2019-11-28', 2, 'Sales professional with lead generation and prospecting expertise', '2019-11-30 10:50:00', (SELECT user_id FROM users WHERE username = 'hr_manager'));
 
 -- ==============================================================================
 -- INSERT DATA: job_postings
@@ -910,7 +961,26 @@ INSERT INTO requests (employee_id, request_type_id, start_date, end_date, number
 (11, 2, '2025-10-08', '2025-10-08', 1, 'Doctor appointment for annual checkup', 'Approved', 11, 'Approved', '2025-10-07 16:00:00'),
 (13, 3, '2025-11-10', '2025-11-12', 3, 'Family emergency', 'Pending', NULL, NULL, NULL),
 (6, 1, '2025-09-15', '2025-09-20', 4, 'Summer vacation', 'Approved', 5, 'Approved', '2025-09-05 10:00:00'),
-(7, 10, '2025-10-12', '2025-10-12', 1, 'Worked overtime on weekend project', 'Approved', 5, 'Approved compensatory leave for weekend work', '2025-10-10 09:30:00');
+(7, 10, '2025-10-12', '2025-10-12', 1, 'Worked overtime on weekend project', 'Approved', 5, 'Approved compensatory leave for weekend work', '2025-10-10 09:30:00'),
+
+-- Auto-generated requests for Excel template attendance records (Business Trip & Remote)
+-- These correspond to the sample data in attendance-template.xlsx
+(5, 5, '2024-10-18', '2024-10-18', 1, 'Business trip as per attendance template', 'Approved', 12, 'Pre-approved for attendance import', '2024-10-17 10:00:00'),
+(6, 4, '2024-10-21', '2024-10-21', 1, 'Remote work as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-20 10:00:00'),
+(11, 5, '2024-10-14', '2024-10-14', 1, 'Business trip as per attendance template', 'Approved', 12, 'Pre-approved for attendance import', '2024-10-13 10:00:00'),
+(12, 4, '2024-10-15', '2024-10-15', 1, 'Remote work as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-14 10:00:00'),
+(17, 5, '2024-10-16', '2024-10-16', 1, 'Business trip as per attendance template', 'Approved', 5, 'Pre-approved for attendance import', '2024-10-15 10:00:00'),
+(18, 4, '2024-10-17', '2024-10-17', 1, 'Remote work as per attendance template', 'Approved', 6, 'Pre-approved for attendance import', '2024-10-16 10:00:00'),
+(23, 5, '2024-10-18', '2024-10-18', 1, 'Business trip as per attendance template', 'Approved', 12, 'Pre-approved for attendance import', '2024-10-17 10:00:00'),
+(24, 4, '2024-10-21', '2024-10-21', 1, 'Remote work as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-20 10:00:00'),
+(29, 5, '2024-10-14', '2024-10-14', 1, 'Business trip as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-13 10:00:00'),
+(30, 4, '2024-10-15', '2024-10-15', 1, 'Remote work as per attendance template', 'Approved', 2, 'Pre-approved for attendance import', '2024-10-14 10:00:00'),
+(35, 5, '2024-10-16', '2024-10-16', 1, 'Business trip as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-15 10:00:00'),
+(36, 4, '2024-10-17', '2024-10-17', 1, 'Remote work as per attendance template', 'Approved', 2, 'Pre-approved for attendance import', '2024-10-16 10:00:00'),
+(41, 5, '2024-10-18', '2024-10-18', 1, 'Business trip as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-17 10:00:00'),
+(42, 4, '2024-10-21', '2024-10-21', 1, 'Remote work as per attendance template', 'Approved', 2, 'Pre-approved for attendance import', '2024-10-20 10:00:00'),
+(47, 5, '2024-10-14', '2024-10-14', 1, 'Business trip as per attendance template', 'Approved', 13, 'Pre-approved for attendance import', '2024-10-13 10:00:00'),
+(48, 4, '2024-10-15', '2024-10-15', 1, 'Remote work as per attendance template', 'Approved', 2, 'Pre-approved for attendance import', '2024-10-14 10:00:00');
 
 -- ==============================================================================
 -- INSERT DATA: company_information
@@ -1782,3 +1852,76 @@ SELECT 'System now fully supports all 67 use cases!' AS final_status;
 --
 -- Additional test user accounts (user_id 16-25) have been added without employee records
 -- for testing the Create Employee functionality where HR links employee info to existing user accounts
+
+-- ==============================================================================
+-- AUTO-GENERATE MISSING REQUESTS FOR BUSINESS TRIP AND REMOTE ATTENDANCE
+-- Purpose: Create approved requests for attendance records that have Business Trip
+--          or Remote status but no corresponding approved request
+-- Date: 2025-10-18
+-- ==============================================================================
+
+-- This will automatically create approved requests for any Business Trip or Remote
+-- attendance records that don't have a corresponding approved request.
+-- This ensures data consistency and proper audit trail.
+
+INSERT INTO requests (
+    employee_id,
+    request_type_id,
+    start_date,
+    end_date,
+    number_of_days,
+    reason,
+    request_status,
+    reviewed_by,
+    review_comment,
+    reviewed_at,
+    created_at,
+    updated_at
+)
+SELECT
+    ar.employee_id,
+    CASE
+        WHEN ar.status = 'Business Trip' THEN 5  -- Business Trip request_type_id
+        WHEN ar.status = 'Remote' THEN 4         -- Remote Work request_type_id
+    END AS request_type_id,
+    ar.attendance_date AS start_date,
+    ar.attendance_date AS end_date,
+    1.0 AS number_of_days,
+    CONCAT('Auto-generated from attendance record - ', ar.status, ' on ', DATE_FORMAT(ar.attendance_date, '%Y-%m-%d')) AS reason,
+    'Approved' AS request_status,
+    (SELECT mgr.user_id FROM employees mgr
+     INNER JOIN departments d ON mgr.employee_id = d.manager_id
+     WHERE d.department_id = e.department_id
+     LIMIT 1) AS reviewed_by,
+    'Auto-approved based on attendance record' AS review_comment,
+    ar.attendance_date AS reviewed_at,
+    DATE_SUB(ar.attendance_date, INTERVAL 1 DAY) AS created_at,
+    ar.attendance_date AS updated_at
+FROM attendance_records ar
+INNER JOIN employees e ON ar.employee_id = e.employee_id
+WHERE ar.status IN ('Business Trip', 'Remote')
+AND NOT EXISTS (
+    -- Check if there's already an approved request for this date
+    SELECT 1
+    FROM requests r
+    WHERE r.employee_id = ar.employee_id
+    AND r.request_status = 'Approved'
+    AND ar.attendance_date BETWEEN r.start_date AND r.end_date
+    AND r.request_type_id IN (4, 5)  -- Remote Work or Business Trip
+);
+
+-- Update attendance records to link them to the auto-generated requests
+UPDATE attendance_records ar
+INNER JOIN requests r ON r.employee_id = ar.employee_id
+    AND ar.attendance_date BETWEEN r.start_date AND r.end_date
+    AND r.request_status = 'Approved'
+    AND r.reason LIKE 'Auto-generated from attendance record%'
+    AND r.request_type_id IN (4, 5)
+SET
+    ar.adjustment_reason = CONCAT('Linked to auto-generated ',
+        (SELECT rt.request_type_name FROM request_types rt WHERE rt.request_type_id = r.request_type_id),
+        ' request #', r.request_id),
+    ar.is_manual_adjustment = TRUE,
+    ar.adjusted_at = NOW()
+WHERE ar.status IN ('Business Trip', 'Remote')
+AND (ar.adjustment_reason IS NULL OR ar.adjustment_reason = '');
