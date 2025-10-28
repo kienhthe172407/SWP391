@@ -5,7 +5,9 @@ import model.AttendancePreviewData;
 import model.AttendancePreviewData.AttendancePreviewRecord;
 import dal.AttendanceDAO;
 import dal.EmployeeDAO;
+import dal.RequestDAO;
 import model.Employee;
+import model.Request;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -99,6 +101,7 @@ public class ImportAttendanceServlet extends HttpServlet {
     // ---------------- Inlined logic from AttendanceImportService ----------------
     private final AttendanceDAO attendanceDAO = new AttendanceDAO();
     private final EmployeeDAO employeeDAO = new EmployeeDAO();
+    private final RequestDAO requestDAO = new RequestDAO();
 
     private AttendancePreviewData parseExcelForPreview(InputStream inputStream, String importBatchID) throws Exception {
         AttendancePreviewData previewData = new AttendancePreviewData(importBatchID);
@@ -125,6 +128,66 @@ public class ImportAttendanceServlet extends HttpServlet {
                         if (employee != null) {
                             previewRecord.setEmployeeName(employee.getFirstName() + " " + employee.getLastName());
                         }
+
+                        // Check for approved leave request for this employee and date
+                        Request approvedLeave = requestDAO.getApprovedRequestForEmployeeAndDate(
+                            record.getEmployeeID(),
+                            record.getAttendanceDate()
+                        );
+
+                        if (approvedLeave != null) {
+                            // Employee has approved leave for this date
+                            previewRecord.setHasApprovedLeave(true);
+                            previewRecord.setLeaveRequestType(approvedLeave.getRequestTypeName());
+                            previewRecord.setLeaveRequestID(approvedLeave.getRequestID());
+
+                            // Determine suggested status based on leave type
+                            String suggestedStatus = mapLeaveTypeToAttendanceStatus(approvedLeave.getRequestTypeName());
+                            previewRecord.setSuggestedStatus(suggestedStatus);
+
+                            // Check if imported status matches the leave request
+                            String importedStatus = record.getStatus();
+
+                            if (importedStatus == null || importedStatus.trim().isEmpty()) {
+                                // Auto-fill status from leave request
+                                record.setStatus(suggestedStatus);
+                                record.setAdjustmentReason("Auto-filled from approved " + approvedLeave.getRequestTypeName() + " request #" + approvedLeave.getRequestID());
+                                previewRecord.setAutoFilled(true);
+                                previewRecord.setStatusIndicator("match");
+                                previewRecord.setStatusMessage("Auto-filled from approved " + approvedLeave.getRequestTypeName());
+                                previewData.incrementRecordsMatchingLeave();
+                            } else if ("Present".equalsIgnoreCase(importedStatus) || "Late".equalsIgnoreCase(importedStatus)) {
+                                // Conflict: Has approved leave but marked as Present/Late
+                                previewRecord.setStatusIndicator("conflict");
+                                previewRecord.setStatusMessage("Warning: Has approved " + approvedLeave.getRequestTypeName() + " but marked " + importedStatus);
+                                previewData.incrementRecordsWithConflict();
+                            } else if (importedStatus.equalsIgnoreCase(suggestedStatus)) {
+                                // Perfect match
+                                record.setAdjustmentReason("Matches approved " + approvedLeave.getRequestTypeName() + " request #" + approvedLeave.getRequestID());
+                                previewRecord.setStatusIndicator("match");
+                                previewRecord.setStatusMessage("Matches approved " + approvedLeave.getRequestTypeName());
+                                previewData.incrementRecordsMatchingLeave();
+                            } else {
+                                // Different status but not a conflict (e.g., Remote vs Business Trip)
+                                previewRecord.setStatusIndicator("info");
+                                previewRecord.setStatusMessage("Has approved " + approvedLeave.getRequestTypeName() + " (suggested: " + suggestedStatus + ")");
+                            }
+                        } else {
+                            // No approved leave request
+                            String importedStatus = record.getStatus();
+                            if ("Absent".equalsIgnoreCase(importedStatus)) {
+                                // Absent without approved leave - flag for review
+                                previewRecord.setStatusIndicator("warning");
+                                previewRecord.setStatusMessage("Absent without approved leave request");
+                                previewData.incrementAbsentWithoutLeave();
+                            } else {
+                                // Normal attendance
+                                previewRecord.setStatusIndicator("normal");
+                                previewRecord.setStatusMessage("Normal attendance");
+                            }
+                        }
+
+                        // Check for duplicate records
                         AttendanceRecord existing = attendanceDAO.getAttendanceRecord(record.getEmployeeID(), record.getAttendanceDate());
                         if (existing != null) {
                             previewRecord.setValid(false);
@@ -272,6 +335,34 @@ public class ImportAttendanceServlet extends HttpServlet {
                 return "";
             default:
                 return "";
+        }
+    }
+
+    /**
+     * Map leave request type to appropriate attendance status
+     * @param leaveTypeName Name of the leave request type
+     * @return Corresponding attendance status
+     */
+    private String mapLeaveTypeToAttendanceStatus(String leaveTypeName) {
+        if (leaveTypeName == null) {
+            return "Absent";
+        }
+
+        switch (leaveTypeName.toLowerCase()) {
+            case "remote work":
+                return "Remote";
+            case "business trip":
+                return "Business Trip";
+            case "annual leave":
+            case "sick leave":
+            case "personal leave":
+            case "maternity leave":
+            case "paternity leave":
+            case "study leave":
+            case "unpaid leave":
+                return "Absent";
+            default:
+                return "Absent";
         }
     }
 }

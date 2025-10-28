@@ -13,12 +13,20 @@ public class AttendancePreviewData {
     private int validRecords;
     private int invalidRecords;
     private String importBatchID;
+
+    // Leave request integration statistics
+    private int recordsMatchingLeave;      // Records that match approved leave
+    private int recordsWithConflict;       // Has approved leave but marked Present
+    private int absentWithoutLeave;        // Absent with no approved leave request
     
     public AttendancePreviewData() {
         this.records = new ArrayList<>();
         this.totalRecords = 0;
         this.validRecords = 0;
         this.invalidRecords = 0;
+        this.recordsMatchingLeave = 0;
+        this.recordsWithConflict = 0;
+        this.absentWithoutLeave = 0;
     }
     
     public AttendancePreviewData(String importBatchID) {
@@ -76,7 +84,43 @@ public class AttendancePreviewData {
     public void setImportBatchID(String importBatchID) {
         this.importBatchID = importBatchID;
     }
-    
+
+    public int getRecordsMatchingLeave() {
+        return recordsMatchingLeave;
+    }
+
+    public void setRecordsMatchingLeave(int recordsMatchingLeave) {
+        this.recordsMatchingLeave = recordsMatchingLeave;
+    }
+
+    public void incrementRecordsMatchingLeave() {
+        this.recordsMatchingLeave++;
+    }
+
+    public int getRecordsWithConflict() {
+        return recordsWithConflict;
+    }
+
+    public void setRecordsWithConflict(int recordsWithConflict) {
+        this.recordsWithConflict = recordsWithConflict;
+    }
+
+    public void incrementRecordsWithConflict() {
+        this.recordsWithConflict++;
+    }
+
+    public int getAbsentWithoutLeave() {
+        return absentWithoutLeave;
+    }
+
+    public void setAbsentWithoutLeave(int absentWithoutLeave) {
+        this.absentWithoutLeave = absentWithoutLeave;
+    }
+
+    public void incrementAbsentWithoutLeave() {
+        this.absentWithoutLeave++;
+    }
+
     /**
      * Inner class to represent a single preview record
      */
@@ -88,11 +132,23 @@ public class AttendancePreviewData {
         private boolean valid;
         private String errorMessage;
         private boolean willUpdate; // true if record exists and will be updated
+
+        // Leave request integration fields
+        private boolean hasApprovedLeave;           // True if employee has approved leave for this date
+        private String leaveRequestType;            // Type of leave (Annual Leave, Sick Leave, etc.)
+        private Integer leaveRequestID;             // ID of the leave request
+        private String suggestedStatus;             // Suggested attendance status based on leave type
+        private String statusIndicator;             // Visual indicator: "match", "conflict", "warning", "normal"
+        private String statusMessage;               // Message to display about the status
+        private boolean autoFilled;                 // True if status was auto-filled from leave request
         
         public AttendancePreviewRecord(int rowNumber) {
             this.rowNumber = rowNumber;
             this.valid = true;
             this.willUpdate = false;
+            this.hasApprovedLeave = false;
+            this.autoFilled = false;
+            this.statusIndicator = "normal";
         }
         
         // Getters and Setters
@@ -148,9 +204,65 @@ public class AttendancePreviewData {
         public boolean isWillUpdate() {
             return willUpdate;
         }
-        
+
         public void setWillUpdate(boolean willUpdate) {
             this.willUpdate = willUpdate;
+        }
+
+        public boolean isHasApprovedLeave() {
+            return hasApprovedLeave;
+        }
+
+        public void setHasApprovedLeave(boolean hasApprovedLeave) {
+            this.hasApprovedLeave = hasApprovedLeave;
+        }
+
+        public String getLeaveRequestType() {
+            return leaveRequestType;
+        }
+
+        public void setLeaveRequestType(String leaveRequestType) {
+            this.leaveRequestType = leaveRequestType;
+        }
+
+        public Integer getLeaveRequestID() {
+            return leaveRequestID;
+        }
+
+        public void setLeaveRequestID(Integer leaveRequestID) {
+            this.leaveRequestID = leaveRequestID;
+        }
+
+        public String getSuggestedStatus() {
+            return suggestedStatus;
+        }
+
+        public void setSuggestedStatus(String suggestedStatus) {
+            this.suggestedStatus = suggestedStatus;
+        }
+
+        public String getStatusIndicator() {
+            return statusIndicator;
+        }
+
+        public void setStatusIndicator(String statusIndicator) {
+            this.statusIndicator = statusIndicator;
+        }
+
+        public String getStatusMessage() {
+            return statusMessage;
+        }
+
+        public void setStatusMessage(String statusMessage) {
+            this.statusMessage = statusMessage;
+        }
+
+        public boolean isAutoFilled() {
+            return autoFilled;
+        }
+
+        public void setAutoFilled(boolean autoFilled) {
+            this.autoFilled = autoFilled;
         }
     }
 }
