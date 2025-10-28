@@ -11,7 +11,7 @@ public abstract class DBContext {
         try {
             // Thông tin kết nối MySQL
             String user = "root";
-            String pass = "Tu262004@";
+            String pass = "123456";
             String url = "jdbc:mysql://127.0.0.1:3306/SWP1234?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
 
             // Load MySQL driver
@@ -29,5 +29,17 @@ public abstract class DBContext {
         }
     }
     
-    
+    /**
+     * Close the database connection
+     * Should be called in finally block to ensure proper cleanup
+     */
+    public void close() {
+        if (connection != null) {
+            try {
+                connection.close();
+            } catch (SQLException e) {
+                Logger.getLogger(DBContext.class.getName()).log(Level.SEVERE, "Error closing connection", e);
+            }
+        }
+    }
 }

@@ -15,7 +15,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Global CSS -->
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
     
     <style>
         .form-section {
@@ -597,21 +597,23 @@
             
             // Button click validation
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.addEventListener('click', function() {
-                const isValid = validateForm();
-                
-                if (!isValid) {
-                    // Scroll to first error
-                    const firstError = document.querySelector('.is-invalid');
-                    if (firstError) {
-                        firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                        firstError.focus();
+            if (submitBtn) {
+                submitBtn.addEventListener('click', function() {
+                    const isValid = validateForm();
+                    
+                    if (!isValid) {
+                        // Scroll to first error
+                        const firstError = document.querySelector('.is-invalid');
+                        if (firstError) {
+                            firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            firstError.focus();
+                        }
+                    } else {
+                        // Validation passed - submit the form
+                        form.submit();
                     }
-                } else {
-                    // Validation passed - submit the form
-                    form.submit();
-                }
-            });
+                });
+            }
             
             // Auto-dismiss alerts after 5 seconds
             setTimeout(function() {

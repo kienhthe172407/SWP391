@@ -64,7 +64,12 @@ public class AddEmployeeInformationServlet extends HttpServlet {
         
         // Check if user has permission to create employee records
         String userRole = (String) session.getAttribute("userRole");
-        if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
+        
+        // Simple role check - handle both formats
+        boolean isHR = "HR".equals(userRole);
+        boolean isHRManager = "HR Manager".equals(userRole) || "HR_MANAGER".equals(userRole);
+        
+        if (!isHR && !isHRManager) {
             session.setAttribute("errorMessage", "Access denied. Only HR staff can add employee information.");
             response.sendRedirect(request.getContextPath() + "/employees/list");
             return;
@@ -115,7 +120,12 @@ public class AddEmployeeInformationServlet extends HttpServlet {
         
         // Check if user has permission to create employee records
         String userRole = (String) session.getAttribute("userRole");
-        if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
+        
+        // Simple role check - handle both formats
+        boolean isHR = "HR".equals(userRole);
+        boolean isHRManager = "HR Manager".equals(userRole) || "HR_MANAGER".equals(userRole);
+        
+        if (!isHR && !isHRManager) {
             session.setAttribute("errorMessage", "Access denied. Only HR staff can add employee information.");
             response.sendRedirect(request.getContextPath() + "/employees/list");
             return;
