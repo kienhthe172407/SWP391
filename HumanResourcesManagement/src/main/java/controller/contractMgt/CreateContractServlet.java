@@ -4,6 +4,7 @@ import dal.ContractDAO;
 import dal.EmployeeDAO;
 import model.Contract;
 import model.Employee;
+import model.User;
 import util.ContractNumberGenerator;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -67,15 +68,18 @@ public class CreateContractServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Get current user ID from session (for created_by field)
+        // Get current user from session (for created_by field)
         HttpSession session = request.getSession();
-        Integer currentUserId = (Integer) session.getAttribute("userId");
+        User currentUser = (User) session.getAttribute("user");
         
         // If not logged in, redirect to login
-        if (currentUserId == null) {
+        if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
+        // Get user ID from the user object
+        int currentUserId = currentUser.getUserId();
         
         try {
             // Get form data
@@ -89,6 +93,7 @@ public class CreateContractServlet extends HttpServlet {
             String termsAndConditions = request.getParameter("termsAndConditions");
             String approvalComment = request.getParameter("approvalComment");
             String saveDraft = request.getParameter("saveDraft");
+            String contractStatus = request.getParameter("contractStatus");
 
             // Create contract object
             Contract contract = new Contract();
@@ -96,8 +101,10 @@ public class CreateContractServlet extends HttpServlet {
             contract.setContractNumber(contractNumber);
             contract.setContractType(contractType);
 
-            // Set contract status based on draft checkbox
-            if ("true".equals(saveDraft)) {
+            // Set contract status based on draft checkbox or contractStatus parameter
+            if (contractStatus != null && !contractStatus.isEmpty()) {
+                contract.setContractStatus(contractStatus);
+            } else if ("true".equals(saveDraft)) {
                 contract.setContractStatus("Draft");
             } else {
                 contract.setContractStatus("Pending Approval");

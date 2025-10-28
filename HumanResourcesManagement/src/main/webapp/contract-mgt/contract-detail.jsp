@@ -450,6 +450,14 @@
                                         <i class="fas fa-times me-1"></i>Reject
                                     </button>
                                 </c:if>
+                                
+                                <c:if test="${sessionScope.userRole == 'HR Manager' or sessionScope.userRole == 'HR'}">
+                                    <button type="button" class="btn btn-danger" id="deleteBtn" 
+                                            data-contract-id="${contract.contractID}" 
+                                            data-employee-name="${contract.employeeFullName}">
+                                        <i class="fas fa-trash me-1"></i>Delete Contract
+                                    </button>
+                                </c:if>
                             </div>
                         </div>
                     </div>
@@ -521,6 +529,41 @@
         </div>
     </div>
 
+    <!-- Delete Contract Modal -->
+    <div class="modal fade" id="deleteContractModal" tabindex="-1" aria-labelledby="deleteContractModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteContractModalLabel">
+                        <i class="fas fa-exclamation-triangle me-2"></i>Delete Contract
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="deleteContractForm" method="POST" action="${pageContext.request.contextPath}/contracts/delete">
+                    <div class="modal-body">
+                        <div class="text-center mb-4">
+                            <div class="mb-3">
+                                <i class="fas fa-trash-alt text-danger" style="font-size: 3rem;"></i>
+                            </div>
+                            <h5>Are you sure you want to delete this contract?</h5>
+                            <p class="text-muted">Contract #<strong id="deleteContractId"></strong> for <strong id="deleteEmployeeName"></strong></p>
+                            <p class="text-danger"><strong>Warning:</strong> This action cannot be undone.</p>
+                        </div>
+                        <input type="hidden" id="deleteContractIdInput" name="contractId" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Cancel
+                        </button>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash-alt me-1"></i>Delete Contract
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -565,6 +608,22 @@
                     document.getElementById('rejectComment').classList.remove('is-invalid');
                 }
             });
+
+            // Delete button handler
+            const deleteBtn = document.getElementById('deleteBtn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', function() {
+                    const contractId = this.getAttribute('data-contract-id');
+                    const employeeName = this.getAttribute('data-employee-name');
+
+                    document.getElementById('deleteContractIdInput').value = contractId;
+                    document.getElementById('deleteContractId').textContent = contractId;
+                    document.getElementById('deleteEmployeeName').textContent = employeeName;
+
+                    const deleteModal = new bootstrap.Modal(document.getElementById('deleteContractModal'));
+                    deleteModal.show();
+                });
+            }
         });
     </script>
 </body>

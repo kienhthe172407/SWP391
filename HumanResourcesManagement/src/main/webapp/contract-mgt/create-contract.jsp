@@ -513,13 +513,15 @@
                                             Save as Draft
                                         </label>
                                     </div>
-                                    <select name="contractStatus" id="contractStatus" class="form-select" disabled>
+                                    <select id="contractStatus" class="form-select" disabled>
                                         <option value="Draft">Draft</option>
                                         <option value="Pending Approval" selected>Pending Approval</option>
                                         <option value="Active">Active</option>
                                         <option value="Expired">Expired</option>
                                         <option value="Terminated">Terminated</option>
                                     </select>
+                                    <!-- Hidden input to submit the actual contract status -->
+                                    <input type="hidden" id="contractStatusInput" name="contractStatus" value="Pending Approval">
                                     <small class="text-muted">Check "Save as Draft" to save without sending for approval, or leave unchecked to submit for HR Manager approval</small>
                                 </div>
                                 
@@ -880,12 +882,15 @@
             // Handle draft checkbox
             const saveDraftCheckbox = document.getElementById('saveDraft');
             const contractStatusSelect = document.getElementById('contractStatus');
+            const contractStatusInput = document.getElementById('contractStatusInput');
 
             saveDraftCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     contractStatusSelect.value = 'Draft';
+                    contractStatusInput.value = 'Draft';
                 } else {
                     contractStatusSelect.value = 'Pending Approval';
+                    contractStatusInput.value = 'Pending Approval';
                 }
             });
 
