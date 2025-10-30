@@ -11,7 +11,7 @@ public abstract class DBContext {
         try {
             // Thông tin kết nối MySQL
             String user = "root";
-            String pass = "123456";
+            String pass = "Tu262004@";
             String url = "jdbc:mysql://127.0.0.1:3306/SWP1234?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC";
 
             // Load MySQL driver

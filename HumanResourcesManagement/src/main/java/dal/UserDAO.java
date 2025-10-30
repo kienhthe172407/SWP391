@@ -173,12 +173,12 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Lấy danh sách tất cả người dùng trong hệ thống
+     * Lấy danh sách tất cả người dùng trong hệ thống (không bao gồm người dùng đã xóa)
      * @return List<User> danh sách người dùng
      */
     public List<User> getAllUsers() {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users ORDER BY user_id ASC";
+        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE status != 'Deleted' ORDER BY user_id ASC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -207,13 +207,13 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Lấy danh sách người dùng theo vai trò
+     * Lấy danh sách người dùng theo vai trò (không bao gồm người dùng đã xóa)
      * @param role vai trò cần lọc
      * @return List<User> danh sách người dùng
      */
     public List<User> getUsersByRole(String role) {
         List<User> users = new ArrayList<>();
-        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE role = ? ORDER BY user_id ASC";
+        String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE role = ? AND status != 'Deleted' ORDER BY user_id ASC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, role);
@@ -285,23 +285,96 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Xóa người dùng (soft delete - chỉ đổi status thành Inactive)
+     * Xóa người dùng vĩnh viễn khỏi database và sắp xếp lại ID (hard delete)
+     * Tự động xử lý foreign key constraints
      * @param userId ID của người dùng
      * @return true nếu xóa thành công
      */
     public boolean deleteUser(int userId) {
-        return updateUserStatus(userId, "Inactive");
+        try {
+            // Tắt foreign key checks tạm thời
+            try (PreparedStatement ps = connection.prepareStatement("SET FOREIGN_KEY_CHECKS = 0")) {
+                ps.executeUpdate();
+            }
+            
+            // Bước 1: Xóa user
+            String deleteSql = "DELETE FROM users WHERE user_id = ?";
+            try (PreparedStatement ps = connection.prepareStatement(deleteSql)) {
+                ps.setInt(1, userId);
+                int affected = ps.executeUpdate();
+                if (affected != 1) {
+                    // Bật lại foreign key checks
+                    try (PreparedStatement ps2 = connection.prepareStatement("SET FOREIGN_KEY_CHECKS = 1")) {
+                        ps2.executeUpdate();
+                    }
+                    return false;
+                }
+            }
+            
+            // Bước 2: Cập nhật lại ID của các user có ID lớn hơn user vừa xóa
+            String updateSql = "UPDATE users SET user_id = user_id - 1 WHERE user_id > ?";
+            try (PreparedStatement ps = connection.prepareStatement(updateSql)) {
+                ps.setInt(1, userId);
+                ps.executeUpdate();
+            }
+            
+            // Bước 3: Cập nhật foreign keys trong các bảng liên quan
+            // Cập nhật created_by trong bảng users
+            String updateCreatedBySql = "UPDATE users SET created_by = created_by - 1 WHERE created_by > ?";
+            try (PreparedStatement ps = connection.prepareStatement(updateCreatedBySql)) {
+                ps.setInt(1, userId);
+                ps.executeUpdate();
+            } catch (SQLException ex) {
+                // Bỏ qua nếu cột không tồn tại
+            }
+            
+            // Bước 4: Reset AUTO_INCREMENT về giá trị tiếp theo
+            String getMaxIdSql = "SELECT MAX(user_id) FROM users";
+            int maxId = 0;
+            try (PreparedStatement ps = connection.prepareStatement(getMaxIdSql);
+                 ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    maxId = rs.getInt(1);
+                }
+            }
+            
+            String resetAutoIncrementSql = "ALTER TABLE users AUTO_INCREMENT = ?";
+            try (PreparedStatement ps = connection.prepareStatement(resetAutoIncrementSql)) {
+                ps.setInt(1, maxId + 1);
+                ps.executeUpdate();
+            }
+            
+            // Bật lại foreign key checks
+            try (PreparedStatement ps = connection.prepareStatement("SET FOREIGN_KEY_CHECKS = 1")) {
+                ps.executeUpdate();
+            }
+            
+            return true;
+            
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.deleteUser: " + ex.getMessage());
+            ex.printStackTrace();
+            
+            // Đảm bảo bật lại foreign key checks ngay cả khi có lỗi
+            try (PreparedStatement ps = connection.prepareStatement("SET FOREIGN_KEY_CHECKS = 1")) {
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+            
+            return false;
+        }
     }
     
     /**
-     * Tìm kiếm người dùng theo tên hoặc email
+     * Tìm kiếm người dùng theo tên hoặc email (không bao gồm người dùng đã xóa)
      * @param searchTerm từ khóa tìm kiếm
      * @return List<User> danh sách người dùng tìm được
      */
     public List<User> searchUsers(String searchTerm) {
         List<User> users = new ArrayList<>();
         String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender " +
-                    "FROM users WHERE username LIKE ? OR email LIKE ? OR first_name LIKE ? OR last_name LIKE ? " +
+                    "FROM users WHERE (username LIKE ? OR email LIKE ? OR first_name LIKE ? OR last_name LIKE ?) AND status != 'Deleted' " +
                     "ORDER BY created_at DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -372,10 +445,10 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Đếm tổng số người dùng
+     * Đếm tổng số người dùng (không bao gồm người dùng đã xóa)
      */
     public int getTotalUsers() {
-        String sql = "SELECT COUNT(*) FROM users";
+        String sql = "SELECT COUNT(*) FROM users WHERE status != 'Deleted'";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -389,13 +462,13 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Lấy danh sách người dùng theo trang
+     * Lấy danh sách người dùng theo trang (không bao gồm người dùng đã xóa)
      */
     public List<User> getUsersByPage(int page, int pageSize) {
         List<User> users = new ArrayList<>();
         int offset = (page - 1) * pageSize;
         String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender " +
-                    "FROM users ORDER BY user_id ASC LIMIT ? OFFSET ?";
+                    "FROM users WHERE status != 'Deleted' ORDER BY user_id ASC LIMIT ? OFFSET ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, pageSize);
@@ -425,13 +498,13 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Lấy danh sách người dùng theo role với phân trang
+     * Lấy danh sách người dùng theo role với phân trang (không bao gồm người dùng đã xóa)
      */
     public List<User> getUsersByRoleAndPage(String role, int page, int pageSize) {
         List<User> users = new ArrayList<>();
         int offset = (page - 1) * pageSize;
         String sql = "SELECT user_id, username, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender " +
-                    "FROM users WHERE role = ? ORDER BY user_id ASC LIMIT ? OFFSET ?";
+                    "FROM users WHERE role = ? AND status != 'Deleted' ORDER BY user_id ASC LIMIT ? OFFSET ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, role);
@@ -462,10 +535,10 @@ public class UserDAO extends DBContext {
     }
     
     /**
-     * Đếm số lượng users theo role
+     * Đếm số lượng users theo role (không bao gồm người dùng đã xóa)
      */
     public int countUsersByRole(String role) {
-        String sql = "SELECT COUNT(*) FROM users WHERE role = ?";
+        String sql = "SELECT COUNT(*) FROM users WHERE role = ? AND status != 'Deleted'";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, role);
             try (ResultSet rs = ps.executeQuery()) {
