@@ -9,10 +9,15 @@ import model.User;
 import org.mindrot.jbcrypt.BCrypt;
 
 /**
- * Data Access Object for users table
+ * Data Access Object cho bảng users
  */
 public class UserDAO extends DBContext {
 
+    /**
+     * Lấy thông tin người dùng theo username
+     * @param username tên đăng nhập
+     * @return User object hoặc null nếu không tìm thấy
+     */
     public User getByUsername(String username) {
         String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE username = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -42,6 +47,11 @@ public class UserDAO extends DBContext {
         return null;
     }
 
+    /**
+     * Lấy thông tin người dùng theo email
+     * @param email địa chỉ email
+     * @return User object hoặc null nếu không tìm thấy
+     */
     public User getByEmail(String email) {
         String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender FROM users WHERE email = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -72,7 +82,10 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Update user's password with a new BCrypt-hashed password. Returns true if updated.
+     * Cập nhật mật khẩu người dùng với mã hóa BCrypt
+     * @param userId ID của người dùng
+     * @param newPlainPassword mật khẩu mới (chưa mã hóa)
+     * @return true nếu cập nhật thành công
      */
     public boolean updatePassword(int userId, String newPlainPassword) {
         if (newPlainPassword == null || newPlainPassword.length() < 8) {
@@ -93,8 +106,10 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Validate credentials using BCrypt hash stored in password_hash.
-     * Returns the authenticated User on success, otherwise null.
+     * Xác thực thông tin đăng nhập sử dụng BCrypt
+     * @param username tên đăng nhập
+     * @param password mật khẩu
+     * @return User object nếu xác thực thành công, ngược lại null
      */
     public User authenticate(String username, String password) {
         User u = getByUsername(username);
@@ -106,14 +121,15 @@ public class UserDAO extends DBContext {
                 return u;
             }
         } catch (IllegalArgumentException ex) {
-            // In case stored hash is not a BCrypt hash, fall back to plain comparison
+            // Trường hợp hash không phải BCrypt, so sánh trực tiếp
             if (storedHash.equals(password)) return u;
         }
         return null;
     }
 
     /**
-     * Create a new user with a BCrypt-hashed password. Returns created User with userId set, or null on failure.
+     * Tạo người dùng mới với mật khẩu được mã hóa BCrypt
+     * @return User object với userId đã được set, hoặc null nếu thất bại
      */
     public User createUser(String username, String plainPassword, String email, String role, String firstName, String lastName, String phone, java.sql.Date dateOfBirth, String gender) {
         String hashed = BCrypt.hashpw(plainPassword, BCrypt.gensalt(10));
@@ -151,7 +167,9 @@ public class UserDAO extends DBContext {
     }
 
     /**
-     * Update basic profile fields for a user. Returns true if one row affected.
+     * Cập nhật thông tin cơ bản của người dùng
+     * @param user đối tượng User chứa thông tin cần cập nhật
+     * @return true nếu cập nhật thành công
      */
     public boolean updateProfile(User user) {
         String sql = "UPDATE users SET email = ?, first_name = ?, last_name = ?, phone = ?, date_of_birth = ?, gender = ? WHERE user_id = ?";
@@ -297,7 +315,7 @@ public class UserDAO extends DBContext {
                 ps.executeUpdate();
             }
             
-            // Bước 1: Xóa user
+            //  Xóa user
             String deleteSql = "DELETE FROM users WHERE user_id = ?";
             try (PreparedStatement ps = connection.prepareStatement(deleteSql)) {
                 ps.setInt(1, userId);
@@ -311,7 +329,7 @@ public class UserDAO extends DBContext {
                 }
             }
             
-            // Bước 2: Cập nhật lại ID của các user có ID lớn hơn user vừa xóa
+            // Cập nhật lại ID của các user có ID lớn hơn user vừa xóa
             String updateSql = "UPDATE users SET user_id = user_id - 1 WHERE user_id > ?";
             try (PreparedStatement ps = connection.prepareStatement(updateSql)) {
                 ps.setInt(1, userId);

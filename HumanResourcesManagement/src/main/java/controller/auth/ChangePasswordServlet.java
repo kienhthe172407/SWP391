@@ -11,13 +11,16 @@ import org.mindrot.jbcrypt.BCrypt;
 
 import java.io.IOException;
 
+/**
+ * Servlet xử lý đổi mật khẩu người dùng
+ */
 public class ChangePasswordServlet extends HttpServlet {
 
     private final UserDAO userDAO = new UserDAO();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        // Show page
+        // Hiển thị trang đổi mật khẩu
         req.getRequestDispatcher("/auth/change-password.jsp").forward(req, resp);
     }
 
@@ -35,7 +38,7 @@ public class ChangePasswordServlet extends HttpServlet {
         String newPassword = request.getParameter("newPassword");
         String confirmPassword = request.getParameter("confirmPassword");
 
-        // Validate inputs
+        // Kiểm tra dữ liệu đầu vào
         if (newPassword == null || newPassword.length() < 8) {
             request.setAttribute("errorMessage", "Password must be at least 8 characters long.");
             request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);
@@ -47,7 +50,7 @@ public class ChangePasswordServlet extends HttpServlet {
             return;
         }
 
-        // Re-authenticate with current password
+        // Xác thực lại với mật khẩu hiện tại
         if (currentUser.getPasswordHash() != null) {
             try {
                 if (!BCrypt.checkpw(currentPassword, currentUser.getPasswordHash())) {
@@ -56,7 +59,7 @@ public class ChangePasswordServlet extends HttpServlet {
                     return;
                 }
             } catch (IllegalArgumentException e) {
-                // Fallback in case stored hash isn't BCrypt (legacy)
+                // Dự phòng nếu hash không phải BCrypt (legacy)
                 if (!currentPassword.equals(currentUser.getPasswordHash())) {
 request.setAttribute("errorMessage", "Current password is incorrect.");
                     request.getRequestDispatcher("/auth/change-password.jsp").forward(request, response);
@@ -65,10 +68,10 @@ request.setAttribute("errorMessage", "Current password is incorrect.");
             }
         }
 
-        // Update password
+        // Cập nhật mật khẩu
         boolean updated = userDAO.updatePassword(currentUser.getUserID(), newPassword);
         if (updated) {
-            // Update session user hash to avoid re-login issues
+            // Cập nhật hash trong session để tránh phải đăng nhập lại
             currentUser.setPasswordHash(BCrypt.hashpw(newPassword, BCrypt.gensalt(10)));
             session.setAttribute("user", currentUser);
             request.setAttribute("successMessage", "Password updated successfully.");

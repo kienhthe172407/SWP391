@@ -10,6 +10,9 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import model.User;
 
+/**
+ * Servlet quản lý hồ sơ cá nhân người dùng
+ */
 @WebServlet(name = "ProfileServlet", urlPatterns = {"/profile"})
 public class ProfileServlet extends HttpServlet {
 
@@ -50,7 +53,7 @@ public class ProfileServlet extends HttpServlet {
             try {
                 dateOfBirth = java.sql.Date.valueOf(dob.trim());
             } catch (IllegalArgumentException ex) {
-                request.setAttribute("errorMessage", "Ngày sinh không hợp lệ. Định dạng yyyy-MM-dd.");
+                request.setAttribute("errorMessage", "Invalid date of birth. Format: yyyy-MM-dd.");
                 request.getRequestDispatcher("/auth/profile.jsp").forward(request, response);
                 return;
             }
@@ -67,9 +70,9 @@ public class ProfileServlet extends HttpServlet {
         boolean ok = dao.updateProfile(current);
         if (ok) {
             session.setAttribute("user", current);
-            request.setAttribute("successMessage", "Cập nhật hồ sơ thành công.");
+            request.setAttribute("successMessage", "Profile updated successfully.");
         } else {
-            request.setAttribute("errorMessage", "Không thể cập nhật hồ sơ. Vui lòng thử lại.");
+            request.setAttribute("errorMessage", "Unable to update profile. Please try again.");
         }
         request.getRequestDispatcher("/auth/profile.jsp").forward(request, response);
     }

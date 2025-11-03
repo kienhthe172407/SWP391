@@ -12,7 +12,7 @@ USE hr_management_system;
 CREATE TABLE users (
     user_id INT PRIMARY KEY AUTO_INCREMENT,                    -- ID người dùng (khóa chính)
     username VARCHAR(50) UNIQUE NOT NULL,                      -- Tên đăng nhập (duy nhất)
-    password_hash VARCHAR(255) NOT NULL,                       -- Mật khẩu đã mã hóa
+    password_hash VARCHAR(255),                                -- Mật khẩu đã mã hóa (NULL cho Google OAuth)
     email VARCHAR(100) UNIQUE NOT NULL,                        -- Email (duy nhất)
     first_name VARCHAR(50),                                    -- Họ (tuỳ chọn)
     last_name VARCHAR(50),                                     -- Tên (tuỳ chọn)
@@ -21,6 +21,9 @@ CREATE TABLE users (
     gender VARCHAR(10),                                        -- Giới tính (tuỳ chọn)
     role ENUM('Admin', 'HR', 'HR Manager', 'Employee', 'Dept Manager') NOT NULL, -- Vai trò người dùng
     status ENUM('Active', 'Inactive') DEFAULT 'Active',        -- Trạng thái tài khoản
+    google_id VARCHAR(255) UNIQUE,                             -- Google ID cho OAuth (duy nhất)
+    auth_provider VARCHAR(50) DEFAULT 'local',                 -- Nhà cung cấp xác thực ('local' hoặc 'google')
+    profile_picture VARCHAR(500),                              -- URL ảnh đại diện
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
     last_login TIMESTAMP NULL,                                 -- Lần đăng nhập cuối
@@ -28,7 +31,9 @@ CREATE TABLE users (
     INDEX idx_username (username),                             -- Index cho tìm kiếm username
     INDEX idx_email (email),                                   -- Index cho tìm kiếm email
     INDEX idx_role (role),                                     -- Index cho lọc theo role
-    INDEX idx_status (status)                                  -- Index cho lọc theo trạng thái
+    INDEX idx_status (status),                                 -- Index cho lọc theo trạng thái
+    INDEX idx_google_id (google_id),                           -- Index cho tìm kiếm Google ID
+    INDEX idx_auth_provider (auth_provider)                    -- Index cho lọc theo auth provider
 ) ENGINE=InnoDB;
 
 -- ==============================================================================

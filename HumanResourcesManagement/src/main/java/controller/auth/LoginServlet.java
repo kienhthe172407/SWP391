@@ -13,11 +13,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Login servlet: authenticate against users table using BCrypt password hashes.
+ * Servlet đăng nhập: xác thực người dùng sử dụng BCrypt password hashes
  */
 @WebServlet(name = "LoginServlet", urlPatterns = {"/login"})
 public class LoginServlet extends HttpServlet {
-// dang nhap bang tai khoan va password
+    // Đăng nhập bằng tài khoản và password
     private static final Logger LOGGER = Logger.getLogger(LoginServlet.class.getName());
 
     @Override
@@ -27,7 +27,7 @@ public class LoginServlet extends HttpServlet {
         String password = request.getParameter("password");
 
         if (username == null || password == null) {
-            request.setAttribute("errorMessage", "Vui lòng nhập tên đăng nhập và mật khẩu.");
+            request.setAttribute("errorMessage", "Please enter username and password.");
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
             return;
         }
@@ -40,7 +40,7 @@ public class LoginServlet extends HttpServlet {
                 HttpSession session = request.getSession(true);
                 session.setAttribute("user", authenticated);
                 String role = authenticated.getRole();
-                LOGGER.info("User role: " + role); // Debug logging
+                LOGGER.info("User role: " + role); // Ghi log debug
                 if ("Admin".equals(role)) {
                     LOGGER.info("Redirecting Admin to: /dashboard/admin-dashboard.jsp");
                     response.sendRedirect(request.getContextPath() + "/dashboard/admin-dashboard.jsp");
@@ -67,14 +67,14 @@ public class LoginServlet extends HttpServlet {
                     return;
                 }
             } else {
-                request.setAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng.");
+                request.setAttribute("errorMessage", "Incorrect username or password.");
                 request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
                 return;
             }
         } catch (RuntimeException ex) {
-            // DB connection failed or other runtime errors. Log and show generic error to user.
+            // Lỗi kết nối database hoặc lỗi runtime khác. Ghi log và hiển thị lỗi chung cho người dùng
             LOGGER.log(Level.SEVERE, "DB/auth error: {0}", ex.getMessage());
-            request.setAttribute("errorMessage", "Lỗi hệ thống (không thể kết nối đến cơ sở dữ liệu). Vui lòng thử lại sau.");
+            request.setAttribute("errorMessage", "System error (unable to connect to database). Please try again later.");
             request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
             return;
         }

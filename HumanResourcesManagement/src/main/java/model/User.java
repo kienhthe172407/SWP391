@@ -25,6 +25,10 @@ public class User {
     private String phone;
     private Date dateOfBirth;
     private String gender;
+    // Google OAuth fields
+    private String googleId;
+    private String authProvider; // 'local' or 'google'
+    private String profilePicture;
 
     // Constructors
     public User() {}
@@ -176,6 +180,30 @@ public class User {
 
     public void setGender(String gender) {
         this.gender = gender;
+    }
+
+    public String getGoogleId() {
+        return googleId;
+    }
+
+    public void setGoogleId(String googleId) {
+        this.googleId = googleId;
+    }
+
+    public String getAuthProvider() {
+        return authProvider;
+    }
+
+    public void setAuthProvider(String authProvider) {
+        this.authProvider = authProvider;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     // Helper methods

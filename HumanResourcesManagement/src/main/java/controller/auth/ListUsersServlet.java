@@ -102,7 +102,7 @@ public class ListUsersServlet extends HttpServlet {
             
         } catch (Exception e) {
             // Xử lý lỗi
-            request.setAttribute("errorMessage", "Có lỗi xảy ra khi tải danh sách người dùng: " + e.getMessage());
+            request.setAttribute("errorMessage", "An error occurred while loading user list: " + e.getMessage());
             request.getRequestDispatcher("/auth/list-users.jsp").forward(request, response);
         }
     }
@@ -141,10 +141,10 @@ public class ListUsersServlet extends HttpServlet {
                         String newStatus = "Active".equals(user.getStatus()) ? "Inactive" : "Active";
                         success = userDAO.updateUserStatus(userId, newStatus);
                         message = success ? 
-                            "Đã " + ("Active".equals(newStatus) ? "kích hoạt" : "vô hiệu hóa") + " tài khoản thành công!" :
-                            "Có lỗi xảy ra khi cập nhật trạng thái tài khoản!";
+                            "Account " + ("Active".equals(newStatus) ? "activated" : "deactivated") + " successfully!" :
+                            "An error occurred while updating account status!";
                     } else {
-                        message = "Không tìm thấy người dùng!";
+                        message = "User not found!";
                     }
                     break;
                     
@@ -154,10 +154,10 @@ public class ListUsersServlet extends HttpServlet {
                     if (newRole != null && !newRole.trim().isEmpty()) {
                         success = userDAO.updateUserRole(userId, newRole);
                         message = success ? 
-                            "Đã cập nhật vai trò thành công!" :
-                            "Có lỗi xảy ra khi cập nhật vai trò!";
+                            "Role updated successfully!" :
+                            "An error occurred while updating role!";
                     } else {
-                        message = "Vai trò không hợp lệ!";
+                        message = "Invalid role!";
                     }
                     break;
                     
@@ -165,12 +165,12 @@ public class ListUsersServlet extends HttpServlet {
                     // Xóa người dùng (soft delete)
                     success = userDAO.deleteUser(userId);
                     message = success ? 
-                        "Đã xóa tài khoản thành công!" :
-                        "Có lỗi xảy ra khi xóa tài khoản!";
+                        "Account deleted successfully!" :
+                        "An error occurred while deleting account!";
                     break;
                     
                 default:
-                    message = "Hành động không hợp lệ!";
+                    message = "Invalid action!";
             }
             
             // Chuyển hướng với thông báo
@@ -187,7 +187,7 @@ public class ListUsersServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/list-users?error=invalid_user_id");
         } catch (Exception e) {
             response.sendRedirect(request.getContextPath() + "/list-users?error=" + 
-                java.net.URLEncoder.encode("Có lỗi xảy ra: " + e.getMessage(), "UTF-8"));
+                java.net.URLEncoder.encode("An error occurred: " + e.getMessage(), "UTF-8"));
         }
     }
 }

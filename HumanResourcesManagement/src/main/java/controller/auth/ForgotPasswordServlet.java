@@ -28,46 +28,91 @@ public class ForgotPasswordServlet extends HttpServlet {
 
         // Validate cơ bản
         if (email == null || !email.contains("@")) {
-            request.setAttribute("errorMessage", "Email không hợp lệ");
+            request.setAttribute("errorMessage", "Invalid email");
             request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
             return;
         }
         if (firstName == null || firstName.trim().isEmpty() || lastName == null || lastName.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Vui lòng nhập đầy đủ họ và tên");
+            request.setAttribute("errorMessage", "Please enter your full name");
             request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
             return;
         }
         if (phone == null || phone.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Vui lòng nhập số điện thoại");
+            request.setAttribute("errorMessage", "Please enter your phone number");
             request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
             return;
         }
 
         User user = userDAO.getByEmail(email.trim());
         if (user == null) {
-            request.setAttribute("errorMessage", "Không tìm thấy tài khoản với email này");
+            request.setAttribute("errorMessage", "No account found with this email");
             request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
             return;
         }
 
-        // Cập nhật thông tin profile
-        user.setFirstName(firstName.trim());
-        user.setLastName(lastName.trim());
-        user.setPhone(phone.trim());
+        // Kiểm tra tất cả thông tin phải khớp chính xác
+        boolean isValid = true;
+        StringBuilder errorMsg = new StringBuilder();
+        
+        // Kiểm tra firstName
+        if (!firstName.trim().equalsIgnoreCase(user.getFirstName())) {
+            isValid = false;
+            errorMsg.append("First name does not match. ");
+        }
+        
+        // Kiểm tra lastName
+        if (!lastName.trim().equalsIgnoreCase(user.getLastName())) {
+            isValid = false;
+            errorMsg.append("Last name does not match. ");
+        }
+        
+        // Kiểm tra phone
+        if (!phone.trim().equals(user.getPhone())) {
+            isValid = false;
+            errorMsg.append("Phone number does not match. ");
+        }
+        
+        // Kiểm tra dateOfBirth
         if (dateOfBirthStr != null && !dateOfBirthStr.trim().isEmpty()) {
             try {
-                user.setDateOfBirth(Date.valueOf(dateOfBirthStr));
-            } catch (IllegalArgumentException ignore) {}
+                Date inputDate = Date.valueOf(dateOfBirthStr.trim());
+                if (user.getDateOfBirth() == null || !inputDate.equals(user.getDateOfBirth())) {
+                    isValid = false;
+                    errorMsg.append("Date of birth does not match. ");
+                }
+            } catch (IllegalArgumentException ex) {
+                isValid = false;
+                errorMsg.append("Invalid date format. ");
+            }
+        } else if (user.getDateOfBirth() != null) {
+            isValid = false;
+            errorMsg.append("Date of birth is required. ");
         }
-        user.setGender(gender);
-        userDAO.updateProfile(user);
+        
+        // Kiểm tra gender
+        if (gender != null && !gender.trim().isEmpty()) {
+            if (user.getGender() == null || !gender.trim().equalsIgnoreCase(user.getGender())) {
+                isValid = false;
+                errorMsg.append("Gender does not match. ");
+            }
+        } else if (user.getGender() != null && !user.getGender().isEmpty()) {
+            isValid = false;
+            errorMsg.append("Gender is required. ");
+        }
+        
+        // Nếu có thông tin không khớp, hiển thị lỗi
+        if (!isValid) {
+            request.setAttribute("errorMessage", "Information does not match our records. " + errorMsg.toString());
+            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+            return;
+        }
 
         // Reset mật khẩu về 12345678
         boolean ok = userDAO.updatePassword(user.getUserID(), "12345678");
         if (ok) {
-            request.setAttribute("successMessage", "Đặt lại mật khẩu thành công. Mật khẩu mới: 12345678");
+            request.setAttribute("successMessage", "Password reset successful. New password: 12345678");
         } else {
-            request.setAttribute("errorMessage", "Không thể đặt lại mật khẩu. Vui lòng thử lại");
+            request.setAttribute("errorMessage", "Unable to reset password. Please try again");
         }
 
         request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);

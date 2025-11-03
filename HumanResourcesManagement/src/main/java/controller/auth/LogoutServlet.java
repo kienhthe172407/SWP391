@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
 /**
- * Logout servlet: invalidates the session and redirects to the login page.
+ * Servlet đăng xuất: hủy session và chuyển hướng về trang đăng nhập
  */
 @WebServlet(name = "LogoutServlet", urlPatterns = {"/logout"})
 public class LogoutServlet extends HttpServlet {

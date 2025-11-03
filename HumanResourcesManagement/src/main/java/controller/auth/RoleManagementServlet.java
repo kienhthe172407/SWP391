@@ -40,7 +40,7 @@ public class RoleManagementServlet extends HttpServlet {
             String roleFilter = request.getParameter("role");
             String searchTerm = request.getParameter("search");
             
-            // Pagination
+            // Phân trang
             int page = 1;
             int pageSize = 10;
             try {
@@ -86,7 +86,7 @@ public class RoleManagementServlet extends HttpServlet {
             
             request.setAttribute("users", users);
             
-            // Pagination info
+            // Thông tin phân trang
             int totalPages = (int) Math.ceil((double) totalUsers / pageSize);
             request.setAttribute("currentPage", page);
             request.setAttribute("totalPages", totalPages);

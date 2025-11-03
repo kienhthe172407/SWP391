@@ -40,20 +40,20 @@ public class EditUserServlet extends HttpServlet {
 
         String id = request.getParameter("id");
         if (id == null || id.isEmpty()) {
-            response.sendRedirect(request.getContextPath() + "/list-users?error=Thi%E1%BA%BFu+tham+s%E1%BB%91+id");
+            response.sendRedirect(request.getContextPath() + "/list-users?error=Missing+id+parameter");
             return;
         }
         try {
             int userId = Integer.parseInt(id);
             User user = userDAO.getUserById(userId);
             if (user == null) {
-                response.sendRedirect(request.getContextPath() + "/list-users?error=Kh%C3%B4ng+t%C3%ACm+th%E1%BA%A5y+ng%C6%B0%E1%BB%9Di+d%C3%B9ng");
+                response.sendRedirect(request.getContextPath() + "/list-users?error=User+not+found");
                 return;
             }
             request.setAttribute("editUser", user);
             request.getRequestDispatcher("/auth/edit-user.jsp").forward(request, response);
         } catch (NumberFormatException e) {
-            response.sendRedirect(request.getContextPath() + "/list-users?error=ID+kh%C3%B4ng+h%E1%BB%A3p+l%E1%BB%87");
+            response.sendRedirect(request.getContextPath() + "/list-users?error=Invalid+ID");
         }
     }
 
@@ -80,11 +80,11 @@ public class EditUserServlet extends HttpServlet {
             int userId = Integer.parseInt(id);
             User user = userDAO.getUserById(userId);
             if (user == null) {
-                error = "Không tìm thấy người dùng";
+                error = "User not found";
             } else {
                 // Validate đơn giản
                 if (email == null || !email.contains("@")) {
-                    error = "Email không hợp lệ";
+                    error = "Invalid email";
                 }
                 if (error == null) {
                     // Cập nhật các trường cơ bản
@@ -112,15 +112,15 @@ public class EditUserServlet extends HttpServlet {
                         if (status != null && !status.isEmpty()) {
                             userDAO.updateUserStatus(userId, status);
                         }
-                        response.sendRedirect(request.getContextPath() + "/list-users?success=C%E1%BA%ADp+nh%E1%BA%ADt+th%C3%A0nh+c%C3%B4ng");
+                        response.sendRedirect(request.getContextPath() + "/list-users?success=Update+successful");
                         return;
                     } else {
-                        error = "Cập nhật thất bại";
+                        error = "Update failed";
                     }
                 }
             }
         } catch (NumberFormatException e) {
-            error = "ID không hợp lệ";
+            error = "Invalid ID";
         }
 
         // Quay lại form với thông báo lỗi
