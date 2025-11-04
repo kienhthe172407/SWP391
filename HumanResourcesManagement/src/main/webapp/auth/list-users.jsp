@@ -9,7 +9,14 @@
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <title>User Management - HR System</title>
                 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+                <!-- Google Fonts - Inter (hỗ trợ tiếng Việt) -->
+                <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+                    rel="stylesheet">
                 <style>
+                    * {
+                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                    }
+
                     body {
                         background: #f8f9fa;
                         padding: 20px 0;
@@ -161,15 +168,6 @@
                                                                         onclick="return confirm('Bạn có chắc muốn ${user.status == 'Active' ? 'vô hiệu hóa' : 'kích hoạt'} tài khoản này?')">
                                                                         ${user.status == 'Active' ? 'Deactivate' :
                                                                         'Activate'}
-                                                                    </button>
-                                                                </form>
-                                                                <form method="post" class="d-inline">
-                                                                    <input type="hidden" name="action" value="delete">
-                                                                    <input type="hidden" name="userId"
-                                                                        value="${user.userId}">
-                                                                    <button type="submit" class="btn btn-danger btn-sm"
-                                                                        onclick="return confirm('⚠️ Bạn có chắc muốn XÓA tài khoản ${user.username}? Hành động này không thể hoàn tác!')">
-                                                                        Delete
                                                                     </button>
                                                                 </form>
                                                             </div>

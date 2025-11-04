@@ -52,7 +52,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="#">
+                            <a href="${pageContext.request.contextPath}/permission-settings">
                                 <i class="fas fa-key"></i>
                                 <span>Permission Settings</span>
                             </a>

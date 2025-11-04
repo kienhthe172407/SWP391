@@ -45,6 +45,11 @@ public class CreateUserServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        // Set encoding UTF-8 cho request và response
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        
         // Kiểm tra quyền admin
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");

@@ -20,21 +20,30 @@
     </servlet-mapping>
     
     <servlet>
-        <servlet-name>ForgotPasswordServlet</servlet-name>
-        <servlet-class>controller.auth.ForgotPasswordServlet</servlet-class>
-    </servlet>
-    <servlet-mapping>
-        <servlet-name>ForgotPasswordServlet</servlet-name>
-        <url-pattern>/forgot-password</url-pattern>
-    </servlet-mapping>
-    
-    <servlet>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <servlet-class>controller.auth.ChangePasswordServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ChangePasswordServlet</servlet-name>
         <url-pattern>/change-password</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>ForgotPasswordServlet</servlet-name>
+        <servlet-class>controller.auth.ForgotPasswordServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ForgotPasswordServlet</servlet-name>
+        <url-pattern>/auth/forgot-password</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>PermissionSettingsServlet</servlet-name>
+        <servlet-class>controller.auth.PermissionSettingsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>PermissionSettingsServlet</servlet-name>
+        <url-pattern>/permission-settings</url-pattern>
     </servlet-mapping>
     
     <!-- Default Servlet for Static Resources -->

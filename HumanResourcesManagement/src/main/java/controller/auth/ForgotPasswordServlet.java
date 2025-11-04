@@ -1,122 +1,88 @@
 package controller.auth;
 
 import dal.UserDAO;
+import model.User;
+import service.EmailService;
+import util.PasswordGenerator;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import model.User;
-
 import java.io.IOException;
-import java.sql.Date;
 
-/**
- * Yêu cầu nhân viên điền đủ thông tin profile rồi reset mật khẩu về 12345678
- */
+@WebServlet(name = "ForgotPasswordServlet", urlPatterns = {"/auth/forgot-password"})
 public class ForgotPasswordServlet extends HttpServlet {
-
-    private final UserDAO userDAO = new UserDAO();
-
+    
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String email = request.getParameter("email");
-        String firstName = request.getParameter("firstName");
-        String lastName = request.getParameter("lastName");
-        String phone = request.getParameter("phone");
-        String dateOfBirthStr = request.getParameter("dateOfBirth");
-        String gender = request.getParameter("gender");
-
-        // Validate cơ bản
-        if (email == null || !email.contains("@")) {
-            request.setAttribute("errorMessage", "Invalid email");
-            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
-            return;
-        }
-        if (firstName == null || firstName.trim().isEmpty() || lastName == null || lastName.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Please enter your full name");
-            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
-            return;
-        }
-        if (phone == null || phone.trim().isEmpty()) {
-            request.setAttribute("errorMessage", "Please enter your phone number");
-            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
-            return;
-        }
-
-        User user = userDAO.getByEmail(email.trim());
-        if (user == null) {
-            request.setAttribute("errorMessage", "No account found with this email");
-            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
-            return;
-        }
-
-        // Kiểm tra tất cả thông tin phải khớp chính xác
-        boolean isValid = true;
-        StringBuilder errorMsg = new StringBuilder();
-        
-        // Kiểm tra firstName
-        if (!firstName.trim().equalsIgnoreCase(user.getFirstName())) {
-            isValid = false;
-            errorMsg.append("First name does not match. ");
-        }
-        
-        // Kiểm tra lastName
-        if (!lastName.trim().equalsIgnoreCase(user.getLastName())) {
-            isValid = false;
-            errorMsg.append("Last name does not match. ");
-        }
-        
-        // Kiểm tra phone
-        if (!phone.trim().equals(user.getPhone())) {
-            isValid = false;
-            errorMsg.append("Phone number does not match. ");
-        }
-        
-        // Kiểm tra dateOfBirth
-        if (dateOfBirthStr != null && !dateOfBirthStr.trim().isEmpty()) {
-            try {
-                Date inputDate = Date.valueOf(dateOfBirthStr.trim());
-                if (user.getDateOfBirth() == null || !inputDate.equals(user.getDateOfBirth())) {
-                    isValid = false;
-                    errorMsg.append("Date of birth does not match. ");
-                }
-            } catch (IllegalArgumentException ex) {
-                isValid = false;
-                errorMsg.append("Invalid date format. ");
-            }
-        } else if (user.getDateOfBirth() != null) {
-            isValid = false;
-            errorMsg.append("Date of birth is required. ");
-        }
-        
-        // Kiểm tra gender
-        if (gender != null && !gender.trim().isEmpty()) {
-            if (user.getGender() == null || !gender.trim().equalsIgnoreCase(user.getGender())) {
-                isValid = false;
-                errorMsg.append("Gender does not match. ");
-            }
-        } else if (user.getGender() != null && !user.getGender().isEmpty()) {
-            isValid = false;
-            errorMsg.append("Gender is required. ");
-        }
-        
-        // Nếu có thông tin không khớp, hiển thị lỗi
-        if (!isValid) {
-            request.setAttribute("errorMessage", "Information does not match our records. " + errorMsg.toString());
-            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
-            return;
-        }
-
-        // Reset mật khẩu về 12345678
-        boolean ok = userDAO.updatePassword(user.getUserID(), "12345678");
-        if (ok) {
-            request.setAttribute("successMessage", "Password reset successful. New password: 12345678");
-        } else {
-            request.setAttribute("errorMessage", "Unable to reset password. Please try again");
-        }
-
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
     }
+    
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+        String email = request.getParameter("email");
+        
+        if (email == null || email.trim().isEmpty()) {
+            request.setAttribute("errorMessage", "Vui lòng nhập địa chỉ email");
+            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+            return;
+        }
+        
+        email = email.trim().toLowerCase();
+        
+        try {
+            UserDAO userDAO = new UserDAO();
+            
+            // Kiểm tra email có tồn tại không
+            User user = userDAO.getByEmail(email);
+            
+            if (user == null) {
+                request.setAttribute("errorMessage", "Email không tồn tại trong hệ thống");
+                request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+            
+            // Kiểm tra trạng thái tài khoản
+            if (!"Active".equals(user.getStatus())) {
+                request.setAttribute("errorMessage", "Tài khoản đã bị vô hiệu hóa");
+                request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+            
+            // Tạo mật khẩu mới
+            String newPassword = PasswordGenerator.generate();
+            
+            // Cập nhật mật khẩu trong database (UserDAO tự động hash bằng BCrypt)
+            boolean updated = userDAO.updatePassword(user.getUserID(), newPassword);
+            
+            if (!updated) {
+                request.setAttribute("errorMessage", "Lỗi hệ thống. Vui lòng thử lại sau");
+                request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+            
+            // Gửi email
+            EmailService emailService = new EmailService();
+            boolean emailSent = emailService.sendNewPassword(email, newPassword);
+            
+            if (!emailSent) {
+                request.setAttribute("errorMessage", "Không thể gửi email. Vui lòng thử lại sau");
+                request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+                return;
+            }
+            
+            // Thành công
+            request.setAttribute("successMessage", "Mật khẩu mới đã được gửi đến email của bạn");
+            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("errorMessage", "Lỗi hệ thống. Vui lòng thử lại sau");
+            request.getRequestDispatcher("/auth/forgot-password.jsp").forward(request, response);
+        }
+    }
 }
-
-

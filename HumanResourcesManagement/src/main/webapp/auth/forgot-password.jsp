@@ -1,133 +1,148 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forgot Password - Human Resources Management System</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts - Nunito -->
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-    <!-- Custom CSS -->
-    <link href="<%= request.getContextPath() %>/css/auth.css" rel="stylesheet">
-</head>
-<body class="auth-page">
-    <div class="auth-container">
+    <!DOCTYPE html>
+    <html lang="vi">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Quên mật khẩu - HR Management System</title>
+        <!-- Bootstrap 5 CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Font Awesome -->
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <style>
+            body {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .card {
+                border: none;
+                border-radius: 15px;
+                box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            }
+
+            .btn-primary {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                border: none;
+                padding: 12px;
+                font-weight: 600;
+                transition: all 0.3s;
+            }
+
+            .btn-primary:hover {
+                background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            }
+
+            .form-control:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            }
+        </style>
+    </head>
+
+    <body>
         <div class="container">
             <div class="row justify-content-center">
-                <div class="col-xl-8 col-lg-10 col-md-9">
-                    <div class="card auth-card">
-                        <div class="card-body p-0">
-                            <div class="row">
-                                <div class="col-lg-5 d-none d-lg-block">
-                                    <div class="p-4 h-100 d-flex flex-column justify-content-center" 
-                                         style="background: linear-gradient(135deg, #4e73df 0%, #224abe 100%); color: white;">
-                                        <div class="text-center mb-5">
-                                            <i class="fas fa-unlock-alt fa-5x mb-4"></i>
-                                            <h3>Password Recovery</h3>
-                                            <p class="mt-3">We will send password reset instructions to your email</p>
-                                        </div>
-                                    </div>
+                <div class="col-md-6 col-lg-5">
+                    <div class="card">
+                        <div class="card-body p-5">
+                            <!-- Header -->
+                            <div class="text-center mb-4">
+                                <div class="mb-3">
+                                    <i class="fas fa-key fa-3x text-primary"></i>
                                 </div>
-                                <div class="col-lg-7">
-                                    <div class="p-5">
-                                        <div class="text-center">
-                                            <h1 class="auth-title">Forgot Password?</h1>
-                                            <p class="auth-subtitle">Please enter your complete profile information. The system will reset your password to 12345678</p>
-                                        </div>
-                                        
-                                        <!-- Show error message if any -->
-                                        <% if(request.getAttribute("errorMessage") != null) { %>
-                                            <div class="auth-error">
-                                                <i class="fas fa-exclamation-circle me-2"></i>
-                                                <%= request.getAttribute("errorMessage") %>
-                                            </div>
-                                        <% } %>
-                                        
-                                        <!-- Show success message if any -->
-                                        <% if(request.getAttribute("successMessage") != null) { %>
-                                            <div class="auth-success">
-                                                <i class="fas fa-check-circle me-2"></i>
-                                                <%= request.getAttribute("successMessage") %>
-                                            </div>
-                                        <% } %>
-                                        
-                                        <form class="auth-form" action="${pageContext.request.contextPath}/forgot-password" method="post">
-                                            <div class="form-group">
-                                                <label class="form-label" for="email">Email</label>
-                                                <div class="input-group">
-                                                    <span class="input-group-text bg-transparent border-end-0">
-                                                        <i class="fas fa-envelope"></i>
-                                                    </span>
-                                                    <input type="email" class="form-control border-start-0" id="email" name="email" 
-                                                           placeholder="Enter registered email" required>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="form-label" for="firstName">First Name</label>
-                                                        <input type="text" class="form-control" id="firstName" name="firstName" placeholder="Enter first name" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="form-label" for="lastName">Last Name</label>
-                                                        <input type="text" class="form-control" id="lastName" name="lastName" placeholder="Enter last name" required>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row">
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="form-label" for="phone">Phone Number</label>
-                                                        <input type="text" class="form-control" id="phone" name="phone" placeholder="0123456789" required>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-6">
-                                                    <div class="form-group">
-                                                        <label class="form-label" for="dateOfBirth">Date of Birth</label>
-                                                        <input type="date" class="form-control" id="dateOfBirth" name="dateOfBirth">
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="form-group">
-                                                <label class="form-label" for="gender">Gender</label>
-                                                <select class="form-select" id="gender" name="gender">
-                                                    <option value="">-- Select --</option>
-                                                    <option value="Male">Male</option>
-                                                    <option value="Female">Female</option>
-                                                    <option value="Other">Other</option>
-                                                </select>
-                                            </div>
-
-                                            <button type="submit" class="btn btn-primary btn-block mt-4">
-                                                Confirm Password Reset <i class="fas fa-paper-plane ms-2"></i>
-                                            </button>
-                                        </form>
-                                        <hr>
-                                        <div class="auth-links">
-                                            <a href="${pageContext.request.contextPath}/auth/login.jsp">
-                                                <i class="fas fa-arrow-left me-1"></i> Back to login page
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
+                                <h2 class="fw-bold mb-2">Quên mật khẩu?</h2>
+                                <p class="text-muted">Nhập email của bạn để nhận hướng dẫn đặt lại mật khẩu</p>
                             </div>
+
+                            <!-- Success Message -->
+                            <% if(request.getAttribute("successMessage") !=null) { %>
+                                <div class="alert alert-success" role="alert">
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    <%= request.getAttribute("successMessage") %>
+                                </div>
+                                <div class="text-center">
+                                    <a href="${pageContext.request.contextPath}/login" class="btn btn-primary w-100">
+                                        <i class="fas fa-sign-in-alt me-2"></i>Đăng nhập ngay
+                                    </a>
+                                </div>
+                                <% } else { %>
+
+                                    <!-- Error Message -->
+                                    <% if(request.getAttribute("errorMessage") !=null) { %>
+                                        <div class="alert alert-danger" role="alert">
+                                            <i class="fas fa-exclamation-circle me-2"></i>
+                                            <%= request.getAttribute("errorMessage") %>
+                                        </div>
+                                        <% } %>
+
+                                            <!-- Form -->
+                                            <form action="${pageContext.request.contextPath}/auth/forgot-password"
+                                                method="post">
+                                                <div class="mb-4">
+                                                    <label for="email" class="form-label fw-semibold">
+                                                        <i class="fas fa-envelope me-2"></i>Địa chỉ Email
+                                                    </label>
+                                                    <input type="email" class="form-control form-control-lg" id="email"
+                                                        name="email" placeholder="example@email.com" required>
+                                                    <div class="form-text">
+                                                        <i class="fas fa-info-circle me-1"></i>
+                                                        Chúng tôi sẽ gửi mật khẩu mới đến email này
+                                                    </div>
+                                                </div>
+
+                                                <button type="submit" class="btn btn-primary w-100 btn-lg mb-3">
+                                                    <i class="fas fa-paper-plane me-2"></i>Gửi mật khẩu mới
+                                                </button>
+                                            </form>
+
+                                            <% } %>
+
+                                                <!-- Divider -->
+                                                <hr class="my-4">
+
+                                                <!-- Back to login -->
+                                                <div class="text-center">
+                                                    <a href="${pageContext.request.contextPath}/login"
+                                                        class="text-decoration-none">
+                                                        <i class="fas fa-arrow-left me-2"></i>Quay lại đăng nhập
+                                                    </a>
+                                                </div>
+
+                                                <!-- Info box -->
+                                                <div class="mt-4 p-3 bg-light rounded">
+                                                    <h6 class="mb-2 fw-semibold">
+                                                        <i class="fas fa-lightbulb me-2 text-warning"></i>Lưu ý:
+                                                    </h6>
+                                                    <ul class="small mb-0 ps-3">
+                                                        <li>Email sẽ được gửi trong vòng vài phút</li>
+                                                        <li>Kiểm tra cả thư mục spam/junk</li>
+                                                        <li>Link đặt lại mật khẩu có hiệu lực trong 24 giờ</li>
+                                                    </ul>
+                                                </div>
                         </div>
+                    </div>
+
+                    <!-- Additional help -->
+                    <div class="text-center mt-3">
+                        <p class="text-white small">
+                            <i class="fas fa-question-circle me-1"></i>
+                            Cần hỗ trợ? Liên hệ
+                            <a href="mailto:support@hrm.com" class="text-white fw-bold">support@hrm.com</a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+        <!-- Bootstrap 5 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </body>
+
+    </html>

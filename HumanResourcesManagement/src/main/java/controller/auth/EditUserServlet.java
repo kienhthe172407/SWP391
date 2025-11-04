@@ -59,6 +59,11 @@ public class EditUserServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Set encoding UTF-8
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType("text/html; charset=UTF-8");
+        
         if (!isAdmin(request.getSession(false))) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;

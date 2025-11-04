@@ -1,0 +1,141 @@
+package util;
+
+import model.User;
+import java.util.*;
+
+/**
+ * Permission Checker - Kiểm tra quyền của user
+ */
+public class PermissionChecker {
+    
+    // Định nghĩa permissions cho từng role
+    private static final Map<String, Set<String>> ROLE_PERMISSIONS = new HashMap<>();
+    
+    static {
+        // Admin - Full permissions
+        Set<String> adminPerms = new HashSet<>(Arrays.asList(
+            PermissionConstants.USER_VIEW, PermissionConstants.USER_CREATE, PermissionConstants.USER_EDIT,
+            PermissionConstants.USER_ACTIVATE,
+            PermissionConstants.EMPLOYEE_VIEW, PermissionConstants.EMPLOYEE_CREATE, PermissionConstants.EMPLOYEE_EDIT,
+            PermissionConstants.EMPLOYEE_DELETE,
+            PermissionConstants.DEPT_VIEW, PermissionConstants.DEPT_CREATE, PermissionConstants.DEPT_EDIT,
+            PermissionConstants.DEPT_DELETE,
+            PermissionConstants.CONTRACT_VIEW, PermissionConstants.CONTRACT_CREATE, PermissionConstants.CONTRACT_EDIT,
+            PermissionConstants.CONTRACT_DELETE, PermissionConstants.CONTRACT_APPROVE,
+            PermissionConstants.JOB_VIEW, PermissionConstants.JOB_CREATE, PermissionConstants.JOB_EDIT,
+            PermissionConstants.JOB_DELETE,
+            PermissionConstants.SYSTEM_CONFIG, PermissionConstants.ROLE_MANAGE, PermissionConstants.PERMISSION_MANAGE
+        ));
+        ROLE_PERMISSIONS.put("Admin", adminPerms);
+        
+        // HR Manager
+        Set<String> hrManagerPerms = new HashSet<>(Arrays.asList(
+            PermissionConstants.USER_VIEW, PermissionConstants.USER_CREATE, PermissionConstants.USER_EDIT,
+            PermissionConstants.EMPLOYEE_VIEW, PermissionConstants.EMPLOYEE_CREATE, PermissionConstants.EMPLOYEE_EDIT,
+            PermissionConstants.EMPLOYEE_DELETE,
+            PermissionConstants.DEPT_VIEW,
+            PermissionConstants.CONTRACT_VIEW, PermissionConstants.CONTRACT_CREATE, PermissionConstants.CONTRACT_EDIT,
+            PermissionConstants.CONTRACT_APPROVE,
+            PermissionConstants.JOB_VIEW, PermissionConstants.JOB_CREATE, PermissionConstants.JOB_EDIT,
+            PermissionConstants.JOB_DELETE
+        ));
+        ROLE_PERMISSIONS.put("HR Manager", hrManagerPerms);
+        
+        // HR
+        Set<String> hrPerms = new HashSet<>(Arrays.asList(
+            PermissionConstants.USER_VIEW,
+            PermissionConstants.EMPLOYEE_VIEW, PermissionConstants.EMPLOYEE_CREATE, PermissionConstants.EMPLOYEE_EDIT,
+            PermissionConstants.DEPT_VIEW,
+            PermissionConstants.CONTRACT_VIEW, PermissionConstants.CONTRACT_CREATE, PermissionConstants.CONTRACT_EDIT,
+            PermissionConstants.JOB_VIEW, PermissionConstants.JOB_CREATE, PermissionConstants.JOB_EDIT
+        ));
+        ROLE_PERMISSIONS.put("HR", hrPerms);
+        
+        // Dept Manager
+        Set<String> deptManagerPerms = new HashSet<>(Arrays.asList(
+            PermissionConstants.EMPLOYEE_VIEW,
+            PermissionConstants.DEPT_VIEW,
+            PermissionConstants.CONTRACT_VIEW,
+            PermissionConstants.JOB_VIEW
+        ));
+        ROLE_PERMISSIONS.put("Dept Manager", deptManagerPerms);
+        
+        // Employee
+        Set<String> employeePerms = new HashSet<>(Arrays.asList(
+            PermissionConstants.EMPLOYEE_VIEW,
+            PermissionConstants.CONTRACT_VIEW,
+            PermissionConstants.JOB_VIEW
+        ));
+        ROLE_PERMISSIONS.put("Employee", employeePerms);
+    }
+    
+    /**
+     * Kiểm tra user có permission không
+     */
+    public static boolean hasPermission(User user, String permission) {
+        if (user == null || user.getRole() == null) {
+            return false;
+        }
+        
+        Set<String> permissions = ROLE_PERMISSIONS.get(user.getRole());
+        return permissions != null && permissions.contains(permission);
+    }
+    
+    /**
+     * Kiểm tra user có bất kỳ permission nào trong danh sách
+     */
+    public static boolean hasAnyPermission(User user, String... permissions) {
+        for (String permission : permissions) {
+            if (hasPermission(user, permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * Kiểm tra user có tất cả permissions trong danh sách
+     */
+    public static boolean hasAllPermissions(User user, String... permissions) {
+        for (String permission : permissions) {
+            if (!hasPermission(user, permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * Lấy tất cả permissions của user
+     */
+    public static Set<String> getUserPermissions(User user) {
+        if (user == null || user.getRole() == null) {
+            return Collections.emptySet();
+        }
+        
+        Set<String> permissions = ROLE_PERMISSIONS.get(user.getRole());
+        return permissions != null ? new HashSet<>(permissions) : Collections.emptySet();
+    }
+    
+    /**
+     * Lấy permissions của role
+     */
+    public static Set<String> getRolePermissions(String role) {
+        Set<String> permissions = ROLE_PERMISSIONS.get(role);
+        return permissions != null ? new HashSet<>(permissions) : Collections.emptySet();
+    }
+    
+    /**
+     * Cập nhật permissions cho role
+     */
+    public static void updateRolePermissions(String role, Set<String> permissions) {
+        ROLE_PERMISSIONS.put(role, new HashSet<>(permissions));
+    }
+    
+    /**
+     * Lấy tất cả roles
+     */
+    public static Set<String> getAllRoles() {
+        return ROLE_PERMISSIONS.keySet();
+    }
+}

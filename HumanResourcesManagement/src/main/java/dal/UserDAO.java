@@ -570,4 +570,113 @@ public class UserDAO extends DBContext {
         }
         return 0;
     }
+    
+    /**
+     * Tìm user theo Google ID
+     * @param googleId Google user ID
+     * @return User object hoặc null nếu không tìm thấy
+     */
+    public User getByGoogleId(String googleId) {
+        String sql = "SELECT user_id, username, password_hash, email, role, status, created_at, first_name, last_name, phone, date_of_birth, gender, google_id, auth_provider, profile_picture FROM users WHERE google_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, googleId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapResultSetToUser(rs);
+                }
+            }
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.getByGoogleId: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+        return null;
+    }
+    
+    /**
+     * Tìm và link user với Google OAuth (không tự động tạo user mới)
+     * Chỉ cho phép login nếu email đã được admin tạo trước
+     * @param googleId Google user ID
+     * @param email Email từ Google
+     * @param firstName First name từ Google
+     * @param lastName Last name từ Google
+     * @param profilePicture URL ảnh đại diện từ Google
+     * @return User object nếu email tồn tại, null nếu email chưa được tạo
+     */
+    public User findOrCreateGoogleUser(String googleId, String email, String firstName, String lastName, String profilePicture) {
+        // Kiểm tra xem user đã có Google ID chưa
+        User existingUser = getByGoogleId(googleId);
+        if (existingUser != null) {
+            // Cập nhật thông tin nếu có thay đổi
+            updateGoogleUserInfo(existingUser.getUserID(), firstName, lastName, profilePicture);
+            return getByGoogleId(googleId);
+        }
+        
+        // Kiểm tra xem có user với email này chưa (phải được admin tạo trước)
+        User userByEmail = getByEmail(email);
+        if (userByEmail != null) {
+            // Link Google account với existing user
+            linkGoogleAccount(userByEmail.getUserID(), googleId, profilePicture);
+            return getByGoogleId(googleId);
+        }
+        
+        // Không tự động tạo user mới - trả về null nếu email chưa tồn tại
+        // Admin phải tạo user trước khi họ có thể login bằng Google
+        return null;
+    }
+    
+    /**
+     * Link Google account với existing user
+     */
+    private void linkGoogleAccount(int userId, String googleId, String profilePicture) {
+        String sql = "UPDATE users SET google_id = ?, auth_provider = 'google', profile_picture = ? WHERE user_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, googleId);
+            ps.setString(2, profilePicture);
+            ps.setInt(3, userId);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.linkGoogleAccount: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * Cập nhật thông tin Google user
+     */
+    private void updateGoogleUserInfo(int userId, String firstName, String lastName, String profilePicture) {
+        String sql = "UPDATE users SET first_name = ?, last_name = ?, profile_picture = ?, updated_at = CURRENT_TIMESTAMP WHERE user_id = ?";
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, firstName);
+            ps.setString(2, lastName);
+            ps.setString(3, profilePicture);
+            ps.setInt(4, userId);
+            ps.executeUpdate();
+        } catch (SQLException ex) {
+            System.err.println("UserDAO.updateGoogleUserInfo: " + ex.getMessage());
+            ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * Helper method để map ResultSet sang User object
+     */
+    private User mapResultSetToUser(ResultSet rs) throws SQLException {
+        User u = new User();
+        u.setUserID(rs.getInt("user_id"));
+        u.setUsername(rs.getString("username"));
+        u.setPasswordHash(rs.getString("password_hash"));
+        u.setEmail(rs.getString("email"));
+        u.setRole(rs.getString("role"));
+        u.setStatus(rs.getString("status"));
+        u.setCreatedAt(rs.getTimestamp("created_at"));
+        u.setFirstName(rs.getString("first_name"));
+        u.setLastName(rs.getString("last_name"));
+        try { u.setPhone(rs.getString("phone")); } catch (SQLException ignore) {}
+        try { u.setDateOfBirth(rs.getDate("date_of_birth")); } catch (SQLException ignore) {}
+        try { u.setGender(rs.getString("gender")); } catch (SQLException ignore) {}
+        try { u.setGoogleId(rs.getString("google_id")); } catch (SQLException ignore) {}
+        try { u.setAuthProvider(rs.getString("auth_provider")); } catch (SQLException ignore) {}
+        try { u.setProfilePicture(rs.getString("profile_picture")); } catch (SQLException ignore) {}
+        return u;
+    }
 }

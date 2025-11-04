@@ -27,6 +27,10 @@ Thumbs.db
 # Logs
 *.log
 
+# Configuration files with sensitive data
+src/main/resources/email.properties
+src/main/resources/google-oauth.properties
+
 # Old build files (NetBeans/Ant)
 build/
 dist/

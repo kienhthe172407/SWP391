@@ -35,7 +35,18 @@ public class LoginServlet extends HttpServlet {
         UserDAO dao = null;
         try {
             dao = new UserDAO();
+            
+            // Thử đăng nhập bằng username trước
             User authenticated = dao.authenticate(username.trim(), password);
+            
+            // Nếu không thành công, thử đăng nhập bằng email
+            if (authenticated == null) {
+                User userByEmail = dao.getByEmail(username.trim());
+                if (userByEmail != null) {
+                    authenticated = dao.authenticate(userByEmail.getUsername(), password);
+                }
+            }
+            
             if (authenticated != null && authenticated.isActive()) {
                 HttpSession session = request.getSession(true);
                 session.setAttribute("user", authenticated);

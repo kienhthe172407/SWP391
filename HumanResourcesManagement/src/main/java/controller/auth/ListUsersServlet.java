@@ -161,14 +161,6 @@ public class ListUsersServlet extends HttpServlet {
                     }
                     break;
                     
-                case "delete":
-                    // Xóa người dùng (soft delete)
-                    success = userDAO.deleteUser(userId);
-                    message = success ? 
-                        "Account deleted successfully!" :
-                        "An error occurred while deleting account!";
-                    break;
-                    
                 default:
                     message = "Invalid action!";
             }
