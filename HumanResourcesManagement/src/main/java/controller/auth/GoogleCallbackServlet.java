@@ -105,8 +105,9 @@ public class GoogleCallbackServlet extends HttpServlet {
             
             // Check if user is active
             if (!user.isActive()) {
+                LOGGER.warning("Google OAuth login failed - account inactive: " + email);
                 response.sendRedirect(request.getContextPath() + "/login?error=" + 
-                    URLEncoder.encode("Your account is inactive", "UTF-8"));
+                    URLEncoder.encode("Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.", "UTF-8"));
                 return;
             }
             

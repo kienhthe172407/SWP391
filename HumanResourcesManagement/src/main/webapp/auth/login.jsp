@@ -18,8 +18,8 @@
         <link href="${pageContext.request.contextPath}/css/auth.css" rel="stylesheet">
     </head>
 
-    <body class="auth-page">
-        <div class="auth-container">
+    <body class="auth-page" style="margin: 0; padding: 0; height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div class="auth-container" style="width: 100%; max-width: 1200px; padding: 2rem;">
             <div class="container">
                 <div class="row justify-content-center">
                     <div class="col-xl-10 col-lg-12 col-md-9">
@@ -57,10 +57,16 @@
                                             </div>
 
                                             <!-- Show error message if any -->
-                                            <% if(request.getAttribute("errorMessage") !=null) { %>
-                                                <div class="auth-error">
-                                                    <i class="fas fa-exclamation-circle me-2"></i>
-                                                    <%= request.getAttribute("errorMessage") %>
+                                            <% 
+                                                String errorMessage = (String) request.getAttribute("errorMessage");
+                                                if (errorMessage == null) {
+                                                    errorMessage = request.getParameter("error");
+                                                }
+                                                if(errorMessage != null) { 
+                                            %>
+                                                <div class="auth-error" style="background-color: #fee2e2; border: 1px solid #ef4444; border-left: 4px solid #dc2626; border-radius: 0.375rem; color: #991b1b; font-size: 0.9rem; font-weight: 500; margin-bottom: 1.5rem; padding: 0.875rem 1rem; box-shadow: 0 1px 3px rgba(220, 38, 38, 0.1);">
+                                                    <i class="fas fa-exclamation-circle me-2" style="color: #dc2626;"></i>
+                                                    <%= errorMessage %>
                                                 </div>
                                                 <% } %>
 

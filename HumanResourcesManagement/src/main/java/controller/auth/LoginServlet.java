@@ -47,7 +47,15 @@ public class LoginServlet extends HttpServlet {
                 }
             }
             
-            if (authenticated != null && authenticated.isActive()) {
+            if (authenticated != null) {
+                // Kiểm tra xem tài khoản có bị vô hiệu hóa không
+                if (!authenticated.isActive()) {
+                    request.setAttribute("errorMessage", "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên.");
+                    request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
+                    return;
+                }
+                
+                // Tài khoản hợp lệ và đang hoạt động
                 HttpSession session = request.getSession(true);
                 session.setAttribute("user", authenticated);
                 String role = authenticated.getRole();
@@ -78,7 +86,7 @@ public class LoginServlet extends HttpServlet {
                     return;
                 }
             } else {
-                request.setAttribute("errorMessage", "Incorrect username or password.");
+                request.setAttribute("errorMessage", "Tên đăng nhập hoặc mật khẩu không đúng.");
                 request.getRequestDispatcher("/auth/login.jsp").forward(request, response);
                 return;
             }
