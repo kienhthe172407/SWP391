@@ -153,7 +153,7 @@ public class SalaryConfigDAO extends DBContext {
      * @return true if successful, false otherwise
      */
     public boolean deleteBenefitType(int benefitTypeID) {
-        String sql = "DELETE FROM benefit_types WHERE benefit_type_id = ?";
+        String sql = "UPDATE benefit_types SET is_deleted = TRUE WHERE benefit_type_id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, benefitTypeID);
@@ -338,7 +338,7 @@ public class SalaryConfigDAO extends DBContext {
      * @return true if successful, false otherwise
      */
     public boolean deleteDeductionType(int deductionTypeID) {
-        String sql = "DELETE FROM deduction_types WHERE deduction_type_id = ?";
+        String sql = "UPDATE deduction_types SET is_deleted = TRUE WHERE deduction_type_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, deductionTypeID);

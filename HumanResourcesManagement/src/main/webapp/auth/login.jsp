@@ -11,7 +11,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
         <!-- Font Awesome -->
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-        <!-- Google Fonts - Inter (hỗ trợ tiếng Việt tốt) -->
+        <!-- Google Fonts - Inter -->
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
             rel="stylesheet">
         <!-- Custom CSS -->
@@ -51,7 +51,7 @@
                                     <div class="col-lg-6">
                                         <div class="p-5">
                                             <div class="text-center">
-                                                <h1 class="auth-title">Login</h1><!-- đăng nhập -->
+                                                <h1 class="auth-title">Login</h1>
                                                 <p class="auth-subtitle">Enter your login information to access the
                                                     system</p>
                                             </div>
@@ -73,7 +73,7 @@
                                                     <form class="auth-form"
                                                         action="${pageContext.request.contextPath}/login" method="post">
                                                         <div class="form-group">
-                                                            <label class="form-label" for="username">Username hoặc
+                                                            <label class="form-label" for="username">Username or
                                                                 Email</label>
                                                             <div class="input-group">
                                                                 <span
@@ -110,7 +110,7 @@
                                                                 </div>
                                                                 <a href="${pageContext.request.contextPath}/auth/forgot-password.jsp"
                                                                     class="text-decoration-none small">
-                                                                    <i class="fas fa-key me-1"></i>Quên mật khẩu?
+                                                                    <i class="fas fa-key me-1"></i>Forgot password?
                                                                 </a>
                                                             </div>
                                                         </div>
@@ -125,7 +125,8 @@
 
                                                     <!-- Google Sign In Button -->
                                                     <a href="${pageContext.request.contextPath}/google-login"
-                                                        class="btn btn-outline-danger btn-block d-flex align-items-center justify-content-center">
+                                                        class="btn btn-block d-flex align-items-center justify-content-center"
+                                                        style="border: 1px solid #d1d5db; color: #000000; background-color: #ffffff; border-radius: 10rem; font-size: 0.9rem; font-weight: 600; padding: 0.75rem 1rem; transition: all 0.2s;">
                                                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                             viewBox="0 0 48 48" class="me-2">
                                                             <path fill="#FFC107"

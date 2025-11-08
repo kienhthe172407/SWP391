@@ -274,7 +274,7 @@ public class BonusAdjustmentDAO extends DBContext {
      * @return true if successful
      */
     public boolean deleteAdjustment(int adjustmentId) {
-        String sql = "DELETE FROM payroll_adjustments WHERE adjustment_id = ? AND status = 'Pending'";
+        String sql = "UPDATE payroll_adjustments SET is_deleted = TRUE WHERE adjustment_id = ? AND status = 'Pending'";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, adjustmentId);

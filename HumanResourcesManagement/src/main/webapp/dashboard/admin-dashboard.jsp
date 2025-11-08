@@ -24,7 +24,7 @@
                     <ul class="sidebar-menu">
                         <li class="menu-section">Dashboard</li>
                         <li>
-                            <a href="${pageContext.request.contextPath}/dashboard/admin-dashboard.jsp" class="active">
+                            <a href="${pageContext.request.contextPath}/dashboard/admin" class="active">
                                 <i class="fas fa-home"></i>
                                 <span>Overview</span>
                             </a>

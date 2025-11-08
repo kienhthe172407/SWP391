@@ -10,7 +10,7 @@
     <title>Employee Dashboard - HR Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
 </head>
 <body>
     <div class="sidebar">
@@ -22,7 +22,7 @@
         <ul class="sidebar-menu">
             <li class="menu-section">Dashboard</li>
             <li>
-                <a href="${pageContext.request.contextPath}/dashboard/employee-dashboard.jsp" class="active">
+                <a href="${pageContext.request.contextPath}/dashboard/employee" class="active">
                     <i class="fas fa-home"></i>
                     <span>Overview</span>
                 </a>

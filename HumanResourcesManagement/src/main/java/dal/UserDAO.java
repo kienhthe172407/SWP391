@@ -315,8 +315,8 @@ public class UserDAO extends DBContext {
                 ps.executeUpdate();
             }
             
-            //  Xóa user
-            String deleteSql = "DELETE FROM users WHERE user_id = ?";
+            // Soft delete user
+            String deleteSql = "UPDATE users SET is_deleted = TRUE WHERE user_id = ?";
             try (PreparedStatement ps = connection.prepareStatement(deleteSql)) {
                 ps.setInt(1, userId);
                 int affected = ps.executeUpdate();

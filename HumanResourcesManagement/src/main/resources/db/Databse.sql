@@ -28,6 +28,7 @@ CREATE TABLE users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
     last_login TIMESTAMP NULL,                                 -- Lần đăng nhập cuối
     created_by INT,                                            -- Người tạo tài khoản
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     INDEX idx_username (username),                             -- Index cho tìm kiếm username
     INDEX idx_email (email),                                   -- Index cho tìm kiếm email
     INDEX idx_role (role),                                     -- Index cho lọc theo role
@@ -47,6 +48,7 @@ CREATE TABLE departments (
     manager_id INT,                                            -- ID trưởng phòng
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     INDEX idx_department_name (department_name)                -- Index cho tìm kiếm tên phòng ban
 ) ENGINE=InnoDB;
 
@@ -62,6 +64,7 @@ CREATE TABLE positions (
     position_allowance DECIMAL(10, 2) DEFAULT 0,               -- Phụ cấp chức vụ
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     INDEX idx_position_name (position_name)                    -- Index cho tìm kiếm tên chức vụ
 ) ENGINE=InnoDB;
 
@@ -89,6 +92,7 @@ CREATE TABLE employees (
     employment_status ENUM('Active', 'On Leave', 'Terminated') DEFAULT 'Active', -- Trạng thái làm việc
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại tới users
     FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE SET NULL, -- Khóa ngoại tới departments
     FOREIGN KEY (position_id) REFERENCES positions(position_id) ON DELETE SET NULL, -- Khóa ngoại tới positions
@@ -171,6 +175,7 @@ CREATE TABLE salary_components (
     is_active BOOLEAN DEFAULT TRUE,                            -- Còn hiệu lực không
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (employee_id) REFERENCES employees(employee_id) ON DELETE CASCADE, -- Khóa ngoại
     INDEX idx_employee (employee_id),                          -- Index cho lọc theo nhân viên
     INDEX idx_effective_dates (effective_from, effective_to),  -- Index cho lọc theo thời gian hiệu lực
@@ -190,7 +195,8 @@ CREATE TABLE benefit_types (
     default_percentage DECIMAL(5, 2),                          -- % mặc định (nếu Percentage)
     is_taxable BOOLEAN DEFAULT TRUE,                           -- Có tính thuế không
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Thời gian cập nhật
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE                           -- Soft delete flag
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -206,7 +212,8 @@ CREATE TABLE deduction_types (
     default_percentage DECIMAL(5, 2),                          -- % mặc định (nếu Percentage)
     is_mandatory BOOLEAN DEFAULT TRUE,                         -- Bắt buộc hay không
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Thời gian cập nhật
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE                           -- Soft delete flag
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -265,6 +272,7 @@ CREATE TABLE payroll_adjustments (
     approved_at TIMESTAMP NULL,                                -- Thời gian duyệt
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (payroll_id) REFERENCES monthly_payroll(payroll_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (employee_id) REFERENCES employees(employee_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (requested_by) REFERENCES users(user_id) ON DELETE CASCADE, -- Khóa ngoại
@@ -296,6 +304,7 @@ CREATE TABLE employment_contracts (
     created_by INT,                                            -- Người tạo hợp đồng
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (employee_id) REFERENCES employees(employee_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (approved_by) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại
     FOREIGN KEY (created_by) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại
@@ -328,6 +337,7 @@ CREATE TABLE job_postings (
     internal_notes TEXT,                                       -- Ghi chú nội bộ (chỉ HR xem)
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE SET NULL, -- Khóa ngoại
     FOREIGN KEY (position_id) REFERENCES positions(position_id) ON DELETE SET NULL, -- Khóa ngoại
     FOREIGN KEY (posted_by) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại
@@ -356,6 +366,7 @@ CREATE TABLE job_applications (
     review_notes TEXT,                                         -- Ghi chú đánh giá
     interview_date DATETIME,                                   -- Ngày phỏng vấn (nếu có)
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (job_id) REFERENCES job_postings(job_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại
     INDEX idx_job (job_id),                                    -- Index cho lọc theo job
@@ -386,6 +397,7 @@ CREATE TABLE tasks (
     cancelled_at TIMESTAMP NULL,                               -- Thời gian hủy
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (assigned_to) REFERENCES employees(employee_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (assigned_by) REFERENCES users(user_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE SET NULL, -- Khóa ngoại
@@ -410,7 +422,8 @@ CREATE TABLE request_types (
     max_days_per_year INT,                                     -- Số ngày tối đa/năm (NULL = không giới hạn)
     is_paid BOOLEAN DEFAULT TRUE,                              -- Có hưởng lương không
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP -- Thời gian cập nhật
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE                           -- Soft delete flag
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -432,6 +445,7 @@ CREATE TABLE requests (
     cancelled_at TIMESTAMP NULL,                               -- Thời gian hủy
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     FOREIGN KEY (employee_id) REFERENCES employees(employee_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (request_type_id) REFERENCES request_types(request_type_id) ON DELETE CASCADE, -- Khóa ngoại
     FOREIGN KEY (reviewed_by) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại

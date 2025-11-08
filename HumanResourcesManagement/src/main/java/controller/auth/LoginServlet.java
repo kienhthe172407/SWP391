@@ -61,24 +61,24 @@ public class LoginServlet extends HttpServlet {
                 String role = authenticated.getRole();
                 LOGGER.info("User role: " + role); // Ghi log debug
                 if ("Admin".equals(role)) {
-                    LOGGER.info("Redirecting Admin to: /dashboard/admin-dashboard.jsp");
-                    response.sendRedirect(request.getContextPath() + "/dashboard/admin-dashboard.jsp");
+                    LOGGER.info("Redirecting Admin to: /dashboard/admin");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/admin");
                     return;
                 } else if ("HR Manager".equals(role)) {
-                    LOGGER.info("Redirecting HR Manager to: /dashboard/hr-manager-dashboard.jsp");
-                    response.sendRedirect(request.getContextPath() + "/dashboard/hr-manager-dashboard.jsp");
+                    LOGGER.info("Redirecting HR Manager to: /dashboard/hr-manager");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/hr-manager");
                     return;
                 } else if ("HR".equals(role)) {
-                    LOGGER.info("Redirecting HR to: /dashboard/hr-dashboard.jsp");
-                    response.sendRedirect(request.getContextPath() + "/dashboard/hr-dashboard.jsp");
+                    LOGGER.info("Redirecting HR to: /dashboard/hr");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/hr");
                     return;
                 } else if ("Employee".equals(role)) {
-                    LOGGER.info("Redirecting Employee to: /dashboard/employee-dashboard.jsp");
-                    response.sendRedirect(request.getContextPath() + "/dashboard/employee-dashboard.jsp");
+                    LOGGER.info("Redirecting Employee to: /dashboard/employee");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/employee");
                     return;
                 } else if ("Dept Manager".equals(role)) {
-                    LOGGER.info("Redirecting Dept Manager to: /dashboard/dept-manager-dashboard.jsp");
-                    response.sendRedirect(request.getContextPath() + "/dashboard/dept-manager-dashboard.jsp");
+                    LOGGER.info("Redirecting Dept Manager to: /dashboard/dept-manager");
+                    response.sendRedirect(request.getContextPath() + "/dashboard/dept-manager");
                     return;
                 } else {
                     LOGGER.info("Redirecting other role (" + role + ") to: /manager/home.jsp");

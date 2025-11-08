@@ -137,7 +137,7 @@ public class ContractDAO extends DBContext {
                      "FROM employment_contracts c " +
                      "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
                      "LEFT JOIN users u ON c.created_by = u.user_id " +
-                     "WHERE c.contract_status = 'Pending Approval' " +
+                     "WHERE c.contract_status = 'Pending Approval' AND c.is_deleted = FALSE " +
                      "ORDER BY c.created_at ASC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -176,7 +176,8 @@ public class ContractDAO extends DBContext {
             "e.employee_code, e.phone_number, e.personal_email " +
             "FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE (c.contract_status = 'Draft' OR c.contract_status = 'Pending Approval') "
+            "WHERE (c.contract_status = 'Draft' OR c.contract_status = 'Pending Approval') " +
+            "AND c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -228,7 +229,9 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) as total FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE (c.contract_status = 'Draft' OR c.contract_status = 'Pending Approval') "
+            "WHERE (c.contract_status = 'Draft' OR c.contract_status = 'Pending Approval') " +
+            "AND c.is_deleted = FALSE " +
+            "AND c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -286,7 +289,7 @@ public class ContractDAO extends DBContext {
             "e.employee_code, e.phone_number, e.personal_email " +
             "FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE c.contract_status = ? "
+            "WHERE c.contract_status = ? AND c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -340,7 +343,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) as total FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE c.contract_status = ? "
+            "WHERE c.contract_status = ? AND c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -392,6 +395,7 @@ public class ContractDAO extends DBContext {
                      "e.employee_code, e.phone_number, e.personal_email " +
                      "FROM employment_contracts c " +
                      "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
+                     "WHERE c.is_deleted = FALSE " +
                      "ORDER BY c.created_at DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -431,7 +435,7 @@ public class ContractDAO extends DBContext {
             "e.employee_code, e.phone_number, e.personal_email " +
             "FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE 1=1 "
+            "WHERE c.is_deleted = FALSE "
         );
 
         // Filter draft contracts by creator for HR and HR Manager roles
@@ -486,6 +490,7 @@ public class ContractDAO extends DBContext {
                      "e.employee_code, e.phone_number, e.personal_email " +
                      "FROM employment_contracts c " +
                      "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
+                     "WHERE c.is_deleted = FALSE " +
                      "ORDER BY c.created_at DESC " +
                      "LIMIT ? OFFSET ?";
         
@@ -550,7 +555,7 @@ public class ContractDAO extends DBContext {
      * @return Total count
      */
     public int getTotalContracts(String userRole, Integer userId) {
-        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as total FROM employment_contracts WHERE 1=1 ");
+        StringBuilder sql = new StringBuilder("SELECT COUNT(*) as total FROM employment_contracts WHERE is_deleted = FALSE ");
 
         // Filter draft contracts by creator for HR and HR Manager roles
         if ("HR".equals(userRole) || "HR Manager".equals(userRole)) {
@@ -583,7 +588,7 @@ public class ContractDAO extends DBContext {
      * @return Total count
      */
     public int getTotalContracts() {
-        String sql = "SELECT COUNT(*) as total FROM employment_contracts";
+        String sql = "SELECT COUNT(*) as total FROM employment_contracts WHERE is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -614,7 +619,7 @@ public class ContractDAO extends DBContext {
                      "e.employee_code, e.phone_number, e.personal_email " +
                      "FROM employment_contracts c " +
                      "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-                     "WHERE c.contract_id = ?";
+                     "WHERE c.contract_id = ? AND c.is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractID);
@@ -648,7 +653,7 @@ public class ContractDAO extends DBContext {
                      "e.employee_code, e.phone_number, e.personal_email " +
                      "FROM employment_contracts c " +
                      "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-                     "WHERE c.employee_id = ? " +
+                     "WHERE c.employee_id = ? AND c.is_deleted = FALSE " +
                      "ORDER BY c.start_date DESC";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -686,7 +691,7 @@ public class ContractDAO extends DBContext {
             "e.employee_code, e.phone_number, e.personal_email " +
             "FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE 1=1 "
+            "WHERE c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -762,7 +767,7 @@ public class ContractDAO extends DBContext {
             "e.employee_code, e.phone_number, e.personal_email " +
             "FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE 1=1 "
+            "WHERE c.is_deleted = FALSE "
         );
 
         // Filter draft contracts by creator for HR and HR Manager roles
@@ -850,7 +855,7 @@ public class ContractDAO extends DBContext {
             "e.employee_code, e.phone_number, e.personal_email " +
             "FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE 1=1 "
+            "WHERE c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -918,7 +923,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) as total FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE 1=1 "
+            "WHERE c.is_deleted = FALSE "
         );
 
         // Filter draft contracts by creator for HR and HR Manager roles
@@ -982,7 +987,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT COUNT(*) as total FROM employment_contracts c " +
             "LEFT JOIN employees e ON c.employee_id = e.employee_id " +
-            "WHERE 1=1 "
+            "WHERE c.is_deleted = FALSE "
         );
         
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -1027,12 +1032,12 @@ public class ContractDAO extends DBContext {
     }
     
     /**
-     * Delete a contract by ID
+     * Delete a contract by ID (soft delete)
      * @param contractID Contract ID to delete
      * @return boolean success
      */
     public boolean deleteContract(int contractID) {
-        String sql = "DELETE FROM employment_contracts WHERE contract_id = ?";
+        String sql = "UPDATE employment_contracts SET is_deleted = TRUE WHERE contract_id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, contractID);

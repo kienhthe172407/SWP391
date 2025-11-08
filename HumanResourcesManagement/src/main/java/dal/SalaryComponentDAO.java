@@ -193,7 +193,7 @@ public class SalaryComponentDAO extends DBContext {
      * @return true if successful, false otherwise
      */
     public boolean deleteSalaryComponent(int componentID) {
-        String sql = "DELETE FROM salary_components WHERE component_id = ?";
+        String sql = "UPDATE salary_components SET is_deleted = TRUE WHERE component_id = ?";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, componentID);

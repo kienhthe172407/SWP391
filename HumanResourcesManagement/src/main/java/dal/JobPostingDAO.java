@@ -29,6 +29,7 @@ public class JobPostingDAO extends DBContext {
                      "LEFT JOIN positions p ON jp.position_id = p.position_id " +
                      "LEFT JOIN users u ON jp.posted_by = u.user_id " +
                      "LEFT JOIN employees e ON u.user_id = e.user_id " +
+                     "WHERE jp.is_deleted = FALSE " +
                      "ORDER BY jp.posted_date DESC, jp.job_id DESC " +
                      "LIMIT ? OFFSET ?";
         
@@ -49,7 +50,7 @@ public class JobPostingDAO extends DBContext {
             
             // If JOIN fails, try without JOINs
             System.out.println("Trying without JOINs...");
-            String simpleSql = "SELECT * FROM job_postings ORDER BY posted_date DESC, job_id DESC LIMIT ? OFFSET ?";
+            String simpleSql = "SELECT * FROM job_postings WHERE is_deleted = FALSE ORDER BY posted_date DESC, job_id DESC LIMIT ? OFFSET ?";
             
             try (PreparedStatement ps = connection.prepareStatement(simpleSql)) {
                 ps.setInt(1, pageSize);
@@ -91,7 +92,7 @@ public class JobPostingDAO extends DBContext {
         sqlBuilder.append("LEFT JOIN positions p ON jp.position_id = p.position_id ");
         sqlBuilder.append("LEFT JOIN users u ON jp.posted_by = u.user_id ");
         sqlBuilder.append("LEFT JOIN employees e ON u.user_id = e.user_id ");
-        sqlBuilder.append("WHERE 1=1 ");
+        sqlBuilder.append("WHERE jp.is_deleted = FALSE ");
         
         // Add search conditions
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -154,7 +155,7 @@ public class JobPostingDAO extends DBContext {
             // If JOIN fails, try without JOINs
             System.out.println("Trying search without JOINs...");
             StringBuilder simpleSqlBuilder = new StringBuilder();
-            simpleSqlBuilder.append("SELECT * FROM job_postings WHERE 1=1 ");
+            simpleSqlBuilder.append("SELECT * FROM job_postings WHERE is_deleted = FALSE ");
             
             if (keyword != null && !keyword.trim().isEmpty()) {
                 simpleSqlBuilder.append("AND job_title LIKE ? ");
@@ -216,7 +217,7 @@ public class JobPostingDAO extends DBContext {
      * @return Total count
      */
     public int getTotalJobPostings() {
-        String sql = "SELECT COUNT(*) FROM job_postings";
+        String sql = "SELECT COUNT(*) FROM job_postings WHERE is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -244,7 +245,7 @@ public class JobPostingDAO extends DBContext {
         sqlBuilder.append("SELECT COUNT(*) FROM job_postings jp ");
         sqlBuilder.append("LEFT JOIN departments d ON jp.department_id = d.department_id ");
         sqlBuilder.append("LEFT JOIN positions p ON jp.position_id = p.position_id ");
-        sqlBuilder.append("WHERE 1=1 ");
+        sqlBuilder.append("WHERE jp.is_deleted = FALSE ");
         
         // Add search conditions
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -306,7 +307,7 @@ public class JobPostingDAO extends DBContext {
     public List<String> getAllJobStatuses() {
         List<String> statuses = new ArrayList<>();
         
-        String sql = "SELECT DISTINCT job_status FROM job_postings ORDER BY job_status";
+        String sql = "SELECT DISTINCT job_status FROM job_postings WHERE is_deleted = FALSE ORDER BY job_status";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -341,7 +342,7 @@ public class JobPostingDAO extends DBContext {
                      "LEFT JOIN positions p ON jp.position_id = p.position_id " +
                      "LEFT JOIN users u ON jp.posted_by = u.user_id " +
                      "LEFT JOIN employees e ON u.user_id = e.user_id " +
-                     "WHERE jp.job_id = ?";
+                     "WHERE jp.job_id = ? AND jp.is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, jobId);
@@ -357,7 +358,7 @@ public class JobPostingDAO extends DBContext {
             
             // If JOIN fails, try simple query without JOINs
             System.out.println("Trying getJobPostingById without JOINs...");
-            String simpleSql = "SELECT * FROM job_postings WHERE job_id = ?";
+            String simpleSql = "SELECT * FROM job_postings WHERE job_id = ? AND is_deleted = FALSE";
             
             try (PreparedStatement ps = connection.prepareStatement(simpleSql)) {
                 ps.setInt(1, jobId);
@@ -460,12 +461,12 @@ public class JobPostingDAO extends DBContext {
     }
     
     /**
-     * Delete a job posting
+     * Delete a job posting (soft delete)
      * @param jobId Job posting ID to delete
      * @return boolean indicating success
      */
     public boolean deleteJobPosting(int jobId) {
-        String sql = "DELETE FROM job_postings WHERE job_id = ?";
+        String sql = "UPDATE job_postings SET is_deleted = TRUE WHERE job_id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, jobId);
@@ -486,7 +487,7 @@ public class JobPostingDAO extends DBContext {
      */
     public List<Department> getAllDepartments() {
         List<Department> departments = new ArrayList<>();
-        String sql = "SELECT department_id, department_name FROM departments ORDER BY department_name";
+        String sql = "SELECT department_id, department_name FROM departments WHERE is_deleted = FALSE ORDER BY department_name";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -510,7 +511,7 @@ public class JobPostingDAO extends DBContext {
      */
     public List<Position> getAllPositions() {
         List<Position> positions = new ArrayList<>();
-        String sql = "SELECT position_id, position_name FROM positions ORDER BY position_name";
+        String sql = "SELECT position_id, position_name FROM positions WHERE is_deleted = FALSE ORDER BY position_name";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -544,7 +545,7 @@ public class JobPostingDAO extends DBContext {
     private String getDepartmentNameById(Integer departmentId) {
         if (departmentId == null) return null;
         
-        String sql = "SELECT department_name FROM departments WHERE department_id = ?";
+        String sql = "SELECT department_name FROM departments WHERE department_id = ? AND is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, departmentId);
@@ -570,7 +571,7 @@ public class JobPostingDAO extends DBContext {
     private String getPositionNameById(Integer positionId) {
         if (positionId == null) return null;
         
-        String sql = "SELECT position_name FROM positions WHERE position_id = ?";
+        String sql = "SELECT position_name FROM positions WHERE position_id = ? AND is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, positionId);
@@ -695,6 +696,7 @@ public class JobPostingDAO extends DBContext {
                      "LEFT JOIN employees e ON u.user_id = e.user_id " +
                      "WHERE jp.job_status = 'Open' " +
                      "AND (jp.application_deadline IS NULL OR jp.application_deadline >= CURDATE()) " +
+                     "AND jp.is_deleted = FALSE " +
                      "ORDER BY jp.posted_date DESC, jp.job_id DESC " +
                      "LIMIT ? OFFSET ?";
 
@@ -723,7 +725,8 @@ public class JobPostingDAO extends DBContext {
     public int getTotalOpenJobPostings() {
         String sql = "SELECT COUNT(*) FROM job_postings " +
                      "WHERE job_status = 'Open' " +
-                     "AND (application_deadline IS NULL OR application_deadline >= CURDATE())";
+                     "AND (application_deadline IS NULL OR application_deadline >= CURDATE()) " +
+                     "AND is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

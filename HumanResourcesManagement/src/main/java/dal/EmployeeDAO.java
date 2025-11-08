@@ -28,7 +28,7 @@ public class EmployeeDAO extends DBContext {
                      "LEFT JOIN departments d ON e.department_id = d.department_id " +
                      "LEFT JOIN positions p ON e.position_id = p.position_id " +
                      "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
-                     "WHERE e.employment_status = 'Active' " +
+                     "WHERE e.employment_status = 'Active' AND e.is_deleted = FALSE " +
                      "ORDER BY e.first_name, e.last_name";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -63,7 +63,7 @@ public class EmployeeDAO extends DBContext {
                      "LEFT JOIN departments d ON e.department_id = d.department_id " +
                      "LEFT JOIN positions p ON e.position_id = p.position_id " +
                      "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
-                     "WHERE e.employee_id = ?";
+                     "WHERE e.employee_id = ? AND e.is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, employeeID);
@@ -98,7 +98,7 @@ public class EmployeeDAO extends DBContext {
                      "LEFT JOIN departments d ON e.department_id = d.department_id " +
                      "LEFT JOIN positions p ON e.position_id = p.position_id " +
                      "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
-                     "WHERE e.employee_code = ?";
+                     "WHERE e.employee_code = ? AND e.is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, employeeCode);
@@ -133,7 +133,7 @@ public class EmployeeDAO extends DBContext {
                      "LEFT JOIN departments d ON e.department_id = d.department_id " +
                      "LEFT JOIN positions p ON e.position_id = p.position_id " +
                      "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
-                     "WHERE e.user_id = ?";
+                     "WHERE e.user_id = ? AND e.is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userID);
@@ -170,6 +170,7 @@ public class EmployeeDAO extends DBContext {
                      "LEFT JOIN departments d ON e.department_id = d.department_id " +
                      "LEFT JOIN positions p ON e.position_id = p.position_id " +
                      "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
+                     "WHERE e.is_deleted = FALSE " +
                      "ORDER BY e.created_at DESC, e.employee_id DESC " +
                      "LIMIT ? OFFSET ?";
 
@@ -196,7 +197,7 @@ public class EmployeeDAO extends DBContext {
      * @return int total count
      */
     public int getTotalEmployees() {
-        String sql = "SELECT COUNT(*) as total FROM employees";
+        String sql = "SELECT COUNT(*) as total FROM employees WHERE is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -237,7 +238,7 @@ public class EmployeeDAO extends DBContext {
             "LEFT JOIN departments d ON e.department_id = d.department_id " +
             "LEFT JOIN positions p ON e.position_id = p.position_id " +
             "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
-            "WHERE 1=1 "
+            "WHERE e.is_deleted = FALSE "
         );
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -440,7 +441,7 @@ public class EmployeeDAO extends DBContext {
      * @return boolean true if exists
      */
     public boolean isEmployeeCodeExists(String employeeCode) {
-        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ?";
+        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ? AND is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, employeeCode);
@@ -467,7 +468,7 @@ public class EmployeeDAO extends DBContext {
         List<Employee> employees = new ArrayList<>();
         StringBuilder sql = new StringBuilder(
             "SELECT employee_id, employee_code, first_name, last_name, department_id, position_id " +
-            "FROM employees WHERE employment_status = 'Active'"
+            "FROM employees WHERE employment_status = 'Active' AND is_deleted = FALSE"
         );
 
         if (excludeEmployeeId != null) {
@@ -539,7 +540,7 @@ public class EmployeeDAO extends DBContext {
      * @return boolean true if user already has employee record
      */
     public boolean isUserAlreadyLinkedToEmployee(int userId) {
-        String sql = "SELECT COUNT(*) FROM employees WHERE user_id = ?";
+        String sql = "SELECT COUNT(*) FROM employees WHERE user_id = ? AND is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, userId);
@@ -712,7 +713,7 @@ public class EmployeeDAO extends DBContext {
      */
     public List<String> getAllEmploymentStatuses() {
         List<String> statuses = new ArrayList<>();
-        String sql = "SELECT DISTINCT employment_status FROM employees WHERE employment_status IS NOT NULL ORDER BY employment_status";
+        String sql = "SELECT DISTINCT employment_status FROM employees WHERE employment_status IS NOT NULL AND is_deleted = FALSE ORDER BY employment_status";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -734,7 +735,7 @@ public class EmployeeDAO extends DBContext {
      */
     public List<model.Department> getAllDepartments() {
         List<model.Department> departments = new ArrayList<>();
-        String sql = "SELECT department_id, department_name FROM departments ORDER BY department_name";
+        String sql = "SELECT department_id, department_name FROM departments WHERE is_deleted = FALSE ORDER BY department_name";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -759,7 +760,7 @@ public class EmployeeDAO extends DBContext {
      */
     public List<model.Position> getAllPositions() {
         List<model.Position> positions = new ArrayList<>();
-        String sql = "SELECT position_id, position_name FROM positions ORDER BY position_name";
+        String sql = "SELECT position_id, position_name FROM positions WHERE is_deleted = FALSE ORDER BY position_name";
 
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -864,7 +865,7 @@ public class EmployeeDAO extends DBContext {
      * @return boolean true if exists
      */
     public boolean isEmployeeCodeExistsExcludingCurrent(String employeeCode, int excludeEmployeeId) {
-        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ? AND employee_id != ?";
+        String sql = "SELECT COUNT(*) FROM employees WHERE employee_code = ? AND employee_id != ? AND is_deleted = FALSE";
 
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setString(1, employeeCode);
@@ -884,7 +885,7 @@ public class EmployeeDAO extends DBContext {
     }
     
     /**
-     * Delete an employee record by ID
+     * Delete an employee record by ID (soft delete)
      * @param employeeId ID of the employee to delete
      * @return boolean success
      */
@@ -894,8 +895,8 @@ public class EmployeeDAO extends DBContext {
             return false;
         }
         
-        // Delete the employee record
-        String sql = "DELETE FROM employees WHERE employee_id = ?";
+        // Soft delete the employee record
+        String sql = "UPDATE employees SET is_deleted = TRUE WHERE employee_id = ?";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, employeeId);
@@ -915,7 +916,7 @@ public class EmployeeDAO extends DBContext {
      * @return String full name of employee or null if not found
      */
     public String getEmployeeNameById(int employeeId) {
-        String sql = "SELECT first_name, last_name FROM employees WHERE employee_id = ?";
+        String sql = "SELECT first_name, last_name FROM employees WHERE employee_id = ? AND is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
             ps.setInt(1, employeeId);

@@ -22,7 +22,7 @@
         <ul class="sidebar-menu">
             <li class="menu-section">Dashboard</li>
             <li>
-                <a href="${pageContext.request.contextPath}/dashboard/hr-manager-dashboard.jsp" class="active">
+                <a href="${pageContext.request.contextPath}/dashboard/hr-manager" class="active">
                     <i class="fas fa-home"></i>
                     <span>Overview</span>
                 </a>

@@ -28,7 +28,18 @@ public class EncodingFilter implements Filter {
         // Set encoding UTF-8 cho request và response
         httpRequest.setCharacterEncoding("UTF-8");
         httpResponse.setCharacterEncoding("UTF-8");
-        httpResponse.setContentType("text/html; charset=UTF-8");
+        
+        // Only set content type for HTML responses, not for static resources (CSS, JS, images, etc.)
+        String requestURI = httpRequest.getRequestURI();
+        
+        if (!requestURI.endsWith(".css") && !requestURI.endsWith(".js") && 
+            !requestURI.endsWith(".png") && !requestURI.endsWith(".jpg") && 
+            !requestURI.endsWith(".jpeg") && !requestURI.endsWith(".gif") && 
+            !requestURI.endsWith(".svg") && !requestURI.endsWith(".ico") &&
+            !requestURI.endsWith(".woff") && !requestURI.endsWith(".woff2") &&
+            !requestURI.endsWith(".ttf") && !requestURI.endsWith(".eot")) {
+            httpResponse.setContentType("text/html; charset=UTF-8");
+        }
         
         // Continue with the request
         chain.doFilter(request, response);
@@ -39,3 +50,4 @@ public class EncodingFilter implements Filter {
         // Cleanup code if needed
     }
 }
+
