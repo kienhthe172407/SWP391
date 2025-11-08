@@ -52,129 +52,14 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h4>Dept Manager Dashboard</h4>
-            <p>Department Management</p>
-        </div>
-
-        <ul class="sidebar-menu">
-            <li class="menu-section">Dashboard</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/dashboard/dept-manager-dashboard.jsp">
-                    <i class="fas fa-home"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Team Management</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-users"></i>
-                    <span>My Team</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Team Members</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>Team Performance</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Approval & Requests</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Approval Queue</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/request/manager/list" class="active">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Employee Requests</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-history"></i>
-                    <span>Approval History</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Task Management</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-tasks"></i>
-                    <span>Assign Tasks</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-list"></i>
-                    <span>Task Board</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Task Statistics</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Reports & Analytics</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Department Reports</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clock"></i>
-                    <span>Attendance Reports</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Main Content -->
+    <!-- Include Sidebar Component -->
+    <jsp:include page="/components/sidebar.jsp" />
+    
     <div class="main-content">
-        <div class="top-header">
-            <h1>Team Requests</h1>
-            <div class="user-info">
-                <span><c:out value="${sessionScope.user.roleDisplayName}" default="Dept Manager"/></span>
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle avatar" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        DM
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
-                                <i class="fas fa-user me-2"></i>Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/auth/change-password.jsp">
-                                <i class="fas fa-key me-2"></i>Change Password
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <!-- Include Header Component -->
+        <jsp:include page="/components/header.jsp">
+            <jsp:param name="pageTitle" value="Team Requests" />
+        </jsp:include>
 
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">

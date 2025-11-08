@@ -100,106 +100,14 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h4>Employee Dashboard</h4>
-            <p>Personal Portal</p>
-        </div>
-
-        <ul class="sidebar-menu">
-            <li class="menu-section">Dashboard</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/dashboard/employee-dashboard.jsp">
-                    <i class="fas fa-home"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Personal Information</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/profile">
-                    <i class="fas fa-user"></i>
-                    <span>My Profile</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/auth/change-password.jsp">
-                    <i class="fas fa-key"></i>
-                    <span>Change Password</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Leave & Requests</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/request/submit">
-                    <i class="fas fa-file-alt"></i>
-                    <span>Personal Requests</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/request/list" class="active">
-                    <i class="fas fa-history"></i>
-                    <span>Request History</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Tasks & Work</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-tasks"></i>
-                    <span>My Tasks</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Task Status</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Attendance & Payroll</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clock"></i>
-                    <span>Attendance Record</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Payslip</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Main Content -->
+    <!-- Include Sidebar Component -->
+    <jsp:include page="/components/sidebar.jsp" />
+    
     <div class="main-content">
-        <div class="top-header">
-            <h1>Edit Request</h1>
-            <div class="user-info">
-                <span><c:out value="${sessionScope.user.roleDisplayName}" default="Employee"/></span>
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle avatar" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        EMP
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
-                                <i class="fas fa-user me-2"></i>Profile
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <!-- Include Header Component -->
+        <jsp:include page="/components/header.jsp">
+            <jsp:param name="pageTitle" value="Edit Request" />
+        </jsp:include>
 
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">

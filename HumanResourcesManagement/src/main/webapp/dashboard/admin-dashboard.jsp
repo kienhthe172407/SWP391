@@ -15,133 +15,18 @@
             </head>
 
             <body>
-                <div class="sidebar">
-                    <div class="sidebar-header">
-                        <h4>Admin Dashboard</h4>
-                        <p>System Administration</p>
-                    </div>
-
-                    <ul class="sidebar-menu">
-                        <li class="menu-section">Dashboard</li>
-                        <li>
-                            <a href="${pageContext.request.contextPath}/dashboard/admin" class="active">
-                                <i class="fas fa-home"></i>
-                                <span>Overview</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-section">User Management</li>
-                        <li>
-                            <a href="${pageContext.request.contextPath}/list-users">
-                                <i class="fas fa-users"></i>
-                                <span>All Users</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="${pageContext.request.contextPath}/create-user">
-                                <i class="fas fa-user-plus"></i>
-                                <span>Create User</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-section">Role & Permissions</li>
-                        <li>
-                            <a href="${pageContext.request.contextPath}/role-management">
-                                <i class="fas fa-user-shield"></i>
-                                <span>Role Management</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="${pageContext.request.contextPath}/permission-settings">
-                                <i class="fas fa-key"></i>
-                                <span>Permission Settings</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-users-cog"></i>
-                                <span>Assign Roles</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-section">System Settings</li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-cog"></i>
-                                <span>System Configuration</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-database"></i>
-                                <span>Database Management</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>Security Settings</span>
-                            </a>
-                        </li>
-
-                        <li class="menu-section">Monitoring & Logs</li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-chart-line"></i>
-                                <span>System Monitoring</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-file-alt"></i>
-                                <span>Audit Logs</span>
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <span>Error Logs</span>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <!-- Include Sidebar Component -->
+                <jsp:include page="/components/sidebar.jsp">
+                    <jsp:param name="role" value="Admin" />
+                    <jsp:param name="currentPage" value="dashboard" />
+                </jsp:include>
 
                 <div class="main-content">
-                    <div class="top-header">
-                        <h1>Admin Dashboard</h1>
-                        <div class="user-info">
-                            <span>
-                                <c:out value="${sessionScope.user.roleDisplayName}" default="Admin" />
-                            </span>
-                            <div class="dropdown">
-                                <button class="btn dropdown-toggle avatar" type="button" id="userDropdown"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    ADM
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li>
-                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
-                                            <i class="fas fa-user me-2"></i>Profile
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item"
-                                            href="${pageContext.request.contextPath}/auth/change-password.jsp">
-                                            <i class="fas fa-key me-2"></i>Change Password
-                                        </a>
-                                    </li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
-                                    <li>
-                                        <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
-                                            <i class="fas fa-sign-out-alt me-2"></i>Logout
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Include Header Component -->
+                    <jsp:include page="/components/header.jsp">
+                        <jsp:param name="role" value="Admin" />
+                        <jsp:param name="pageTitle" value="Admin Dashboard" />
+                    </jsp:include>
 
                     <nav aria-label="breadcrumb">
                         <ol class="breadcrumb">

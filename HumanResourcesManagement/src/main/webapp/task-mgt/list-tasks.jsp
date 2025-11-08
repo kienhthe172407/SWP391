@@ -58,97 +58,14 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <c:set var="roleName" value="${sessionScope.user.role}" />
-            <c:choose>
-                <c:when test="${roleName == 'HR_MANAGER'}">
-                    <h4>HR Manager Dashboard</h4>
-                    <p>Human Resources</p>
-                </c:when>
-                <c:when test="${roleName == 'DEPT_MANAGER'}">
-                    <h4>Department Manager</h4>
-                    <p>Team Management</p>
-                </c:when>
-                <c:otherwise>
-                    <h4>Employee Dashboard</h4>
-                    <p>Personal Portal</p>
-                </c:otherwise>
-            </c:choose>
-        </div>
-
-        <ul class="sidebar-menu">
-            <li class="menu-section">Dashboard</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/">
-                    <i class="fas fa-home"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Task Management</li>
-            <c:if test="${roleName == 'HR_MANAGER' || roleName == 'DEPT_MANAGER'}">
-                <li>
-                    <a href="${pageContext.request.contextPath}/task/assign">
-                        <i class="fas fa-plus-circle"></i>
-                        <span>Assign Task</span>
-                    </a>
-                </li>
-            </c:if>
-            <li>
-                <a href="${pageContext.request.contextPath}/task/list" class="active">
-                    <i class="fas fa-tasks"></i>
-                    <span>View Tasks</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Account</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/profile">
-                    <i class="fas fa-user"></i>
-                    <span>My Profile</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/logout">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Logout</span>
-                </a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Main Content -->
+    <!-- Include Sidebar Component -->
+    <jsp:include page="/components/sidebar.jsp" />
+    
     <div class="main-content">
-        <div class="top-header">
-            <h1>Task Management</h1>
-            <div class="user-info">
-                <span><c:out value="${sessionScope.user.roleDisplayName}" default="User"/></span>
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle avatar" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                        <c:choose>
-                            <c:when test="${roleName == 'HR_MANAGER'}">HRM</c:when>
-                            <c:when test="${roleName == 'DEPT_MANAGER'}">MGR</c:when>
-                            <c:otherwise>EMP</c:otherwise>
-                        </c:choose>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
-                                <i class="fas fa-user me-2"></i>Profile
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <!-- Include Header Component -->
+        <jsp:include page="/components/header.jsp">
+            <jsp:param name="pageTitle" value="Task List" />
+        </jsp:include>
 
         <nav aria-label="breadcrumb" class="breadcrumb">
             <ol class="breadcrumb">

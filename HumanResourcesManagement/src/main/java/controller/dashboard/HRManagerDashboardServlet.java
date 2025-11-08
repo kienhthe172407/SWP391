@@ -41,7 +41,7 @@ public class HRManagerDashboardServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         
         // Verify user is HR Manager
-        if (!"HR_MANAGER".equals(user.getRole())) {
+        if (!"HR Manager".equals(user.getRole())) {
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }

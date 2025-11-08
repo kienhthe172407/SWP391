@@ -13,155 +13,18 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/global.css">
 </head>
 <body>
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h4>HR Manager Dashboard</h4>
-            <p>Human Resources</p>
-        </div>
-
-        <ul class="sidebar-menu">
-            <li class="menu-section">Dashboard</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/dashboard/hr-manager" class="active">
-                    <i class="fas fa-home"></i>
-                    <span>Overview</span>
-                </a>
-            </li>
-
-            <li class="menu-section">HR Management</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-users-cog"></i>
-                    <span>HR Staff Management</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-tasks"></i>
-                    <span>Task Assignment</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Approval Queue</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Employee Management</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/employees/list">
-                    <i class="fas fa-users"></i>
-                    <span>All Employees</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/employees/addInformation">
-                    <i class="fas fa-user-plus"></i>
-                    <span>Add Employee Information</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Contracts & Attendance</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/contracts/list">
-                    <i class="fas fa-file"></i>
-                    <span>Contracts</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/attendance/import">
-                    <i class="fas fa-clock"></i>
-                    <span>Attendance</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Leave Requests</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Recruitment</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/job-postings/list">
-                    <i class="fas fa-briefcase"></i>
-                    <span> Job Postings</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/job-postings/create">
-                    <i class="fas fa-plus"></i>
-                    <span>Create Job Posting</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Payroll & Benefits</li>
-            <li>
-                <a href="${pageContext.request.contextPath}/salary/manage-benefits-deductions">
-                    <i class="fas fa-gift"></i>
-                    <span>Benefits & Deductions</span>
-                </a>
-            </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/salary/import">
-                    <i class="fas fa-dollar-sign"></i>
-                    <span>Payroll</span>
-                </a>
-            </li>
-
-            <li class="menu-section">Reports & Analytics</li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>HR Reports</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Statistics</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+    <!-- Include Sidebar Component -->
+    <jsp:include page="/components/sidebar.jsp">
+        <jsp:param name="role" value="HR Manager" />
+        <jsp:param name="currentPage" value="dashboard" />
+    </jsp:include>
 
     <div class="main-content">
-        <div class="top-header">
-            <h1>HR Manager Dashboard</h1>
-            <div class="user-info">
-                <span><c:out value="${sessionScope.user.roleDisplayName}" default="HR Manager"/></span>
-                <div class="dropdown">
-                    <button class="btn dropdown-toggle avatar" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                        HR
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/profile">
-                                <i class="fas fa-user me-2"></i>Profile
-                            </a>
-                        </li>
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/auth/change-password.jsp">
-                                <i class="fas fa-key me-2"></i>Change Password
-                            </a>
-                        </li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li>
-                            <a class="dropdown-item" href="${pageContext.request.contextPath}/logout">
-                                <i class="fas fa-sign-out-alt me-2"></i>Logout
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+        <!-- Include Header Component -->
+        <jsp:include page="/components/header.jsp">
+            <jsp:param name="role" value="HR Manager" />
+            <jsp:param name="pageTitle" value="HR Manager Dashboard" />
+        </jsp:include>
 
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb">

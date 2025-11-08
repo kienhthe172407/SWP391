@@ -58,8 +58,14 @@ public class LoginServlet extends HttpServlet {
                 // Tài khoản hợp lệ và đang hoạt động
                 HttpSession session = request.getSession(true);
                 session.setAttribute("user", authenticated);
+                
+                // Also set userRole for backward compatibility
+                session.setAttribute("userRole", authenticated.getRoleDisplayName());
+                
                 String role = authenticated.getRole();
-                LOGGER.info("User role: " + role); // Ghi log debug
+                LOGGER.info("User logged in - Username: " + authenticated.getUsername() + ", Role: " + role);
+                
+                // Redirect based on role
                 if ("Admin".equals(role)) {
                     LOGGER.info("Redirecting Admin to: /dashboard/admin");
                     response.sendRedirect(request.getContextPath() + "/dashboard/admin");
@@ -81,8 +87,8 @@ public class LoginServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/dashboard/dept-manager");
                     return;
                 } else {
-                    LOGGER.info("Redirecting other role (" + role + ") to: /manager/home.jsp");
-                    response.sendRedirect(request.getContextPath() + "/manager/home.jsp");
+                    LOGGER.warning("Unknown role (" + role + "), redirecting to home page");
+                    response.sendRedirect(request.getContextPath() + "/");
                     return;
                 }
             } else {
