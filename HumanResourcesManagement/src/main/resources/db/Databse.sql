@@ -1944,3 +1944,265 @@ SET
     ar.adjusted_at = NOW()
 WHERE ar.status IN ('Business Trip', 'Remote')
 AND (ar.adjustment_reason IS NULL OR ar.adjustment_reason = '');
+
+-- =====================================================
+-- TEST DATA FOR HR STATISTICS & REPORTS
+-- =====================================================
+-- This section adds additional test data to help demonstrate
+-- the HR Statistics & Reports functionality
+-- =====================================================
+
+-- Add more attendance records for the last 6 months (for trend analysis)
+INSERT INTO attendance_records (employee_id, attendance_date, check_in_time, check_out_time, status, overtime_hours)
+SELECT 
+    e.employee_id,
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY) AS attendance_date,
+    CASE 
+        WHEN RAND() > 0.15 THEN TIME('08:00:00')
+        WHEN RAND() > 0.5 THEN TIME('08:30:00')
+        ELSE TIME('09:15:00')
+    END AS check_in_time,
+    CASE 
+        WHEN RAND() > 0.2 THEN TIME('17:30:00')
+        ELSE TIME('18:30:00')
+    END AS check_out_time,
+    CASE 
+        WHEN RAND() > 0.85 THEN 'Absent'
+        WHEN RAND() > 0.75 THEN 'Late'
+        WHEN RAND() > 0.90 THEN 'Remote'
+        WHEN RAND() > 0.95 THEN 'Business Trip'
+        ELSE 'Present'
+    END AS status,
+    CASE 
+        WHEN RAND() > 0.7 THEN ROUND(RAND() * 3, 2)
+        ELSE 0
+    END AS overtime_hours
+FROM employees e
+WHERE e.employment_status = 'Active'
+AND NOT EXISTS (
+    SELECT 1 FROM attendance_records ar 
+    WHERE ar.employee_id = e.employee_id 
+    AND ar.attendance_date = DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY)
+)
+LIMIT 500;
+
+-- Add more job applications for the last 6 months (for recruitment trend)
+INSERT INTO job_applications (job_id, applicant_name, applicant_email, applicant_phone, application_status, applied_date)
+SELECT 
+    jp.job_id,
+    CONCAT('Applicant ', FLOOR(RAND() * 1000)) AS applicant_name,
+    CONCAT('applicant', FLOOR(RAND() * 10000), '@example.com') AS applicant_email,
+    CONCAT('09', LPAD(FLOOR(RAND() * 100000000), 8, '0')) AS applicant_phone,
+    CASE 
+        WHEN RAND() > 0.7 THEN 'Submitted'
+        WHEN RAND() > 0.5 THEN 'Screening'
+        WHEN RAND() > 0.3 THEN 'Interview'
+        WHEN RAND() > 0.15 THEN 'Rejected'
+        WHEN RAND() > 0.05 THEN 'Offered'
+        ELSE 'Hired'
+    END AS application_status,
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY) AS applied_date
+FROM job_postings jp
+WHERE jp.status = 'Open'
+LIMIT 200;
+
+-- Add more tasks with various statuses (for task statistics)
+INSERT INTO tasks (task_title, task_description, assigned_to, assigned_by, department_id, priority, task_status, start_date, due_date, progress_percentage)
+SELECT 
+    CONCAT('Task #', FLOOR(RAND() * 10000), ' - ', 
+        CASE FLOOR(RAND() * 5)
+            WHEN 0 THEN 'Review Documents'
+            WHEN 1 THEN 'Prepare Report'
+            WHEN 2 THEN 'Team Meeting'
+            WHEN 3 THEN 'Client Presentation'
+            ELSE 'Project Planning'
+        END) AS task_title,
+    'This is a test task for HR statistics demonstration' AS task_description,
+    e.employee_id AS assigned_to,
+    u.user_id AS assigned_by,
+    e.department_id,
+    CASE FLOOR(RAND() * 4)
+        WHEN 0 THEN 'Low'
+        WHEN 1 THEN 'Medium'
+        WHEN 2 THEN 'High'
+        ELSE 'Urgent'
+    END AS priority,
+    CASE FLOOR(RAND() * 5)
+        WHEN 0 THEN 'Not Started'
+        WHEN 1 THEN 'In Progress'
+        WHEN 2 THEN 'Done'
+        WHEN 3 THEN 'Blocked'
+        ELSE 'In Progress'
+    END AS task_status,
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 60) DAY) AS start_date,
+    DATE_ADD(CURDATE(), INTERVAL FLOOR(RAND() * 30) DAY) AS due_date,
+    CASE 
+        WHEN RAND() > 0.7 THEN FLOOR(RAND() * 50)
+        WHEN RAND() > 0.4 THEN FLOOR(RAND() * 100)
+        ELSE 100
+    END AS progress_percentage
+FROM employees e
+INNER JOIN users u ON e.employee_id = u.employee_id
+WHERE e.employment_status = 'Active'
+AND u.role IN ('HR_MANAGER', 'DEPT_MANAGER')
+LIMIT 100;
+
+-- Update some tasks to be completed
+UPDATE tasks 
+SET 
+    task_status = 'Done',
+    progress_percentage = 100,
+    completed_date = DATE_ADD(start_date, INTERVAL FLOOR(RAND() * 20) DAY)
+WHERE task_status = 'Done'
+AND completed_date IS NULL;
+
+-- Add more requests for various types (for request statistics)
+INSERT INTO requests (employee_id, request_type_id, start_date, end_date, number_of_days, reason, request_status, reviewed_by, review_comment, reviewed_at)
+SELECT 
+    e.employee_id,
+    FLOOR(1 + RAND() * 6) AS request_type_id, -- Random request type (1-6)
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 90) DAY) AS start_date,
+    DATE_ADD(DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 90) DAY), INTERVAL FLOOR(1 + RAND() * 5) DAY) AS end_date,
+    FLOOR(1 + RAND() * 5) AS number_of_days,
+    CASE FLOOR(RAND() * 4)
+        WHEN 0 THEN 'Personal matters'
+        WHEN 1 THEN 'Family emergency'
+        WHEN 2 THEN 'Medical appointment'
+        ELSE 'Vacation'
+    END AS reason,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN 'Pending'
+        WHEN 1 THEN 'Approved'
+        ELSE 'Rejected'
+    END AS request_status,
+    (SELECT u2.user_id FROM users u2 
+     INNER JOIN employees e2 ON u2.employee_id = e2.employee_id
+     INNER JOIN departments d ON e2.employee_id = d.manager_id
+     WHERE d.department_id = e.department_id
+     LIMIT 1) AS reviewed_by,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN NULL
+        WHEN 1 THEN 'Approved as requested'
+        ELSE 'Rejected due to workload'
+    END AS review_comment,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN NULL
+        ELSE DATE_ADD(DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 90) DAY), INTERVAL 1 DAY)
+    END AS reviewed_at
+FROM employees e
+WHERE e.employment_status = 'Active'
+LIMIT 150;
+
+-- Add more contracts with various statuses (for contract statistics)
+INSERT INTO contracts (employee_id, contract_type, contract_number, start_date, end_date, salary_amount, contract_status, signed_date)
+SELECT 
+    e.employee_id,
+    CASE FLOOR(RAND() * 4)
+        WHEN 0 THEN 'Full-time'
+        WHEN 1 THEN 'Part-time'
+        WHEN 2 THEN 'Contract'
+        ELSE 'Internship'
+    END AS contract_type,
+    CONCAT('CT', YEAR(CURDATE()), LPAD(FLOOR(RAND() * 10000), 4, '0')) AS contract_number,
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY) AS start_date,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN DATE_ADD(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY)
+        WHEN 1 THEN DATE_ADD(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY)
+        ELSE DATE_ADD(CURDATE(), INTERVAL 30 DAY) -- Expiring soon
+    END AS end_date,
+    ROUND(8000000 + (RAND() * 22000000), 0) AS salary_amount,
+    CASE FLOOR(RAND() * 4)
+        WHEN 0 THEN 'Active'
+        WHEN 1 THEN 'Active'
+        WHEN 2 THEN 'Expired'
+        ELSE 'Pending'
+    END AS contract_status,
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY) AS signed_date
+FROM employees e
+WHERE e.employment_status = 'Active'
+AND NOT EXISTS (
+    SELECT 1 FROM contracts c 
+    WHERE c.employee_id = e.employee_id 
+    AND c.contract_status = 'Active'
+)
+LIMIT 50;
+
+-- Add monthly payroll records for the last 6 months (for salary statistics)
+INSERT INTO monthly_payroll (employee_id, pay_period_month, pay_period_year, base_salary, overtime_pay, bonus, deductions, net_salary, payment_status, payment_date)
+SELECT 
+    e.employee_id,
+    MONTH(DATE_SUB(CURDATE(), INTERVAL n.n MONTH)) AS pay_period_month,
+    YEAR(DATE_SUB(CURDATE(), INTERVAL n.n MONTH)) AS pay_period_year,
+    ROUND(10000000 + (RAND() * 20000000), 0) AS base_salary,
+    ROUND(RAND() * 3000000, 0) AS overtime_pay,
+    CASE 
+        WHEN RAND() > 0.7 THEN ROUND(RAND() * 5000000, 0)
+        ELSE 0
+    END AS bonus,
+    ROUND(1000000 + (RAND() * 2000000), 0) AS deductions,
+    ROUND((10000000 + (RAND() * 20000000)) + (RAND() * 3000000) + 
+          CASE WHEN RAND() > 0.7 THEN RAND() * 5000000 ELSE 0 END - 
+          (1000000 + (RAND() * 2000000)), 0) AS net_salary,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN 'Pending'
+        WHEN 1 THEN 'Paid'
+        ELSE 'Paid'
+    END AS payment_status,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN NULL
+        ELSE LAST_DAY(DATE_SUB(CURDATE(), INTERVAL n.n MONTH))
+    END AS payment_date
+FROM employees e
+CROSS JOIN (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) n
+WHERE e.employment_status = 'Active'
+AND NOT EXISTS (
+    SELECT 1 FROM monthly_payroll mp 
+    WHERE mp.employee_id = e.employee_id 
+    AND mp.pay_period_month = MONTH(DATE_SUB(CURDATE(), INTERVAL n.n MONTH))
+    AND mp.pay_period_year = YEAR(DATE_SUB(CURDATE(), INTERVAL n.n MONTH))
+)
+LIMIT 300;
+
+-- Add some overdue tasks (for overdue task statistics)
+UPDATE tasks 
+SET due_date = DATE_SUB(CURDATE(), INTERVAL FLOOR(1 + RAND() * 30) DAY)
+WHERE task_status IN ('Not Started', 'In Progress', 'Blocked')
+AND RAND() > 0.7
+LIMIT 20;
+
+-- Add attendance exception requests (for exception statistics)
+INSERT INTO attendance_exception_requests (attendance_id, employee_id, request_reason, proposed_check_in, proposed_check_out, proposed_status, status)
+SELECT 
+    ar.attendance_id,
+    ar.employee_id,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN 'Forgot to check in/out'
+        WHEN 1 THEN 'System error'
+        ELSE 'Traffic jam'
+    END AS request_reason,
+    TIME('08:00:00') AS proposed_check_in,
+    TIME('17:30:00') AS proposed_check_out,
+    'Present' AS proposed_status,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN 'Pending'
+        WHEN 1 THEN 'Approved'
+        ELSE 'Rejected'
+    END AS status
+FROM attendance_records ar
+WHERE ar.status IN ('Late', 'Absent')
+AND RAND() > 0.8
+LIMIT 30;
+
+-- =====================================================
+-- END OF TEST DATA
+-- =====================================================
+
+-- Verify test data counts
+SELECT 'Test Data Summary' AS info;
+SELECT 'Total Employees' AS metric, COUNT(*) AS count FROM employees WHERE employment_status = 'Active';
+SELECT 'Total Attendance Records (Last 6 months)' AS metric, COUNT(*) AS count FROM attendance_records WHERE attendance_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH);
+SELECT 'Total Job Applications (Last 6 months)' AS metric, COUNT(*) AS count FROM job_applications WHERE applied_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH);
+SELECT 'Total Tasks' AS metric, COUNT(*) AS count FROM tasks WHERE is_deleted = FALSE;
+SELECT 'Total Requests' AS metric, COUNT(*) AS count FROM requests;
+SELECT 'Total Contracts' AS metric, COUNT(*) AS count FROM contracts;
+SELECT 'Total Payroll Records (Last 6 months)' AS metric, COUNT(*) AS count FROM monthly_payroll WHERE CONCAT(pay_period_year, '-', LPAD(pay_period_month, 2, '0')) >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), '%Y-%m');
