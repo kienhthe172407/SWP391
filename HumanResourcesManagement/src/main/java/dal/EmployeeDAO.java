@@ -45,6 +45,44 @@ public class EmployeeDAO extends DBContext {
         
         return employees;
     }
+
+    /**
+     * Get all active employees by department ID
+     * @param departmentId Department ID
+     * @return List<Employee>
+     */
+    public List<Employee> getEmployeesByDepartment(Integer departmentId) {
+        List<Employee> employees = new ArrayList<>();
+        String sql = "SELECT e.employee_id, e.user_id, e.employee_code, e.first_name, e.last_name, " +
+                     "e.date_of_birth, e.gender, e.phone_number, e.personal_email, " +
+                     "e.home_address, e.emergency_contact_name, e.emergency_contact_phone, " +
+                     "e.department_id, e.position_id, e.manager_id, e.hire_date, e.employment_status, " +
+                     "e.created_at, e.updated_at, " +
+                     "d.department_name, p.position_name, " +
+                     "CONCAT(m.first_name, ' ', m.last_name) AS manager_name " +
+                     "FROM employees e " +
+                     "LEFT JOIN departments d ON e.department_id = d.department_id " +
+                     "LEFT JOIN positions p ON e.position_id = p.position_id " +
+                     "LEFT JOIN employees m ON e.manager_id = m.employee_id " +
+                     "WHERE e.department_id = ? AND e.employment_status = 'Active' AND e.is_deleted = FALSE " +
+                     "ORDER BY e.first_name, e.last_name";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, departmentId);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Employee employee = mapResultSetToEmployee(rs);
+                    employees.add(employee);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getEmployeesByDepartment: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return employees;
+    }
     
     /**
      * Get employee by ID
