@@ -182,6 +182,47 @@ public class PayrollDAO extends DBContext {
     }
     
     /**
+     * Get all payroll records for a specific employee
+     * @param employeeID Employee ID
+     * @return List of MonthlyPayroll objects ordered by month (newest first)
+     */
+    public List<MonthlyPayroll> getPayrollsByEmployeeId(int employeeID) {
+        List<MonthlyPayroll> payrolls = new ArrayList<>();
+        String sql = "SELECT mp.*, e.employee_code, " +
+                     "CONCAT(e.first_name, ' ', e.last_name) AS employee_name, " +
+                     "d.department_name, p.position_name, " +
+                     "CONCAT(u1.first_name, ' ', u1.last_name) AS calculated_by_name " +
+                     "FROM monthly_payroll mp " +
+                     "JOIN employees e ON mp.employee_id = e.employee_id " +
+                     "LEFT JOIN departments d ON e.department_id = d.department_id " +
+                     "LEFT JOIN positions p ON e.position_id = p.position_id " +
+                     "LEFT JOIN users u1 ON mp.calculated_by = u1.user_id " +
+                     "WHERE mp.employee_id = ? " +
+                     "ORDER BY mp.payroll_month DESC";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setInt(1, employeeID);
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    MonthlyPayroll payroll = mapResultSetToPayroll(rs);
+                    payroll.setEmployeeCode(rs.getString("employee_code"));
+                    payroll.setEmployeeName(rs.getString("employee_name"));
+                    payroll.setDepartmentName(rs.getString("department_name"));
+                    payroll.setPositionName(rs.getString("position_name"));
+                    payroll.setCalculatedByName(rs.getString("calculated_by_name"));
+                    payrolls.add(payroll);
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getPayrollsByEmployeeId: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return payrolls;
+    }
+    
+    /**
      * Check if payroll exists for employee and month
      * @param employeeID Employee ID
      * @param payrollMonth Payroll month

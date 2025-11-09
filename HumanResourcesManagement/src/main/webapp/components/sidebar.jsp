@@ -452,7 +452,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="<%= request.getContextPath() %>/employee/my-payslip">
                     <i class="fas fa-dollar-sign"></i>
                     <span>Payslip</span>
                 </a>
