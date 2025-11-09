@@ -75,10 +75,12 @@ public class EditTaskServlet extends HttpServlet {
             // Check if user has permission to edit
             String userRole = user.getRole();
             boolean canEdit = false;
+            boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+            boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
 
-            if ("HR_MANAGER".equals(userRole)) {
+            if (isHRManager) {
                 canEdit = true; // HR Manager can edit any task
-            } else if ("DEPT_MANAGER".equals(userRole)) {
+            } else if (isDeptManager) {
                 // Dept Manager can edit tasks they assigned
                 if (task.getAssignedBy() == user.getUserId()) {
                     canEdit = true;
@@ -106,9 +108,9 @@ public class EditTaskServlet extends HttpServlet {
             }
 
             // Get list of employees for reassignment (managers only)
-            if ("HR_MANAGER".equals(userRole) || "DEPT_MANAGER".equals(userRole)) {
+            if (isHRManager || isDeptManager) {
                 List<Employee> employees;
-                if ("DEPT_MANAGER".equals(userRole)) {
+                if (isDeptManager) {
                     Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
                     if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
                         employees = employeeDAO.getEmployeesByDepartment(managerEmployee.getDepartmentID());
@@ -189,7 +191,9 @@ public class EditTaskServlet extends HttpServlet {
 
             // Check permissions
             String userRole = user.getRole();
-            boolean isManager = "HR_MANAGER".equals(userRole) || "DEPT_MANAGER".equals(userRole);
+            boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+            boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
+            boolean isManager = isHRManager || isDeptManager;
             boolean isAssignee = false;
             
             Employee employee = employeeDAO.getEmployeeByUserId(user.getUserId());

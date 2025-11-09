@@ -73,10 +73,12 @@ public class CancelTaskServlet extends HttpServlet {
             // Check if user has permission to cancel
             String userRole = user.getRole();
             boolean canCancel = false;
+            boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+            boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
 
-            if ("HR_MANAGER".equals(userRole)) {
+            if (isHRManager) {
                 canCancel = true; // HR Manager can cancel any task
-            } else if ("DEPT_MANAGER".equals(userRole)) {
+            } else if (isDeptManager) {
                 // Dept Manager can cancel tasks they assigned
                 if (task.getAssignedBy() == user.getUserId()) {
                     canCancel = true;

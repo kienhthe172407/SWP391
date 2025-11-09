@@ -23,6 +23,18 @@ public class TaskDAO extends DBContext {
                      "department_id, priority, task_status, start_date, due_date, progress_percentage) " +
                      "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
+        System.out.println("TaskDAO.createTask - Input values:");
+        System.out.println("  - Title: " + task.getTaskTitle());
+        System.out.println("  - Description: " + (task.getTaskDescription() != null ? task.getTaskDescription().substring(0, Math.min(50, task.getTaskDescription().length())) : "null"));
+        System.out.println("  - AssignedTo (Employee ID): " + task.getAssignedTo());
+        System.out.println("  - AssignedBy (User ID): " + task.getAssignedBy());
+        System.out.println("  - DepartmentId: " + task.getDepartmentId());
+        System.out.println("  - Priority: " + task.getPriority());
+        System.out.println("  - TaskStatus: " + task.getTaskStatus());
+        System.out.println("  - StartDate: " + task.getStartDate());
+        System.out.println("  - DueDate: " + task.getDueDate());
+        System.out.println("  - ProgressPercentage: " + task.getProgressPercentage());
+        
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, task.getTaskTitle());
             ps.setString(2, task.getTaskDescription());
@@ -31,24 +43,38 @@ public class TaskDAO extends DBContext {
             
             if (task.getDepartmentId() != null) {
                 ps.setInt(5, task.getDepartmentId());
+                System.out.println("TaskDAO.createTask - Setting department_id: " + task.getDepartmentId());
             } else {
                 ps.setNull(5, Types.INTEGER);
+                System.out.println("TaskDAO.createTask - Setting department_id: NULL");
             }
             
+            String taskStatus = task.getTaskStatus() != null ? task.getTaskStatus() : "Not Started";
             ps.setString(6, task.getPriority());
-            ps.setString(7, task.getTaskStatus() != null ? task.getTaskStatus() : "Not Started");
+            ps.setString(7, taskStatus);
             ps.setDate(8, task.getStartDate());
             ps.setDate(9, task.getDueDate());
             ps.setInt(10, task.getProgressPercentage());
             
+            System.out.println("TaskDAO.createTask - Executing INSERT with:");
+            System.out.println("  - assigned_by: " + task.getAssignedBy());
+            System.out.println("  - task_status: " + taskStatus);
+            
             int affectedRows = ps.executeUpdate();
+            System.out.println("TaskDAO.createTask - INSERT affected rows: " + affectedRows);
             
             if (affectedRows > 0) {
                 try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
                     if (generatedKeys.next()) {
-                        return generatedKeys.getInt(1);
+                        int taskId = generatedKeys.getInt(1);
+                        System.out.println("TaskDAO.createTask - Task created successfully with ID: " + taskId);
+                        return taskId;
+                    } else {
+                        System.err.println("TaskDAO.createTask - No generated key returned!");
                     }
                 }
+            } else {
+                System.err.println("TaskDAO.createTask - INSERT failed! No rows affected.");
             }
         } catch (SQLException e) {
             System.err.println("Error in createTask: " + e.getMessage());
@@ -68,11 +94,11 @@ public class TaskDAO extends DBContext {
                      "t.department_id, t.priority, t.task_status, t.start_date, t.due_date, t.completed_date, " +
                      "t.progress_percentage, t.cancellation_reason, t.cancelled_by, t.cancelled_at, " +
                      "t.created_at, t.updated_at, t.is_deleted, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) AS assigned_to_name, " +
+                     "TRIM(CONCAT(COALESCE(e.first_name, ''), ' ', COALESCE(e.last_name, ''))) AS assigned_to_name, " +
                      "e.employee_code AS assigned_to_code, " +
-                     "CONCAT(u.first_name, ' ', u.last_name) AS assigned_by_name, " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), u.username) AS assigned_by_name, " +
                      "d.department_name, " +
-                     "CONCAT(cu.first_name, ' ', cu.last_name) AS cancelled_by_name " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''), cu.username) AS cancelled_by_name " +
                      "FROM tasks t " +
                      "INNER JOIN employees e ON t.assigned_to = e.employee_id " +
                      "INNER JOIN users u ON t.assigned_by = u.user_id " +
@@ -107,11 +133,11 @@ public class TaskDAO extends DBContext {
                      "t.department_id, t.priority, t.task_status, t.start_date, t.due_date, t.completed_date, " +
                      "t.progress_percentage, t.cancellation_reason, t.cancelled_by, t.cancelled_at, " +
                      "t.created_at, t.updated_at, t.is_deleted, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) AS assigned_to_name, " +
+                     "TRIM(CONCAT(COALESCE(e.first_name, ''), ' ', COALESCE(e.last_name, ''))) AS assigned_to_name, " +
                      "e.employee_code AS assigned_to_code, " +
-                     "CONCAT(u.first_name, ' ', u.last_name) AS assigned_by_name, " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), u.username) AS assigned_by_name, " +
                      "d.department_name, " +
-                     "CONCAT(cu.first_name, ' ', cu.last_name) AS cancelled_by_name " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''), cu.username) AS cancelled_by_name " +
                      "FROM tasks t " +
                      "INNER JOIN employees e ON t.assigned_to = e.employee_id " +
                      "INNER JOIN users u ON t.assigned_by = u.user_id " +
@@ -147,11 +173,11 @@ public class TaskDAO extends DBContext {
                      "t.department_id, t.priority, t.task_status, t.start_date, t.due_date, t.completed_date, " +
                      "t.progress_percentage, t.cancellation_reason, t.cancelled_by, t.cancelled_at, " +
                      "t.created_at, t.updated_at, t.is_deleted, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) AS assigned_to_name, " +
+                     "TRIM(CONCAT(COALESCE(e.first_name, ''), ' ', COALESCE(e.last_name, ''))) AS assigned_to_name, " +
                      "e.employee_code AS assigned_to_code, " +
-                     "CONCAT(u.first_name, ' ', u.last_name) AS assigned_by_name, " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), u.username) AS assigned_by_name, " +
                      "d.department_name, " +
-                     "CONCAT(cu.first_name, ' ', cu.last_name) AS cancelled_by_name " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''), cu.username) AS cancelled_by_name " +
                      "FROM tasks t " +
                      "INNER JOIN employees e ON t.assigned_to = e.employee_id " +
                      "INNER JOIN users u ON t.assigned_by = u.user_id " +
@@ -187,11 +213,11 @@ public class TaskDAO extends DBContext {
                      "t.department_id, t.priority, t.task_status, t.start_date, t.due_date, t.completed_date, " +
                      "t.progress_percentage, t.cancellation_reason, t.cancelled_by, t.cancelled_at, " +
                      "t.created_at, t.updated_at, t.is_deleted, " +
-                     "CONCAT(e.first_name, ' ', e.last_name) AS assigned_to_name, " +
+                     "TRIM(CONCAT(COALESCE(e.first_name, ''), ' ', COALESCE(e.last_name, ''))) AS assigned_to_name, " +
                      "e.employee_code AS assigned_to_code, " +
-                     "CONCAT(u.first_name, ' ', u.last_name) AS assigned_by_name, " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), u.username) AS assigned_by_name, " +
                      "d.department_name, " +
-                     "CONCAT(cu.first_name, ' ', cu.last_name) AS cancelled_by_name " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''), cu.username) AS cancelled_by_name " +
                      "FROM tasks t " +
                      "INNER JOIN employees e ON t.assigned_to = e.employee_id " +
                      "INNER JOIN users u ON t.assigned_by = u.user_id " +
@@ -217,6 +243,43 @@ public class TaskDAO extends DBContext {
     }
 
     /**
+     * Get all tasks in the system (for HR Manager)
+     * @return List of all tasks
+     */
+    public List<Task> getAllTasks() {
+        List<Task> tasks = new ArrayList<>();
+        String sql = "SELECT t.task_id, t.task_title, t.task_description, t.assigned_to, t.assigned_by, " +
+                     "t.department_id, t.priority, t.task_status, t.start_date, t.due_date, t.completed_date, " +
+                     "t.progress_percentage, t.cancellation_reason, t.cancelled_by, t.cancelled_at, " +
+                     "t.created_at, t.updated_at, t.is_deleted, " +
+                     "TRIM(CONCAT(COALESCE(e.first_name, ''), ' ', COALESCE(e.last_name, ''))) AS assigned_to_name, " +
+                     "e.employee_code AS assigned_to_code, " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, ''))), ''), u.username) AS assigned_by_name, " +
+                     "d.department_name, " +
+                     "COALESCE(NULLIF(TRIM(CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, ''))), ''), cu.username) AS cancelled_by_name " +
+                     "FROM tasks t " +
+                     "INNER JOIN employees e ON t.assigned_to = e.employee_id " +
+                     "INNER JOIN users u ON t.assigned_by = u.user_id " +
+                     "LEFT JOIN departments d ON t.department_id = d.department_id " +
+                     "LEFT JOIN users cu ON t.cancelled_by = cu.user_id " +
+                     "WHERE t.is_deleted = FALSE " +
+                     "ORDER BY t.due_date ASC, t.priority DESC, t.created_at DESC";
+        
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                tasks.add(extractTaskFromResultSet(rs));
+            }
+        } catch (SQLException e) {
+            System.err.println("Error in getAllTasks: " + e.getMessage());
+            e.printStackTrace();
+        }
+        
+        return tasks;
+    }
+
+    /**
      * Search tasks with filters
      * @param assignedTo Employee ID (null for all)
      * @param assignedBy User ID (null for all)
@@ -233,11 +296,11 @@ public class TaskDAO extends DBContext {
         sql.append("t.department_id, t.priority, t.task_status, t.start_date, t.due_date, t.completed_date, ");
         sql.append("t.progress_percentage, t.cancellation_reason, t.cancelled_by, t.cancelled_at, ");
         sql.append("t.created_at, t.updated_at, t.is_deleted, ");
-        sql.append("CONCAT(e.first_name, ' ', e.last_name) AS assigned_to_name, ");
+        sql.append("CONCAT(COALESCE(e.first_name, ''), ' ', COALESCE(e.last_name, '')) AS assigned_to_name, ");
         sql.append("e.employee_code AS assigned_to_code, ");
-        sql.append("CONCAT(u.first_name, ' ', u.last_name) AS assigned_by_name, ");
+        sql.append("CONCAT(COALESCE(u.first_name, ''), ' ', COALESCE(u.last_name, '')) AS assigned_by_name, ");
         sql.append("d.department_name, ");
-        sql.append("CONCAT(cu.first_name, ' ', cu.last_name) AS cancelled_by_name ");
+        sql.append("CONCAT(COALESCE(cu.first_name, ''), ' ', COALESCE(cu.last_name, '')) AS cancelled_by_name ");
         sql.append("FROM tasks t ");
         sql.append("INNER JOIN employees e ON t.assigned_to = e.employee_id ");
         sql.append("INNER JOIN users u ON t.assigned_by = u.user_id ");
@@ -471,7 +534,8 @@ public class TaskDAO extends DBContext {
         task.setTaskTitle(rs.getString("task_title"));
         task.setTaskDescription(rs.getString("task_description"));
         task.setAssignedTo(rs.getInt("assigned_to"));
-        task.setAssignedBy(rs.getInt("assigned_by"));
+        int assignedByUserId = rs.getInt("assigned_by");
+        task.setAssignedBy(assignedByUserId);
         
         int deptId = rs.getInt("department_id");
         if (!rs.wasNull()) {
@@ -479,7 +543,22 @@ public class TaskDAO extends DBContext {
         }
         
         task.setPriority(rs.getString("priority"));
-        task.setTaskStatus(rs.getString("task_status"));
+        String taskStatusRaw = rs.getString("task_status");
+        boolean taskStatusWasNull = rs.wasNull();
+        
+        // Debug logging for task_status (before setting default)
+        System.out.println("TaskDAO.extractTaskFromResultSet - Task Status Debug:");
+        System.out.println("  - task_id: " + task.getTaskId());
+        System.out.println("  - task_status (raw from DB): " + (taskStatusRaw != null ? taskStatusRaw : "NULL"));
+        System.out.println("  - task_status wasNull(): " + taskStatusWasNull);
+        
+        // Ensure task_status is never null - default to "Not Started"
+        if (taskStatusRaw == null || taskStatusRaw.isEmpty() || taskStatusWasNull) {
+            System.out.println("TaskDAO.extractTaskFromResultSet - ⚠️ WARNING: task_status is NULL/EMPTY, setting default to 'Not Started'");
+            taskStatusRaw = "Not Started";
+        }
+        task.setTaskStatus(taskStatusRaw);
+        System.out.println("  - task.taskStatus (final): " + task.getTaskStatus());
         task.setStartDate(rs.getDate("start_date"));
         task.setDueDate(rs.getDate("due_date"));
         task.setCompletedDate(rs.getDate("completed_date"));
@@ -499,9 +578,61 @@ public class TaskDAO extends DBContext {
         // Additional display fields
         task.setAssignedToName(rs.getString("assigned_to_name"));
         task.setAssignedToCode(rs.getString("assigned_to_code"));
-        task.setAssignedByName(rs.getString("assigned_by_name"));
+        
+        // Check raw values from ResultSet before setting
+        String assignedByName = rs.getString("assigned_by_name");
+        boolean assignedByNameWasNull = rs.wasNull();
+        
+        // Try to get user info directly from ResultSet if available
+        try {
+            String userFirstName = rs.getString("u.first_name");
+            String userLastName = rs.getString("u.last_name");
+            System.out.println("TaskDAO.extractTaskFromResultSet - Raw ResultSet values:");
+            System.out.println("  - assigned_by (User ID): " + assignedByUserId);
+            System.out.println("  - u.first_name (raw): " + (userFirstName != null ? userFirstName : "NULL"));
+            System.out.println("  - u.last_name (raw): " + (userLastName != null ? userLastName : "NULL"));
+            System.out.println("  - assigned_by_name (raw): " + (assignedByName != null ? assignedByName : "NULL"));
+            System.out.println("  - assigned_by_name wasNull(): " + assignedByNameWasNull);
+            System.out.println("  - task_status (raw): " + (taskStatusRaw != null ? taskStatusRaw : "NULL"));
+        } catch (Exception e) {
+            // Column not available in ResultSet, skip
+            System.out.println("TaskDAO.extractTaskFromResultSet - Raw ResultSet values:");
+            System.out.println("  - assigned_by (User ID): " + assignedByUserId);
+            System.out.println("  - assigned_by_name (raw): " + (assignedByName != null ? assignedByName : "NULL"));
+            System.out.println("  - assigned_by_name wasNull(): " + assignedByNameWasNull);
+            System.out.println("  - task_status (raw): " + (taskStatusRaw != null ? taskStatusRaw : "NULL"));
+        }
+        
+        task.setAssignedByName(assignedByName);
         task.setDepartmentName(rs.getString("department_name"));
         task.setCancelledByName(rs.getString("cancelled_by_name"));
+        
+        // Debug logging - log all values for newly created tasks
+        System.out.println("TaskDAO.extractTaskFromResultSet - Extracted task:");
+        System.out.println("  - task_id: " + task.getTaskId());
+        System.out.println("  - task_title: " + task.getTaskTitle());
+        System.out.println("  - assigned_to (Employee ID): " + task.getAssignedTo());
+        System.out.println("  - assigned_to_name: " + task.getAssignedToName());
+        System.out.println("  - assigned_by (User ID): " + task.getAssignedBy());
+        System.out.println("  - assigned_by_name: " + (assignedByName != null ? assignedByName : "NULL"));
+        System.out.println("  - task_status: " + (task.getTaskStatus() != null ? task.getTaskStatus() : "NULL"));
+        System.out.println("  - priority: " + task.getPriority());
+        System.out.println("  - department_id: " + task.getDepartmentId());
+        System.out.println("  - department_name: " + task.getDepartmentName());
+        
+        // Warning logging
+        if (assignedByName == null || assignedByName.isEmpty()) {
+            System.err.println("TaskDAO.extractTaskFromResultSet - ⚠️ WARNING: assigned_by_name is NULL/EMPTY!");
+            System.err.println("  - task_id: " + task.getTaskId());
+            System.err.println("  - assigned_by (User ID from DB): " + task.getAssignedBy());
+            System.err.println("  - assigned_by_name from ResultSet: " + assignedByName);
+            System.err.println("  - This means JOIN with users table failed or user not found!");
+        }
+        if (task.getTaskStatus() == null || task.getTaskStatus().isEmpty()) {
+            System.err.println("TaskDAO.extractTaskFromResultSet - ⚠️ WARNING: task_status is NULL/EMPTY!");
+            System.err.println("  - task_id: " + task.getTaskId());
+            System.err.println("  - task_status from ResultSet: " + task.getTaskStatus());
+        }
         
         return task;
     }

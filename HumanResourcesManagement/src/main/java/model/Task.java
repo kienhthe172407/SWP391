@@ -304,20 +304,46 @@ public class Task {
         return dueDate.before(new Date(System.currentTimeMillis()));
     }
 
+    /**
+     * Check if task should be auto-started (start date has passed but status is still "Not Started")
+     * @return true if task should be auto-started
+     */
+    public boolean shouldAutoStart() {
+        if (startDate == null || isDone() || isCancelled() || isBlocked()) {
+            return false;
+        }
+        if (!"Not Started".equals(taskStatus)) {
+            return false;
+        }
+        // Check if start date has passed (including today)
+        Date today = new Date(System.currentTimeMillis());
+        // Compare dates without time
+        java.util.Calendar cal1 = java.util.Calendar.getInstance();
+        cal1.setTime(startDate);
+        java.util.Calendar cal2 = java.util.Calendar.getInstance();
+        cal2.setTime(today);
+        boolean sameDay = cal1.get(java.util.Calendar.YEAR) == cal2.get(java.util.Calendar.YEAR) &&
+                         cal1.get(java.util.Calendar.DAY_OF_YEAR) == cal2.get(java.util.Calendar.DAY_OF_YEAR);
+        return startDate.before(today) || sameDay;
+    }
+
     public String getStatusBadgeClass() {
+        if (taskStatus == null || taskStatus.isEmpty()) {
+            return "bg-secondary";
+        }
         switch (taskStatus) {
             case "Not Started":
-                return "badge-secondary";
+                return "bg-secondary";
             case "In Progress":
-                return "badge-pending"; // Yellow
+                return "bg-warning text-dark"; // Yellow
             case "Done":
-                return "badge-active"; // Green
+                return "bg-success"; // Green
             case "Blocked":
-                return "badge-expired"; // Red
+                return "bg-danger"; // Red
             case "Cancelled":
-                return "badge-secondary";
+                return "bg-secondary";
             default:
-                return "badge-secondary";
+                return "bg-secondary";
         }
     }
 

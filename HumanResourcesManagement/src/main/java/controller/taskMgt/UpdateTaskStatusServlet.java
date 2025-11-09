@@ -94,7 +94,10 @@ public class UpdateTaskStatusServlet extends HttpServlet {
             if (employee == null || employee.getEmployeeID() != task.getAssignedTo()) {
                 // Allow managers to update status too
                 String userRole = user.getRole();
-                if (!"HR_MANAGER".equals(userRole) && !"DEPT_MANAGER".equals(userRole)) {
+                boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+                boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
+                
+                if (!isHRManager && !isDeptManager) {
                     session.setAttribute("errorMessage", "You can only update status of tasks assigned to you.");
                     response.sendRedirect(request.getContextPath() + "/task/list");
                     return;

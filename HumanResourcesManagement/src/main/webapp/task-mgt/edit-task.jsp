@@ -90,7 +90,7 @@
                         </div>
 
                         <div class="row">
-                            <c:if test="${userRole == 'HR_MANAGER' || userRole == 'DEPT_MANAGER'}">
+                            <c:if test="${userRole == 'HR_MANAGER' || userRole == 'HR Manager' || userRole == 'DEPT_MANAGER' || userRole == 'Dept Manager'}">
                                 <div class="col-md-6 mb-3">
                                     <label for="assignedTo" class="form-label required-field">Assign To</label>
                                     <select class="form-select" id="assignedTo" name="assignedTo" required>

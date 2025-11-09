@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,25 +57,68 @@ public class AssignTaskServlet extends HttpServlet {
 
         // Check if user has permission to assign tasks (HR Manager or Dept Manager)
         String userRole = user.getRole();
-        if (!"HR_MANAGER".equals(userRole) && !"DEPT_MANAGER".equals(userRole)) {
+        boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+        boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
+        
+        if (!isHRManager && !isDeptManager) {
             session.setAttribute("errorMessage", "Access denied. Only managers can assign tasks.");
             response.sendRedirect(request.getContextPath() + "/");
             return;
         }
 
         // Get list of employees for assignment
-        List<Employee> employees;
-        if ("DEPT_MANAGER".equals(userRole)) {
-            // Department manager can only assign to employees in their department
-            Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
-            if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
-                employees = employeeDAO.getEmployeesByDepartment(managerEmployee.getDepartmentID());
-            } else {
+        List<Employee> employees = new ArrayList<>();
+        try {
+            if (isDeptManager) {
+                // Department manager can only assign to employees in their department
+                Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
+                System.out.println("Dept Manager - User ID: " + user.getUserId());
+                System.out.println("Dept Manager - Manager Employee: " + (managerEmployee != null ? "Found" : "Not Found"));
+                
+                if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
+                    System.out.println("Dept Manager - Department ID: " + managerEmployee.getDepartmentID());
+                    employees = employeeDAO.getEmployeesByDepartment(managerEmployee.getDepartmentID());
+                    
+                    // Remove the manager themselves from the list (managers shouldn't assign tasks to themselves)
+                    final int managerEmployeeID = managerEmployee.getEmployeeID();
+                    employees.removeIf(emp -> emp.getEmployeeID() == managerEmployeeID);
+                    
+                    System.out.println("Dept Manager - Found " + employees.size() + " employees in department " + managerEmployee.getDepartmentID());
+                    
+                    if (employees.isEmpty()) {
+                        session.setAttribute("errorMessage", "No employees found in your department. Please contact HR to add employees to your department.");
+                    }
+                } else {
+                    // If manager doesn't have employee record or department, show empty list
+                    employees = new ArrayList<>();
+                    System.out.println("Dept Manager - No employee record or department found for user " + user.getUserId());
+                    session.setAttribute("errorMessage", "Unable to load employees. Please ensure your employee record is linked to a department.");
+                }
+            } else if (isHRManager) {
+                // HR Manager can assign to any employee
                 employees = employeeDAO.getAllActiveEmployees();
+                System.out.println("HR Manager - Found " + employees.size() + " active employees");
+            } else {
+                // Fallback: empty list
+                employees = new ArrayList<>();
             }
-        } else {
-            // HR Manager can assign to any employee
-            employees = employeeDAO.getAllActiveEmployees();
+        } catch (Exception e) {
+            System.err.println("Error loading employees in AssignTaskServlet: " + e.getMessage());
+            e.printStackTrace();
+            employees = new ArrayList<>();
+            session.setAttribute("errorMessage", "Error loading employee list. Please try again.");
+        }
+
+        // Ensure employees list is not null
+        if (employees == null) {
+            employees = new ArrayList<>();
+        }
+
+        // Debug: Log employees before setting attribute
+        System.out.println("AssignTaskServlet - Setting employees attribute: " + employees.size() + " employees");
+        if (!employees.isEmpty()) {
+            Employee firstEmp = employees.get(0);
+            System.out.println("AssignTaskServlet - First employee ID: " + firstEmp.getEmployeeID());
         }
 
         // Get list of departments
@@ -82,10 +126,19 @@ public class AssignTaskServlet extends HttpServlet {
 
         // Set attributes for JSP
         request.setAttribute("employees", employees);
-        request.setAttribute("departments", departments);
+        request.setAttribute("departments", departments != null ? departments : new ArrayList<>());
+        
+        System.out.println("AssignTaskServlet - Employees attribute set. Size: " + employees.size());
 
         // Forward to JSP page
-        request.getRequestDispatcher("/task-mgt/assign-task.jsp").forward(request, response);
+        try {
+            request.getRequestDispatcher("/task-mgt/assign-task.jsp").forward(request, response);
+        } catch (Exception e) {
+            System.err.println("Error forwarding to JSP: " + e.getMessage());
+            e.printStackTrace();
+            session.setAttribute("errorMessage", "Error loading assign task form. Please try again.");
+            response.sendRedirect(request.getContextPath() + "/task/list");
+        }
     }
 
     /**
@@ -106,7 +159,10 @@ public class AssignTaskServlet extends HttpServlet {
 
         // Check if user has permission
         String userRole = user.getRole();
-        if (!"HR_MANAGER".equals(userRole) && !"DEPT_MANAGER".equals(userRole)) {
+        boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+        boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
+        
+        if (!isHRManager && !isDeptManager) {
             session.setAttribute("errorMessage", "Access denied. Only managers can assign tasks.");
             response.sendRedirect(request.getContextPath() + "/");
             return;
@@ -163,12 +219,19 @@ public class AssignTaskServlet extends HttpServlet {
                 return;
             }
 
+            // Get assigned employee details
+            Employee assignedEmployee = employeeDAO.getEmployeeById(assignedTo);
+            if (assignedEmployee == null) {
+                session.setAttribute("errorMessage", "Selected employee not found.");
+                response.sendRedirect(request.getContextPath() + "/task/assign");
+                return;
+            }
+
             // Additional validation for department managers
-            if ("DEPT_MANAGER".equals(userRole)) {
+            if (isDeptManager) {
                 Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
-                Employee assignedEmployee = employeeDAO.getEmployeeById(assignedTo);
                 
-                if (managerEmployee != null && assignedEmployee != null) {
+                if (managerEmployee != null) {
                     if (managerEmployee.getDepartmentID() != null && 
                         !managerEmployee.getDepartmentID().equals(assignedEmployee.getDepartmentID())) {
                         session.setAttribute("errorMessage", "You can only assign tasks to employees in your department.");
@@ -178,12 +241,19 @@ public class AssignTaskServlet extends HttpServlet {
                 }
             }
 
+            // If department_id is not specified in form, use the assigned employee's department
+            if (departmentId == null && assignedEmployee.getDepartmentID() != null) {
+                departmentId = assignedEmployee.getDepartmentID();
+                System.out.println("AssignTaskServlet - Auto-setting department_id to: " + departmentId + " from assigned employee");
+            }
+
             // Create task object
             Task task = new Task();
             task.setTaskTitle(taskTitle.trim());
             task.setTaskDescription(taskDescription != null ? taskDescription.trim() : "");
             task.setAssignedTo(assignedTo);
-            task.setAssignedBy(user.getUserId());
+            int assignedByUserId = user.getUserId();
+            task.setAssignedBy(assignedByUserId);
             task.setDepartmentId(departmentId);
             task.setPriority(priority != null && !priority.isEmpty() ? priority : "Medium");
             task.setStartDate(startDate);
@@ -191,8 +261,21 @@ public class AssignTaskServlet extends HttpServlet {
             task.setTaskStatus("Not Started");
             task.setProgressPercentage(0);
 
+            System.out.println("AssignTaskServlet - Creating task:");
+            System.out.println("  - Title: " + taskTitle);
+            System.out.println("  - AssignedTo (Employee ID): " + assignedTo);
+            System.out.println("  - AssignedBy (User ID): " + assignedByUserId);
+            System.out.println("  - AssignedBy (User Name): " + user.getFirstName() + " " + user.getLastName());
+            System.out.println("  - AssignedBy (User Email): " + user.getEmail());
+            System.out.println("  - DepartmentId: " + departmentId);
+            System.out.println("  - Priority: " + task.getPriority());
+            System.out.println("  - TaskStatus: " + task.getTaskStatus());
+            System.out.println("  - DueDate: " + dueDate);
+
             // Save to database
             int taskId = taskDAO.createTask(task);
+            
+            System.out.println("AssignTaskServlet - Task created with ID: " + taskId);
 
             if (taskId > 0) {
                 session.setAttribute("successMessage", "Task assigned successfully!");

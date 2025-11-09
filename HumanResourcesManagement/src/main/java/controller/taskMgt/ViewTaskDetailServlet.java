@@ -69,10 +69,12 @@ public class ViewTaskDetailServlet extends HttpServlet {
             // Check if user has permission to view this task
             String userRole = user.getRole();
             boolean canView = false;
+            boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+            boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
 
-            if ("HR_MANAGER".equals(userRole)) {
+            if (isHRManager) {
                 canView = true; // HR Manager can view any task
-            } else if ("DEPT_MANAGER".equals(userRole)) {
+            } else if (isDeptManager) {
                 // Dept Manager can view tasks they assigned or in their department
                 if (task.getAssignedBy() == user.getUserId()) {
                     canView = true;
@@ -99,6 +101,18 @@ public class ViewTaskDetailServlet extends HttpServlet {
                 return;
             }
 
+            // Auto-start task if start date has passed and status is still "Not Started"
+            if (task.shouldAutoStart()) {
+                System.out.println("ViewTaskDetailServlet - Auto-starting task " + taskId + 
+                                 " (start date: " + task.getStartDate() + " has passed)");
+                boolean updated = taskDAO.updateTaskStatus(taskId, "In Progress", 0, null);
+                if (updated) {
+                    // Reload task to get updated status
+                    task = taskDAO.getTaskById(taskId);
+                    System.out.println("ViewTaskDetailServlet - Task status auto-updated to: " + task.getTaskStatus());
+                }
+            }
+
             // Determine user's permissions for this task
             boolean canEdit = false;
             boolean canCancel = false;
@@ -106,11 +120,11 @@ public class ViewTaskDetailServlet extends HttpServlet {
 
             Employee currentEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
             
-            if ("HR_MANAGER".equals(userRole)) {
+            if (isHRManager) {
                 canEdit = task.canBeEdited();
                 canCancel = task.canBeCancelled();
                 canUpdateStatus = !task.isCancelled();
-            } else if ("DEPT_MANAGER".equals(userRole)) {
+            } else if (isDeptManager) {
                 if (task.getAssignedBy() == user.getUserId()) {
                     canEdit = task.canBeEdited();
                     canCancel = task.canBeCancelled();

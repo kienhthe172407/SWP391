@@ -52,21 +52,61 @@ public class ViewTaskListServlet extends HttpServlet {
 
         String userRole = user.getRole();
         List<Task> tasks = null;
-        String viewType = "assigned_to_me"; // Default view
-
+        
         // Get filter parameters
         String statusFilter = request.getParameter("status");
         String priorityFilter = request.getParameter("priority");
         String viewParam = request.getParameter("view");
 
+        // Determine default view based on role
+        boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
+        boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
+        
+        String viewType;
         if (viewParam != null && !viewParam.isEmpty()) {
             viewType = viewParam;
+        } else {
+            // Set default view based on role
+            if (isHRManager) {
+                viewType = "all_tasks"; // HR Manager sees all tasks by default
+            } else if (isDeptManager) {
+                viewType = "my_department"; // Dept Manager sees department tasks by default
+            } else {
+                viewType = "assigned_to_me"; // Employee sees only their tasks
+            }
         }
+        
+        System.out.println("ViewTaskListServlet - Role: " + userRole + ", ViewType: " + viewType);
 
         try {
-            // Determine which tasks to show based on role and view type
-            if ("HR_MANAGER".equals(userRole) || "DEPT_MANAGER".equals(userRole)) {
-                // Managers can view tasks they assigned or tasks in their department
+            if (isHRManager) {
+                // HR Manager can view all tasks or filter by specific criteria
+                if ("assigned_by_me".equals(viewType)) {
+                    // Tasks assigned by this HR manager
+                    if (statusFilter != null || priorityFilter != null) {
+                        tasks = taskDAO.searchTasks(null, user.getUserId(), statusFilter, priorityFilter, null);
+                    } else {
+                        tasks = taskDAO.getTasksByAssignedBy(user.getUserId());
+                    }
+                } else if ("all_tasks".equals(viewType)) {
+                    // All tasks in the system
+                    if (statusFilter != null || priorityFilter != null) {
+                        tasks = taskDAO.searchTasks(null, null, statusFilter, priorityFilter, null);
+                    } else {
+                        tasks = taskDAO.getAllTasks();
+                    }
+                } else {
+                    // Default: all tasks
+                    if (statusFilter != null || priorityFilter != null) {
+                        tasks = taskDAO.searchTasks(null, null, statusFilter, priorityFilter, null);
+                    } else {
+                        tasks = taskDAO.getAllTasks();
+                    }
+                }
+                System.out.println("ViewTaskListServlet - HR Manager loaded " + (tasks != null ? tasks.size() : 0) + " tasks");
+                
+            } else if (isDeptManager) {
+                // Dept Manager can view department tasks or tasks assigned by them
                 if ("assigned_by_me".equals(viewType)) {
                     // Tasks assigned by this manager
                     if (statusFilter != null || priorityFilter != null) {
@@ -74,7 +114,7 @@ public class ViewTaskListServlet extends HttpServlet {
                     } else {
                         tasks = taskDAO.getTasksByAssignedBy(user.getUserId());
                     }
-                } else if ("my_department".equals(viewType) && "DEPT_MANAGER".equals(userRole)) {
+                } else if ("my_department".equals(viewType)) {
                     // Tasks in manager's department
                     Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
                     if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
@@ -83,16 +123,21 @@ public class ViewTaskListServlet extends HttpServlet {
                         } else {
                             tasks = taskDAO.getTasksByDepartment(managerEmployee.getDepartmentID());
                         }
+                        System.out.println("ViewTaskListServlet - Dept Manager loaded " + (tasks != null ? tasks.size() : 0) + " tasks for department " + managerEmployee.getDepartmentID());
+                    } else {
+                        System.err.println("ViewTaskListServlet - Dept Manager has no department assigned");
+                        tasks = List.of();
                     }
                 } else {
-                    // Default: tasks assigned to me (if manager also has employee record)
+                    // Default: department tasks
                     Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
-                    if (managerEmployee != null) {
+                    if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
                         if (statusFilter != null || priorityFilter != null) {
-                            tasks = taskDAO.searchTasks(managerEmployee.getEmployeeID(), null, statusFilter, priorityFilter, null);
+                            tasks = taskDAO.searchTasks(null, null, statusFilter, priorityFilter, managerEmployee.getDepartmentID());
                         } else {
-                            tasks = taskDAO.getTasksByAssignedTo(managerEmployee.getEmployeeID());
+                            tasks = taskDAO.getTasksByDepartment(managerEmployee.getDepartmentID());
                         }
+                        System.out.println("ViewTaskListServlet - Dept Manager (default) loaded " + (tasks != null ? tasks.size() : 0) + " tasks for department " + managerEmployee.getDepartmentID());
                     }
                 }
             } else {
@@ -111,18 +156,55 @@ public class ViewTaskListServlet extends HttpServlet {
                 }
             }
 
-            // Get task statistics if viewing own tasks
-            if ("assigned_to_me".equals(viewType)) {
-                Employee employee = employeeDAO.getEmployeeByUserId(user.getUserId());
-                if (employee != null) {
-                    int[] taskCounts = taskDAO.getTaskCountsByStatus(employee.getEmployeeID());
-                    request.setAttribute("notStartedCount", taskCounts[0]);
-                    request.setAttribute("inProgressCount", taskCounts[1]);
-                    request.setAttribute("doneCount", taskCounts[2]);
-                    request.setAttribute("blockedCount", taskCounts[3]);
-                    request.setAttribute("cancelledCount", taskCounts[4]);
+            // Auto-start tasks if start date has passed and status is still "Not Started"
+            if (tasks != null && !tasks.isEmpty()) {
+                for (Task task : tasks) {
+                    if (task.shouldAutoStart()) {
+                        System.out.println("ViewTaskListServlet - Auto-starting task " + task.getTaskId() + 
+                                         " (start date: " + task.getStartDate() + " has passed)");
+                        boolean updated = taskDAO.updateTaskStatus(task.getTaskId(), "In Progress", 0, null);
+                        if (updated) {
+                            // Update task status in the list
+                            task.setTaskStatus("In Progress");
+                            System.out.println("ViewTaskListServlet - Task " + task.getTaskId() + " status auto-updated to: In Progress");
+                        }
+                    }
                 }
             }
+
+            // Get task statistics based on current view
+            int notStartedCount = 0, inProgressCount = 0, doneCount = 0, blockedCount = 0, cancelledCount = 0;
+            
+            if (tasks != null && !tasks.isEmpty()) {
+                for (Task task : tasks) {
+                    String status = task.getTaskStatus();
+                    if (status != null) {
+                        switch (status) {
+                            case "Not Started":
+                                notStartedCount++;
+                                break;
+                            case "In Progress":
+                                inProgressCount++;
+                                break;
+                            case "Done":
+                                doneCount++;
+                                break;
+                            case "Blocked":
+                                blockedCount++;
+                                break;
+                            case "Cancelled":
+                                cancelledCount++;
+                                break;
+                        }
+                    }
+                }
+            }
+            
+            request.setAttribute("notStartedCount", notStartedCount);
+            request.setAttribute("inProgressCount", inProgressCount);
+            request.setAttribute("doneCount", doneCount);
+            request.setAttribute("blockedCount", blockedCount);
+            request.setAttribute("cancelledCount", cancelledCount);
 
             // Set attributes for JSP
             request.setAttribute("tasks", tasks != null ? tasks : List.of());
@@ -130,6 +212,11 @@ public class ViewTaskListServlet extends HttpServlet {
             request.setAttribute("statusFilter", statusFilter != null ? statusFilter : "");
             request.setAttribute("priorityFilter", priorityFilter != null ? priorityFilter : "");
             request.setAttribute("userRole", userRole);
+            
+            System.out.println("ViewTaskListServlet - Statistics: Not Started=" + notStartedCount + 
+                             ", In Progress=" + inProgressCount + ", Done=" + doneCount + 
+                             ", Blocked=" + blockedCount + ", Cancelled=" + cancelledCount + 
+                             ", Total=" + (tasks != null ? tasks.size() : 0));
 
             // Forward to JSP page
             request.getRequestDispatcher("/task-mgt/list-tasks.jsp").forward(request, response);

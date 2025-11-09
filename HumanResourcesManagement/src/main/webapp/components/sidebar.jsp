@@ -193,9 +193,9 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/task/list">
                     <i class="fas fa-tasks"></i>
-                    <span>Task Assignment</span>
+                    <span>Task Management</span>
                 </a>
             </li>
             <li>
@@ -385,21 +385,15 @@
 
             <li class="menu-section">Task Management</li>
             <li>
-                <a href="#">
-                    <i class="fas fa-tasks"></i>
-                    <span>Assign Tasks</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/task/list">
                     <i class="fas fa-clipboard-list"></i>
                     <span>Task Board</span>
                 </a>
             </li>
             <li>
-                <a href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Task Statistics</span>
+                <a href="${pageContext.request.contextPath}/task/assign">
+                    <i class="fas fa-tasks"></i>
+                    <span>Assign Tasks</span>
                 </a>
             </li>
 
@@ -456,15 +450,9 @@
 
             <li class="menu-section">Tasks & Work</li>
             <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/task/list">
                     <i class="fas fa-tasks"></i>
                     <span>My Tasks</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Task Status</span>
                 </a>
             </li>
 

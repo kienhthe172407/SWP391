@@ -23,6 +23,17 @@
             content: " *";
             color: #dc2626;
         }
+        .card-body {
+            padding: 2rem;
+        }
+        .form-section {
+            margin-bottom: 2rem;
+        }
+        .form-section h5 {
+            color: #495057;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
     </style>
 </head>
 <body>
@@ -69,69 +80,115 @@
                     <i class="fas fa-plus-circle me-2"></i>Task Assignment Form
                 </div>
                 <div class="card-body">
-                    <form action="${pageContext.request.contextPath}/task/assign" method="POST">
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
+                    <form action="${pageContext.request.contextPath}/task/assign" method="post">
+                        <!-- Task Information Section -->
+                        <div class="form-section">
+                            <h5><i class="fas fa-info-circle me-2"></i>Task Information</h5>
+                            
+                            <div class="mb-3">
                                 <label for="taskTitle" class="form-label required-field">Task Title</label>
                                 <input type="text" class="form-control" id="taskTitle" name="taskTitle" 
-                                       placeholder="Enter task title" required maxlength="200">
+                                       placeholder="Enter task title" maxlength="200" required>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Enter a clear and concise title for the task (required, max 200 characters)
+                                </small>
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-12 mb-3">
+                            <div class="mb-3">
                                 <label for="taskDescription" class="form-label">Task Description</label>
                                 <textarea class="form-control" id="taskDescription" name="taskDescription" 
                                           rows="4" placeholder="Describe the task in detail"></textarea>
+                                <small class="form-text text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Provide detailed information about the task, including objectives, requirements, and any relevant context (optional)
+                                </small>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="assignedTo" class="form-label required-field">Assign To</label>
-                                <select class="form-select" id="assignedTo" name="assignedTo" required>
-                                    <option value="">-- Select Employee --</option>
-                                    <c:forEach var="employee" items="${employees}">
-                                        <option value="${employee.employeeID}">
-                                            ${employee.employeeCode} - ${employee.firstName} ${employee.lastName}
-                                            <c:if test="${not empty employee.departmentName}">
-                                                (${employee.departmentName})
-                                            </c:if>
-                                        </option>
-                                    </c:forEach>
-                                </select>
-                            </div>
+                        <!-- Assignment Section -->
+                        <hr class="my-4">
+                        <div class="form-section">
+                            <h5><i class="fas fa-user-check me-2"></i>Assignment</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="assignedTo" class="form-label required-field">Assign To</label>
+                                    <select class="form-select" id="assignedTo" name="assignedTo" required>
+                                        <option value="">-- Select Employee --</option>
+                                        <c:forEach var="employee" items="${employees}">
+                                            <option value="${employee.employeeID}">
+                                                ${employee.employeeCode} - ${employee.firstName} ${employee.lastName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                    <c:if test="${empty employees}">
+                                        <small class="form-text text-danger">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            No employees found. Please ensure your employee record is linked to a department.
+                                        </small>
+                                    </c:if>
+                                    <c:if test="${not empty employees}">
+                                        <small class="form-text text-muted">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Select the employee who will be responsible for completing this task (required)
+                                        </small>
+                                    </c:if>
+                                </div>
 
-                            <div class="col-md-6 mb-3">
-                                <label for="departmentId" class="form-label">Department</label>
-                                <select class="form-select" id="departmentId" name="departmentId">
-                                    <option value="">-- Select Department (Optional) --</option>
-                                    <c:forEach var="dept" items="${departments}">
-                                        <option value="${dept.departmentID}">${dept.departmentName}</option>
-                                    </c:forEach>
-                                </select>
+                                <div class="col-md-6 mb-3">
+                                    <label for="departmentId" class="form-label">Department</label>
+                                    <select class="form-select" id="departmentId" name="departmentId">
+                                        <option value="">-- Select Department (Optional) --</option>
+                                        <c:forEach var="dept" items="${departments}">
+                                            <option value="${dept.departmentId}">${dept.departmentName}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Optionally specify the department associated with this task (optional)
+                                    </small>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <label for="priority" class="form-label">Priority</label>
-                                <select class="form-select" id="priority" name="priority">
-                                    <option value="Low">Low</option>
-                                    <option value="Medium" selected>Medium</option>
-                                    <option value="High">High</option>
-                                    <option value="Urgent">Urgent</option>
-                                </select>
-                            </div>
+                        <!-- Priority and Dates Section -->
+                        <hr class="my-4">
+                        <div class="form-section">
+                            <h5><i class="fas fa-calendar-alt me-2"></i>Priority & Timeline</h5>
+                            
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label for="priority" class="form-label">Priority</label>
+                                    <select class="form-select" id="priority" name="priority">
+                                        <option value="Low">Low</option>
+                                        <option value="Medium" selected>Medium</option>
+                                        <option value="High">High</option>
+                                        <option value="Urgent">Urgent</option>
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        Set the priority level: Low, Medium, High, or Urgent (default: Medium)
+                                    </small>
+                                </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="startDate" class="form-label">Start Date</label>
-                                <input type="date" class="form-control" id="startDate" name="startDate">
-                            </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="startDate" class="form-label">Start Date</label>
+                                    <input type="date" class="form-control" id="startDate" name="startDate">
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        The date when work on this task should begin (optional)
+                                    </small>
+                                </div>
 
-                            <div class="col-md-4 mb-3">
-                                <label for="dueDate" class="form-label required-field">Due Date</label>
-                                <input type="date" class="form-control" id="dueDate" name="dueDate" required>
+                                <div class="col-md-4 mb-3">
+                                    <label for="dueDate" class="form-label required-field">Due Date</label>
+                                    <input type="date" class="form-control" id="dueDate" name="dueDate" required>
+                                    <small class="form-text text-muted">
+                                        <i class="fas fa-info-circle me-1"></i>
+                                        The deadline for completing this task (required, must be on or after start date)
+                                    </small>
+                                </div>
                             </div>
                         </div>
 
@@ -156,18 +213,26 @@
     
     <script>
         // Set minimum date to today for start and due dates
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById('startDate').setAttribute('min', today);
-        document.getElementById('dueDate').setAttribute('min', today);
-        
-        // Update due date minimum when start date changes
-        document.getElementById('startDate').addEventListener('change', function() {
-            const startDate = this.value;
-            if (startDate) {
-                document.getElementById('dueDate').setAttribute('min', startDate);
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            const startDateInput = document.getElementById('startDate');
+            const dueDateInput = document.getElementById('dueDate');
+            
+            if (startDateInput) {
+                startDateInput.setAttribute('min', today);
+            }
+            
+            if (dueDateInput) {
+                dueDateInput.setAttribute('min', today);
+            }
+            
+            // Validate due date is after start date
+            if (startDateInput && dueDateInput) {
+                startDateInput.addEventListener('change', function() {
+                    dueDateInput.setAttribute('min', this.value || today);
+                });
             }
         });
     </script>
 </body>
 </html>
-

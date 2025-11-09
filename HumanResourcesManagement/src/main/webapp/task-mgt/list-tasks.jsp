@@ -141,14 +141,17 @@
                 <div class="card-body">
                     <form action="${pageContext.request.contextPath}/task/list" method="GET" class="row g-3">
                         <!-- View Type (for managers) -->
-                        <c:if test="${userRole == 'HR_MANAGER' || userRole == 'DEPT_MANAGER'}">
+                        <c:if test="${userRole == 'HR_MANAGER' || userRole == 'HR Manager' || userRole == 'DEPT_MANAGER' || userRole == 'Dept Manager'}">
                             <div class="col-md-3">
                                 <label class="form-label">View</label>
                                 <select class="form-select" name="view" onchange="this.form.submit()">
                                     <option value="assigned_to_me" ${viewType == 'assigned_to_me' ? 'selected' : ''}>Assigned to Me</option>
                                     <option value="assigned_by_me" ${viewType == 'assigned_by_me' ? 'selected' : ''}>Assigned by Me</option>
-                                    <c:if test="${userRole == 'DEPT_MANAGER'}">
+                                    <c:if test="${userRole == 'DEPT_MANAGER' || userRole == 'Dept Manager'}">
                                         <option value="my_department" ${viewType == 'my_department' ? 'selected' : ''}>My Department</option>
+                                    </c:if>
+                                    <c:if test="${userRole == 'HR_MANAGER' || userRole == 'HR Manager'}">
+                                        <option value="all_tasks" ${viewType == 'all_tasks' ? 'selected' : ''}>All Tasks</option>
                                     </c:if>
                                 </select>
                             </div>
@@ -203,7 +206,7 @@
                             <c:otherwise>My Tasks</c:otherwise>
                         </c:choose>
                     </div>
-                    <c:if test="${userRole == 'HR_MANAGER' || userRole == 'DEPT_MANAGER'}">
+                    <c:if test="${userRole == 'HR_MANAGER' || userRole == 'HR Manager' || userRole == 'DEPT_MANAGER' || userRole == 'Dept Manager'}">
                         <a href="${pageContext.request.contextPath}/task/assign" class="btn btn-primary btn-sm">
                             <i class="fas fa-plus me-2"></i>Assign New Task
                         </a>
@@ -241,9 +244,16 @@
                                                 </p>
 
                                                 <div class="mb-2">
-                                                    <span class="badge ${task.statusBadgeClass}">${task.taskStatus}</span>
+                                                    <c:choose>
+                                                        <c:when test="${not empty task.taskStatus}">
+                                                            <span class="badge ${task.statusBadgeClass}">${task.taskStatus}</span>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="badge bg-secondary">Not Started</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
                                                     <c:if test="${task.overdue && !task.done && !task.cancelled}">
-                                                        <span class="badge badge-expired">Overdue</span>
+                                                        <span class="badge bg-danger ms-1">Overdue</span>
                                                     </c:if>
                                                 </div>
 
@@ -251,10 +261,26 @@
                                                     <div><i class="fas fa-user me-1"></i> 
                                                         <c:choose>
                                                             <c:when test="${viewType == 'assigned_by_me'}">
-                                                                Assigned to: ${task.assignedToName}
+                                                                Assigned to: 
+                                                                <c:choose>
+                                                                    <c:when test="${not empty task.assignedToName}">
+                                                                        ${task.assignedToName}
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-muted">Unknown</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </c:when>
                                                             <c:otherwise>
-                                                                Assigned by: ${task.assignedByName}
+                                                                Assigned by: 
+                                                                <c:choose>
+                                                                    <c:when test="${not empty task.assignedByName}">
+                                                                        ${task.assignedByName}
+                                                                    </c:when>
+                                                                    <c:otherwise>
+                                                                        <span class="text-muted">Unknown</span>
+                                                                    </c:otherwise>
+                                                                </c:choose>
                                                             </c:otherwise>
                                                         </c:choose>
                                                     </div>
@@ -281,7 +307,7 @@
                                                        class="btn btn-sm btn-action btn-view">
                                                         <i class="fas fa-eye me-1"></i>View
                                                     </a>
-                                                    <c:if test="${task.canBeEdited() && (userRole == 'HR_MANAGER' || userRole == 'DEPT_MANAGER')}">
+                                                    <c:if test="${task.canBeEdited() && (userRole == 'HR_MANAGER' || userRole == 'HR Manager' || userRole == 'DEPT_MANAGER' || userRole == 'Dept Manager')}">
                                                         <a href="${pageContext.request.contextPath}/task/edit?id=${task.taskId}" 
                                                            class="btn btn-sm btn-action btn-edit">
                                                             <i class="fas fa-edit me-1"></i>Edit
