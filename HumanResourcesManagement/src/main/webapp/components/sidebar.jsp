@@ -263,21 +263,9 @@
 
             <li class="menu-section">Reports & Analytics</li>
             <li>
-                <a href="#">
-                    <i class="fas fa-chart-bar"></i>
-                    <span>HR Reports</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Analytics</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/hr/statistics">
                     <i class="fas fa-chart-pie"></i>
-                    <span>Statistics</span>
+                    <span>HR Statistics & Reports</span>
                 </a>
             </li>
         </c:if>

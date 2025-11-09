@@ -49,7 +49,7 @@ public class ViewHRStatisticsServlet extends HttpServlet {
 
         // Check if user is HR Manager
         String userRole = user.getRole();
-        if (!"HR_MANAGER".equals(userRole)) {
+        if (!"HR_MANAGER".equals(userRole) && !"HR Manager".equals(userRole)) {
             session.setAttribute("errorMessage", "Access denied. Only HR Manager can view statistics.");
             response.sendRedirect(request.getContextPath() + "/");
             return;
@@ -83,8 +83,9 @@ public class ViewHRStatisticsServlet extends HttpServlet {
         } catch (Exception e) {
             System.err.println("Error in ViewHRStatisticsServlet: " + e.getMessage());
             e.printStackTrace();
-            session.setAttribute("errorMessage", "An error occurred while loading statistics.");
-            response.sendRedirect(request.getContextPath() + "/");
+            session.setAttribute("errorMessage", "An error occurred while loading statistics: " + e.getMessage());
+            // Redirect to HR Manager dashboard instead of home
+            response.sendRedirect(request.getContextPath() + "/dashboard/hr-manager");
         }
     }
 

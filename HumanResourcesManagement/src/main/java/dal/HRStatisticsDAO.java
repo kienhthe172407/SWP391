@@ -39,24 +39,35 @@ public class HRStatisticsDAO extends DBContext {
         // Total and active employees
         String sql = "SELECT " +
                      "COUNT(*) as total, " +
-                     "SUM(CASE WHEN employment_status = 'Active' THEN 1 ELSE 0 END) as active, " +
-                     "SUM(CASE WHEN employment_status = 'Terminated' THEN 1 ELSE 0 END) as terminated " +
-                     "FROM employees";
+                     "COALESCE(SUM(CASE WHEN employment_status = 'Active' THEN 1 ELSE 0 END), 0) as active, " +
+                     "COALESCE(SUM(CASE WHEN employment_status = 'Terminated' THEN 1 ELSE 0 END), 0) as terminated_count " +
+                     "FROM employees WHERE is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                stats.setTotalEmployees(rs.getInt("total"));
-                stats.setActiveEmployees(rs.getInt("active"));
-                stats.setTerminatedEmployees(rs.getInt("terminated"));
+                int total = rs.getInt("total");
+                int active = rs.getInt("active");
+                int terminated = rs.getInt("terminated_count");
+                System.out.println("Employee Statistics - Total: " + total + ", Active: " + active + ", Terminated: " + terminated);
+                stats.setTotalEmployees(total);
+                stats.setActiveEmployees(active);
+                stats.setTerminatedEmployees(terminated);
+            } else {
+                System.out.println("No employee data found");
+                stats.setTotalEmployees(0);
+                stats.setActiveEmployees(0);
+                stats.setTerminatedEmployees(0);
             }
         } catch (SQLException e) {
             System.err.println("Error getting employee statistics: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // New hires this month
         sql = "SELECT COUNT(*) as count FROM employees " +
-              "WHERE MONTH(hire_date) = MONTH(CURDATE()) AND YEAR(hire_date) = YEAR(CURDATE())";
+              "WHERE MONTH(hire_date) = MONTH(CURDATE()) AND YEAR(hire_date) = YEAR(CURDATE()) " +
+              "AND is_deleted = FALSE";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -67,7 +78,8 @@ public class HRStatisticsDAO extends DBContext {
         }
 
         // New hires this year
-        sql = "SELECT COUNT(*) as count FROM employees WHERE YEAR(hire_date) = YEAR(CURDATE())";
+        sql = "SELECT COUNT(*) as count FROM employees " +
+              "WHERE YEAR(hire_date) = YEAR(CURDATE()) AND is_deleted = FALSE";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -80,7 +92,8 @@ public class HRStatisticsDAO extends DBContext {
         // Employees by department
         sql = "SELECT d.department_name, COUNT(e.employee_id) as count " +
               "FROM departments d " +
-              "LEFT JOIN employees e ON d.department_id = e.department_id AND e.employment_status = 'Active' " +
+              "LEFT JOIN employees e ON d.department_id = e.department_id " +
+              "AND e.employment_status = 'Active' AND e.is_deleted = FALSE " +
               "GROUP BY d.department_id, d.department_name " +
               "ORDER BY count DESC";
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -97,7 +110,8 @@ public class HRStatisticsDAO extends DBContext {
         // Employees by position
         sql = "SELECT p.position_name, COUNT(e.employee_id) as count " +
               "FROM positions p " +
-              "LEFT JOIN employees e ON p.position_id = e.position_id AND e.employment_status = 'Active' " +
+              "LEFT JOIN employees e ON p.position_id = e.position_id " +
+              "AND e.employment_status = 'Active' AND e.is_deleted = FALSE " +
               "GROUP BY p.position_id, p.position_name " +
               "ORDER BY count DESC LIMIT 10";
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -112,7 +126,8 @@ public class HRStatisticsDAO extends DBContext {
         }
 
         // Employees by status
-        sql = "SELECT employment_status, COUNT(*) as count FROM employees GROUP BY employment_status";
+        sql = "SELECT employment_status, COUNT(*) as count FROM employees " +
+              "WHERE is_deleted = FALSE GROUP BY employment_status";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             Map<String, Integer> byStatus = new HashMap<>();
@@ -129,45 +144,67 @@ public class HRStatisticsDAO extends DBContext {
      * Get attendance statistics
      */
     private void getAttendanceStatistics(HRStatistics stats) {
-        // Today's attendance
+        // Today's attendance - if no data for today, get latest available date
         String sql = "SELECT " +
-                     "SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present, " +
-                     "SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent, " +
-                     "SUM(CASE WHEN status = 'Late' THEN 1 ELSE 0 END) as late, " +
-                     "SUM(CASE WHEN status = 'Remote' THEN 1 ELSE 0 END) as remote " +
+                     "COALESCE(SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END), 0) as present, " +
+                     "COALESCE(SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END), 0) as absent, " +
+                     "COALESCE(SUM(CASE WHEN status = 'Late' THEN 1 ELSE 0 END), 0) as late, " +
+                     "COALESCE(SUM(CASE WHEN status = 'Remote' THEN 1 ELSE 0 END), 0) as remote " +
                      "FROM attendance_records " +
-                     "WHERE attendance_date = CURDATE()";
+                     "WHERE attendance_date = (SELECT MAX(attendance_date) FROM attendance_records)";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                stats.setTotalPresentToday(rs.getInt("present"));
-                stats.setTotalAbsentToday(rs.getInt("absent"));
-                stats.setTotalLateToday(rs.getInt("late"));
-                stats.setTotalRemoteToday(rs.getInt("remote"));
+                int present = rs.getInt("present");
+                int absent = rs.getInt("absent");
+                int late = rs.getInt("late");
+                int remote = rs.getInt("remote");
+                System.out.println("Today's Attendance - Present: " + present + ", Absent: " + absent + ", Late: " + late + ", Remote: " + remote);
+                stats.setTotalPresentToday(present);
+                stats.setTotalAbsentToday(absent);
+                stats.setTotalLateToday(late);
+                stats.setTotalRemoteToday(remote);
+            } else {
+                // No data for today, set all to 0
+                System.out.println("No attendance data for today (CURDATE())");
+                stats.setTotalPresentToday(0);
+                stats.setTotalAbsentToday(0);
+                stats.setTotalLateToday(0);
+                stats.setTotalRemoteToday(0);
             }
         } catch (SQLException e) {
             System.err.println("Error getting today's attendance: " + e.getMessage());
+            e.printStackTrace();
         }
 
-        // Average attendance rate (last 30 days)
+        // Average attendance rate (last 30 days from latest date or all available data)
         sql = "SELECT " +
-              "(SUM(CASE WHEN status IN ('Present', 'Late', 'Remote', 'Business Trip') THEN 1 ELSE 0 END) * 100.0 / " +
-              "COUNT(*)) as rate " +
+              "COALESCE((SUM(CASE WHEN status IN ('Present', 'Late', 'Remote', 'Business Trip') THEN 1 ELSE 0 END) * 100.0 / " +
+              "NULLIF(COUNT(*), 0)), 0) as rate " +
               "FROM attendance_records " +
-              "WHERE attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY)";
+              "WHERE attendance_date >= GREATEST(DATE_SUB((SELECT MAX(attendance_date) FROM attendance_records), INTERVAL 30 DAY), " +
+              "(SELECT MIN(attendance_date) FROM attendance_records))";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
-                stats.setAverageAttendanceRate(rs.getDouble("rate"));
+                double rate = rs.getDouble("rate");
+                if (rs.wasNull()) {
+                    rate = 0.0;
+                }
+                stats.setAverageAttendanceRate(rate);
+            } else {
+                stats.setAverageAttendanceRate(0.0);
             }
         } catch (SQLException e) {
             System.err.println("Error getting average attendance rate: " + e.getMessage());
+            e.printStackTrace();
         }
 
-        // Attendance by status (last 30 days)
+        // Attendance by status (last 30 days from latest date or all available data)
         sql = "SELECT status, COUNT(*) as count FROM attendance_records " +
-              "WHERE attendance_date >= DATE_SUB(CURDATE(), INTERVAL 30 DAY) " +
+              "WHERE attendance_date >= GREATEST(DATE_SUB((SELECT MAX(attendance_date) FROM attendance_records), INTERVAL 30 DAY), " +
+              "(SELECT MIN(attendance_date) FROM attendance_records)) " +
               "GROUP BY status";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -188,7 +225,7 @@ public class HRStatisticsDAO extends DBContext {
         // Job postings count
         String sql = "SELECT " +
                      "COUNT(*) as total, " +
-                     "SUM(CASE WHEN status = 'Active' AND deadline >= CURDATE() THEN 1 ELSE 0 END) as active " +
+                     "SUM(CASE WHEN job_status = 'Open' AND application_deadline >= CURDATE() THEN 1 ELSE 0 END) as active " +
                      "FROM job_postings WHERE is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -266,7 +303,7 @@ public class HRStatisticsDAO extends DBContext {
                      "COUNT(*) as total, " +
                      "SUM(CASE WHEN task_status = 'Done' THEN 1 ELSE 0 END) as completed, " +
                      "SUM(CASE WHEN task_status = 'In Progress' THEN 1 ELSE 0 END) as in_progress, " +
-                     "SUM(CASE WHEN task_status NOT IN ('Done', 'Cancelled') AND due_date < CURDATE() THEN 1 ELSE 0 END) as overdue " +
+                     "SUM(CASE WHEN task_status NOT IN ('Done', 'Cancelled') AND due_date IS NOT NULL AND due_date < CURDATE() THEN 1 ELSE 0 END) as overdue " +
                      "FROM tasks WHERE is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -325,7 +362,7 @@ public class HRStatisticsDAO extends DBContext {
         String sql = "SELECT " +
                      "COUNT(*) as total, " +
                      "SUM(CASE WHEN request_status = 'Pending' THEN 1 ELSE 0 END) as pending " +
-                     "FROM requests";
+                     "FROM requests WHERE is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -342,7 +379,9 @@ public class HRStatisticsDAO extends DBContext {
               "SUM(CASE WHEN request_status = 'Approved' THEN 1 ELSE 0 END) as approved, " +
               "SUM(CASE WHEN request_status = 'Rejected' THEN 1 ELSE 0 END) as rejected " +
               "FROM requests " +
-              "WHERE MONTH(reviewed_at) = MONTH(CURDATE()) AND YEAR(reviewed_at) = YEAR(CURDATE())";
+              "WHERE is_deleted = FALSE " +
+              "AND reviewed_at IS NOT NULL " +
+              "AND MONTH(reviewed_at) = MONTH(CURDATE()) AND YEAR(reviewed_at) = YEAR(CURDATE())";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -357,6 +396,7 @@ public class HRStatisticsDAO extends DBContext {
         sql = "SELECT rt.request_type_name, COUNT(r.request_id) as count " +
               "FROM request_types rt " +
               "LEFT JOIN requests r ON rt.request_type_id = r.request_type_id " +
+              "AND r.is_deleted = FALSE " +
               "GROUP BY rt.request_type_id, rt.request_type_name";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -370,7 +410,8 @@ public class HRStatisticsDAO extends DBContext {
         }
 
         // Requests by status
-        sql = "SELECT request_status, COUNT(*) as count FROM requests GROUP BY request_status";
+        sql = "SELECT request_status, COUNT(*) as count FROM requests " +
+              "WHERE is_deleted = FALSE GROUP BY request_status";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             Map<String, Integer> byStatus = new HashMap<>();
@@ -393,7 +434,7 @@ public class HRStatisticsDAO extends DBContext {
                      "SUM(CASE WHEN contract_status = 'Active' THEN 1 ELSE 0 END) as active, " +
                      "SUM(CASE WHEN contract_status = 'Expired' THEN 1 ELSE 0 END) as expired, " +
                      "SUM(CASE WHEN contract_status = 'Active' AND end_date BETWEEN CURDATE() AND DATE_ADD(CURDATE(), INTERVAL 30 DAY) THEN 1 ELSE 0 END) as expiring " +
-                     "FROM contracts WHERE is_deleted = FALSE";
+                     "FROM employment_contracts WHERE is_deleted = FALSE";
         
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -408,7 +449,7 @@ public class HRStatisticsDAO extends DBContext {
         }
 
         // Contracts by type
-        sql = "SELECT contract_type, COUNT(*) as count FROM contracts " +
+        sql = "SELECT contract_type, COUNT(*) as count FROM employment_contracts " +
               "WHERE is_deleted = FALSE GROUP BY contract_type";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -426,8 +467,15 @@ public class HRStatisticsDAO extends DBContext {
      * Get salary statistics
      */
     private void getSalaryStatistics(HRStatistics stats) {
-        // Average salary
-        String sql = "SELECT AVG(base_salary) as avg_salary FROM employees WHERE employment_status = 'Active'";
+        // Average salary - get from salary_components (active components for active employees)
+        String sql = "SELECT AVG(sc.base_salary) as avg_salary " +
+                     "FROM salary_components sc " +
+                     "INNER JOIN employees e ON sc.employee_id = e.employee_id " +
+                     "WHERE e.employment_status = 'Active' " +
+                     "AND e.is_deleted = FALSE " +
+                     "AND sc.is_active = TRUE " +
+                     "AND sc.is_deleted = FALSE " +
+                     "AND (sc.effective_to IS NULL OR sc.effective_to >= CURDATE())";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -437,12 +485,16 @@ public class HRStatisticsDAO extends DBContext {
             System.err.println("Error getting average salary: " + e.getMessage());
         }
 
-        // Average salary by department
-        sql = "SELECT d.department_name, AVG(e.base_salary) as avg_salary " +
+        // Average salary by department - get from salary_components
+        sql = "SELECT d.department_name, AVG(sc.base_salary) as avg_salary " +
               "FROM departments d " +
-              "LEFT JOIN employees e ON d.department_id = e.department_id AND e.employment_status = 'Active' " +
+              "LEFT JOIN employees e ON d.department_id = e.department_id " +
+              "AND e.employment_status = 'Active' AND e.is_deleted = FALSE " +
+              "LEFT JOIN salary_components sc ON e.employee_id = sc.employee_id " +
+              "AND sc.is_active = TRUE AND sc.is_deleted = FALSE " +
+              "AND (sc.effective_to IS NULL OR sc.effective_to >= CURDATE()) " +
               "GROUP BY d.department_id, d.department_name " +
-              "HAVING AVG(e.base_salary) IS NOT NULL";
+              "HAVING AVG(sc.base_salary) IS NOT NULL";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             Map<String, Double> byDept = new HashMap<>();
@@ -458,9 +510,9 @@ public class HRStatisticsDAO extends DBContext {
         sql = "SELECT " +
               "COALESCE(SUM(net_salary), 0) as total_payroll, " +
               "COALESCE(SUM(total_bonus), 0) as total_bonus, " +
-              "COALESCE(SUM(total_deduction), 0) as total_deduction " +
+              "COALESCE(SUM(total_deductions), 0) as total_deduction " +
               "FROM monthly_payroll " +
-              "WHERE month = MONTH(CURDATE()) AND year = YEAR(CURDATE())";
+              "WHERE MONTH(payroll_month) = MONTH(CURDATE()) AND YEAR(payroll_month) = YEAR(CURDATE())";
         try (PreparedStatement ps = connection.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -477,10 +529,13 @@ public class HRStatisticsDAO extends DBContext {
      * Get trend data for charts
      */
     private void getTrendData(HRStatistics stats) {
-        // Employee growth by month (last 12 months)
+        // Employee growth by month (last 12 months from latest hire date, or all data if less than 12 months)
+        // For demo purposes, show all available data grouped by month
         String sql = "SELECT DATE_FORMAT(hire_date, '%Y-%m') as month, COUNT(*) as count " +
                      "FROM employees " +
-                     "WHERE hire_date >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH) " +
+                     "WHERE is_deleted = FALSE " +
+                     "AND hire_date >= GREATEST(DATE_SUB((SELECT MAX(hire_date) FROM employees WHERE is_deleted = FALSE), INTERVAL 12 MONTH), " +
+                     "(SELECT MIN(hire_date) FROM employees WHERE is_deleted = FALSE)) " +
                      "GROUP BY DATE_FORMAT(hire_date, '%Y-%m') " +
                      "ORDER BY month";
         try (PreparedStatement ps = connection.prepareStatement(sql);
@@ -495,11 +550,13 @@ public class HRStatisticsDAO extends DBContext {
             System.err.println("Error getting employee growth trend: " + e.getMessage());
         }
 
-        // Attendance trend by month (last 6 months)
+        // Attendance trend by month (last 6 months from latest date or all available data)
         sql = "SELECT DATE_FORMAT(attendance_date, '%Y-%m') as month, " +
-              "(SUM(CASE WHEN status IN ('Present', 'Late', 'Remote', 'Business Trip') THEN 1 ELSE 0 END) * 100.0 / COUNT(*)) as rate " +
+              "COALESCE((SUM(CASE WHEN status IN ('Present', 'Late', 'Remote', 'Business Trip') THEN 1 ELSE 0 END) * 100.0 / " +
+              "NULLIF(COUNT(*), 0)), 0) as rate " +
               "FROM attendance_records " +
-              "WHERE attendance_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH) " +
+              "WHERE attendance_date >= GREATEST(DATE_SUB((SELECT MAX(attendance_date) FROM attendance_records), INTERVAL 6 MONTH), " +
+              "(SELECT MIN(attendance_date) FROM attendance_records)) " +
               "GROUP BY DATE_FORMAT(attendance_date, '%Y-%m') " +
               "ORDER BY month";
         try (PreparedStatement ps = connection.prepareStatement(sql);

@@ -109,7 +109,7 @@
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="icon" style="background: #667eea;">
                             <i class="fas fa-users"></i>
                         </div>
                         <div class="value text-primary">${statistics.totalEmployees}</div>
@@ -118,7 +118,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="icon" style="background: #f093fb;">
                             <i class="fas fa-user-check"></i>
                         </div>
                         <div class="value text-success">${statistics.activeEmployees}</div>
@@ -127,7 +127,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="icon" style="background: #4facfe;">
                             <i class="fas fa-user-plus"></i>
                         </div>
                         <div class="value text-info">${statistics.newHiresThisMonth}</div>
@@ -136,7 +136,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="icon" style="background: #fa709a;">
                             <i class="fas fa-calendar-alt"></i>
                         </div>
                         <div class="value text-warning">${statistics.newHiresThisYear}</div>
@@ -178,7 +178,7 @@
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="icon" style="background: #43e97b;">
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="value text-success">${statistics.totalPresentToday}</div>
@@ -187,7 +187,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="icon" style="background: #fa709a;">
                             <i class="fas fa-exclamation-circle"></i>
                         </div>
                         <div class="value text-warning">${statistics.totalLateToday}</div>
@@ -196,7 +196,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="icon" style="background: #f093fb;">
                             <i class="fas fa-times-circle"></i>
                         </div>
                         <div class="value text-danger">${statistics.totalAbsentToday}</div>
@@ -205,7 +205,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="icon" style="background: #4facfe;">
                             <i class="fas fa-home"></i>
                         </div>
                         <div class="value text-info">${statistics.totalRemoteToday}</div>
@@ -253,7 +253,7 @@
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="icon" style="background: #667eea;">
                             <i class="fas fa-clipboard-list"></i>
                         </div>
                         <div class="value text-primary">${statistics.totalJobPostings}</div>
@@ -262,7 +262,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="icon" style="background: #43e97b;">
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="value text-success">${statistics.activeJobPostings}</div>
@@ -271,7 +271,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="icon" style="background: #4facfe;">
                             <i class="fas fa-file-alt"></i>
                         </div>
                         <div class="value text-info">${statistics.totalApplications}</div>
@@ -280,7 +280,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="icon" style="background: #fa709a;">
                             <i class="fas fa-calendar-check"></i>
                         </div>
                         <div class="value text-warning">${statistics.applicationsThisMonth}</div>
@@ -321,7 +321,7 @@
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="icon" style="background: #667eea;">
                             <i class="fas fa-tasks"></i>
                         </div>
                         <div class="value text-primary">${statistics.totalTasks}</div>
@@ -330,7 +330,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="icon" style="background: #43e97b;">
                             <i class="fas fa-check-double"></i>
                         </div>
                         <div class="value text-success">${statistics.completedTasks}</div>
@@ -339,7 +339,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                        <div class="icon" style="background: #4facfe;">
                             <i class="fas fa-spinner"></i>
                         </div>
                         <div class="value text-info">${statistics.inProgressTasks}</div>
@@ -348,7 +348,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="icon" style="background: #f093fb;">
                             <i class="fas fa-exclamation-triangle"></i>
                         </div>
                         <div class="value text-danger">${statistics.overdueTasksCount}</div>
@@ -396,7 +396,7 @@
             <div class="row mb-4">
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <div class="icon" style="background: #667eea;">
                             <i class="fas fa-file-alt"></i>
                         </div>
                         <div class="value text-primary">${statistics.totalRequests}</div>
@@ -405,7 +405,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                        <div class="icon" style="background: #fa709a;">
                             <i class="fas fa-clock"></i>
                         </div>
                         <div class="value text-warning">${statistics.pendingRequests}</div>
@@ -414,7 +414,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                        <div class="icon" style="background: #43e97b;">
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="value text-success">${statistics.approvedRequestsThisMonth}</div>
@@ -423,7 +423,7 @@
                 </div>
                 <div class="col-md-3 mb-3">
                     <div class="stats-card">
-                        <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                        <div class="icon" style="background: #f093fb;">
                             <i class="fas fa-times-circle"></i>
                         </div>
                         <div class="value text-danger">${statistics.rejectedRequestsThisMonth}</div>
@@ -466,7 +466,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6 mb-3">
                             <div class="stats-card">
-                                <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="icon" style="background: #667eea;">
                                     <i class="fas fa-file-contract"></i>
                                 </div>
                                 <div class="value text-primary">${statistics.totalContracts}</div>
@@ -475,7 +475,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="stats-card">
-                                <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                <div class="icon" style="background: #43e97b;">
                                     <i class="fas fa-check-circle"></i>
                                 </div>
                                 <div class="value text-success">${statistics.activeContracts}</div>
@@ -484,7 +484,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="stats-card">
-                                <div class="icon" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);">
+                                <div class="icon" style="background: #fa709a;">
                                     <i class="fas fa-exclamation-triangle"></i>
                                 </div>
                                 <div class="value text-warning">${statistics.expiringContractsThisMonth}</div>
@@ -493,7 +493,7 @@
                         </div>
                         <div class="col-md-6 mb-3">
                             <div class="stats-card">
-                                <div class="icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <div class="icon" style="background: #f093fb;">
                                     <i class="fas fa-times-circle"></i>
                                 </div>
                                 <div class="value text-danger">${statistics.expiredContracts}</div>
@@ -508,7 +508,7 @@
                     <div class="row mb-3">
                         <div class="col-md-12 mb-3">
                             <div class="stats-card">
-                                <div class="icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <div class="icon" style="background: #667eea;">
                                     <i class="fas fa-money-bill-wave"></i>
                                 </div>
                                 <div class="value text-primary">
@@ -519,7 +519,7 @@
                         </div>
                         <div class="col-md-12 mb-3">
                             <div class="stats-card">
-                                <div class="icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
+                                <div class="icon" style="background: #43e97b;">
                                     <i class="fas fa-wallet"></i>
                                 </div>
                                 <div class="value text-success">
