@@ -95,6 +95,16 @@
             --bs-btn-disabled-border-color: #fd7e14;
             --bs-btn-focus-shadow-rgb: 253,126,20;
         }
+        
+        /* Approval Queue button: text white on hover */
+        .btn-outline-warning:hover,
+        .btn-outline-warning:hover i,
+        .btn-outline-warning:focus,
+        .btn-outline-warning:focus i,
+        .btn-outline-warning:active,
+        .btn-outline-warning:active i {
+            color: #fff !important;
+        }
     </style>
 </head>
 <body>
@@ -123,6 +133,11 @@
                 <a href="${pageContext.request.contextPath}/attendance/monthly-report" class="btn btn-outline-primary">
                     <i class="fas fa-calendar-alt me-2"></i>Monthly Report
                 </a>
+                <c:if test="${sessionScope.user != null && (sessionScope.user.role == 'HR Manager' || sessionScope.user.role == 'HR_MANAGER' || sessionScope.user.role == 'HR')}">
+                    <a href="${pageContext.request.contextPath}/attendance/exception/list" class="btn btn-outline-warning">
+                        <i class="fas fa-clipboard-check me-2"></i>Approval Queue
+                    </a>
+                </c:if>
             </div>
         </div>
         

@@ -3,6 +3,7 @@ package controller.salaryMgt;
 import model.SalaryComponent;
 import model.SalaryPreviewData;
 import model.SalaryPreviewData.SalaryPreviewRecord;
+import model.User;
 import dal.SalaryComponentDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -31,11 +32,18 @@ public class SaveImportedSalaryServlet extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        // Check permission
-        String userRole = (String) session.getAttribute("userRole");
-        if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
+        // Check authentication
+        if (session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
+        }
+        
+        // Check authorization (HR and HR Manager only)
+        User user = (User) session.getAttribute("user");
+        String role = user.getRole();
+        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
             session.setAttribute("errorMessage", "Access denied. Only HR staff can save salary data.");
-            response.sendRedirect(request.getContextPath() + "/dashboard/hr-dashboard.jsp");
+            response.sendRedirect(request.getContextPath() + "/");
             return;
         }
         

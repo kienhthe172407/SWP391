@@ -23,7 +23,7 @@
         .filter-section {
             background-color: #f8f9fa;
             border-radius: 0.375rem;
-            padding: 1.5rem 0; /* remove left/right padding */
+            padding: 0 0 1.5rem 0; /* remove top and left/right padding, keep bottom */
             margin-bottom: 1.5rem;
         }
         .text-nowrap { white-space: nowrap; }
@@ -76,40 +76,64 @@
             
             <!-- Filter Section -->
             <div class="filter-section">
-                <h5 class="mb-3"><i class="fas fa-filter me-2"></i>Filter Attendance Records</h5>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h5 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Attendance Records</h5>
+                    <!-- Approval Queue Button for Dept Manager - Right side with whitespace -->
+                    <c:if test="${isDeptManager}">
+                        <a href="${pageContext.request.contextPath}/attendance/exception/list" class="btn btn-outline-primary">
+                            <i class="fas fa-clipboard-check me-1"></i>Approval Queue
+                        </a>
+                    </c:if>
+                </div>
                 <form method="GET" action="${pageContext.request.contextPath}/attendance/summary" id="filterForm">
                     <div class="row g-3">
-                        <div class="col-md-3">
-                            <label for="employeeCode" class="form-label">Employee</label>
-                            <select class="form-select" id="employeeCode" name="employeeCode">
-                                <option value="">All Employees</option>
-                                <c:forEach var="emp" items="${employees}">
-                                    <option value="${emp.employeeCode}" ${filterEmployeeCode == emp.employeeCode ? 'selected' : ''}>
-                                        ${emp.employeeCode} - ${emp.firstName} ${emp.lastName}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label for="departmentId" class="form-label">Department</label>
-                            <select class="form-select" id="departmentId" name="departmentId">
-                                <option value="">All Departments</option>
-                                <c:forEach var="dept" items="${departments}">
-                                    <option value="${dept.departmentId}" ${filterDepartmentId == dept.departmentId ? 'selected' : ''}>
-                                        ${dept.departmentName}
-                                    </option>
-                                </c:forEach>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
+                        <c:if test="${!isEmployee}">
+                            <!-- Employee filter - for HR, HR Manager, and Dept Manager -->
+                            <div class="col-md-${isDeptManager ? '4' : '3'}">
+                                <label for="employeeCode" class="form-label">Employee</label>
+                                <select class="form-select" id="employeeCode" name="employeeCode">
+                                    <option value="">All Employees</option>
+                                    <c:forEach var="emp" items="${employees}">
+                                        <option value="${emp.employeeCode}" ${filterEmployeeCode == emp.employeeCode ? 'selected' : ''}>
+                                            ${emp.employeeCode} - ${emp.firstName} ${emp.lastName}
+                                        </option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <!-- Department filter - only for HR and HR Manager -->
+                            <c:if test="${!isDeptManager}">
+                                <div class="col-md-3">
+                                    <label for="departmentId" class="form-label">Department</label>
+                                    <select class="form-select" id="departmentId" name="departmentId">
+                                        <option value="">All Departments</option>
+                                        <c:forEach var="dept" items="${departments}">
+                                            <option value="${dept.departmentId}" ${filterDepartmentId == dept.departmentId ? 'selected' : ''}>
+                                                ${dept.departmentName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </c:if>
+                        </c:if>
+                        <c:if test="${isEmployee}">
+                            <!-- Employee info display - only for Employee -->
+                            <div class="col-md-4">
+                                <label class="form-label">Employee</label>
+                                <div class="form-control-plaintext">
+                                    <strong>${currentEmployee.employeeCode} - ${currentEmployee.firstName} ${currentEmployee.lastName}</strong>
+                                    <span class="text-muted">(${currentEmployee.departmentName})</span>
+                                </div>
+                            </div>
+                        </c:if>
+                        <div class="col-md-${isEmployee ? '2' : (isDeptManager ? '2' : '2')}">
                             <label for="startDate" class="form-label">Start Date</label>
                             <input type="date" class="form-control" id="startDate" name="startDate" value="${filterStartDate}">
                         </div>
-                        <div class="col-md-2">
+                        <div class="col-md-${isEmployee ? '2' : (isDeptManager ? '2' : '2')}">
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="date" class="form-control" id="endDate" name="endDate" value="${filterEndDate}">
                         </div>
-                        <div class="col-md-2 d-flex align-items-end">
+                        <div class="col-md-${isEmployee ? '4' : (isDeptManager ? '4' : '2')} d-flex align-items-end">
                             <div class="d-flex w-100 gap-2">
                                 <button type="submit" class="btn btn-primary flex-fill">
                                     <i class="fas fa-search me-1"></i>Filter
@@ -124,7 +148,7 @@
             </div>
             
             <!-- Attendance Summary Section -->
-            <c:if test="${(not empty summary) and ((not empty filterEmployeeCode) or (not empty filterDepartmentId))}">
+            <c:if test="${(not empty summary) and ((not empty filterEmployeeCode) or (not empty filterDepartmentId) or isEmployee or isDeptManager)}">
                 <div class="card mb-3">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <span>
@@ -137,6 +161,9 @@
                                 <c:when test="${empty filterEmployeeCode and not empty filterDepartmentId}">
                                     <span class="text-muted">(by Department)</span>
                                 </c:when>
+                                <c:when test="${isDeptManager}">
+                                    <span class="text-muted">(My Department)</span>
+                                </c:when>
                             </c:choose>
                         </span>
                         <small class="text-muted">
@@ -148,6 +175,9 @@
                                 <c:forEach var="d" items="${departments}">
                                     <c:if test="${d.departmentId == filterDepartmentId}">${d.departmentName}</c:if>
                                 </c:forEach>
+                            </c:if>
+                            <c:if test="${isDeptManager && empty filterDepartmentId}">
+                                &nbsp;· My Department
                             </c:if>
                             <c:if test="${not empty filterEmployeeCode}">
                                 &nbsp;· Emp:
@@ -211,7 +241,7 @@
                     </div>
                 </div>
             </c:if>
-            <c:if test="${empty filterEmployeeCode and empty filterDepartmentId}">
+            <c:if test="${empty filterEmployeeCode and empty filterDepartmentId && !isEmployee && !isDeptManager}">
                 <div class="alert alert-info d-flex align-items-center mb-3" role="alert">
                     <i class="fas fa-info-circle me-2"></i>
                     Please select an Employee or a Department to view the aggregated Attendance Summary. Otherwise, the system will only display detailed records.
@@ -224,7 +254,14 @@
                     <span><i class="fas fa-table me-2"></i>Attendance Records</span>
                     <div class="d-flex align-items-center gap-2">
                         <span class="badge bg-light text-dark">${totalRecords} total records</span>
-                        <c:if test="${not empty attendanceRecords}">
+                        <!-- Exception Requests Button - only for Employee -->
+                        <c:if test="${isEmployee}">
+                            <a href="${pageContext.request.contextPath}/attendance/exception/list" class="btn btn-outline-warning btn-sm">
+                                <i class="fas fa-exclamation-circle me-1"></i>My Exception Requests
+                            </a>
+                        </c:if>
+                        <c:if test="${not empty attendanceRecords && !isEmployee && !isDeptManager}">
+                            <!-- Export button - only for HR and HR Manager -->
                             <div class="btn-group" role="group">
                                 <button type="button" class="btn btn-outline-success btn-sm dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-download me-1"></i>Export
@@ -258,24 +295,35 @@
                                 <table class="table table-hover table-striped">
                                     <thead class="table-dark">
                                         <tr>
-                                            <th class="text-nowrap" style="width: 5%;">#</th>
-                                            <th class="text-nowrap" style="width: 12%;">Employee Code</th>
-                                            <th class="text-nowrap" style="width: 18%;">Employee Name</th>
-                                            <th class="text-nowrap" style="width: 12%;">Date</th>
-                                            <th class="text-nowrap" style="width: 10%;">Check-in</th>
-                                            <th class="text-nowrap" style="width: 10%;">Check-out</th>
-                                            <th class="text-nowrap" style="width: 12%;">Status</th>
-                                            <th class="text-nowrap" style="width: 8%;">Overtime</th>
-                                            <th class="text-nowrap" style="width: 10%;">Adjustment</th>
-                                            <th class="text-nowrap" style="width: 10%;">Actions</th>
+                                            <c:if test="${!isEmployee}">
+                                                <th class="text-nowrap" style="width: 12%;">Employee Code</th>
+                                                <th class="text-nowrap" style="width: 18%;">Employee Name</th>
+                                                <th class="text-nowrap" style="width: 12%;">Date</th>
+                                                <th class="text-nowrap" style="width: 10%;">Check-in</th>
+                                                <th class="text-nowrap" style="width: 10%;">Check-out</th>
+                                                <th class="text-nowrap" style="width: 12%;">Status</th>
+                                                <th class="text-nowrap" style="width: 8%;">Overtime</th>
+                                                <th class="text-nowrap" style="width: 10%;">Adjustment</th>
+                                                <th class="text-nowrap" style="width: 10%;">Actions</th>
+                                            </c:if>
+                                            <c:if test="${isEmployee}">
+                                                <th class="text-nowrap" style="width: 15%;">Date</th>
+                                                <th class="text-nowrap" style="width: 12%;">Check-in</th>
+                                                <th class="text-nowrap" style="width: 12%;">Check-out</th>
+                                                <th class="text-nowrap" style="width: 15%;">Status</th>
+                                                <th class="text-nowrap" style="width: 10%;">Overtime</th>
+                                                <th class="text-nowrap" style="width: 12%;">Adjustment</th>
+                                                <th class="text-nowrap" style="width: 12%;">Actions</th>
+                                            </c:if>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <c:forEach var="record" items="${attendanceRecords}" varStatus="status">
                                             <tr>
-                                                <td>${(currentPage - 1) * pageSize + status.index + 1}</td>
-                                                <td><strong>${record.employeeCode}</strong></td>
-                                                <td>${record.employeeName}</td>
+                                                <c:if test="${!isEmployee}">
+                                                    <td><strong>${record.employeeCode}</strong></td>
+                                                    <td>${record.employeeName}</td>
+                                                </c:if>
                                                 <td>
                                                     <fmt:formatDate value="${record.attendanceDate}" pattern="yyyy-MM-dd"/>
                                                 </td>
@@ -341,11 +389,29 @@
                                                     </c:choose>
                                                 </td>
                                                 <td>
-                                                    <a href="${pageContext.request.contextPath}/attendance/adjust?id=${record.attendanceID}"
-                                                       class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-1 text-nowrap"
-                                                       title="Adjust this record">
-                                                        <i class="fas fa-edit me-1"></i> Edit
-                                                    </a>
+                                                    <div class="btn-group btn-group-sm" role="group">
+                                                        <c:choose>
+                                                            <c:when test="${isEmployee}">
+                                                                <!-- Employee: Show Submit Exception button -->
+                                                                <a href="${pageContext.request.contextPath}/attendance/exception/submit?attendanceId=${record.attendanceID}"
+                                                                   class="btn btn-outline-warning"
+                                                                   title="Submit exception request for this record">
+                                                                    <i class="fas fa-exclamation-circle"></i>
+                                                                </a>
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                <!-- HR/HR Manager: Show Edit button -->
+                                                                <c:if test="${isHR || isHRManager}">
+                                                                    <a href="${pageContext.request.contextPath}/attendance/adjust?id=${record.attendanceID}"
+                                                                       class="btn btn-outline-primary"
+                                                                       title="Adjust this record">
+                                                                        <i class="fas fa-edit"></i>
+                                                                    </a>
+                                                                </c:if>
+                                                                <!-- Dept Manager: No edit button, view only -->
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </c:forEach>

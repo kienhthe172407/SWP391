@@ -18,6 +18,29 @@
             padding: 15px;
             margin-bottom: 20px;
         }
+        .calculation-card {
+            border-left: 4px solid #0d6efd;
+        }
+        .breakdown-section {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .breakdown-item:last-child {
+            border-bottom: none;
+        }
+        .breakdown-total {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #0d6efd;
+        }
         .adjustment-history {
             max-height: 400px;
             overflow-y: auto;
@@ -81,21 +104,179 @@
                         </div>
                     </div>
 
-                    <!-- Current Salary Info -->
+                    <!-- Current Salary Info - Detailed Card -->
                     <c:if test="${not empty payroll}">
-                        <div class="info-card">
-                            <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Current Salary for ${year}-${String.format("%02d", month)}</h6>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <p class="mb-2"><strong>Base Salary:</strong> <fmt:formatNumber value="${payroll.baseSalary}" type="currency" currencySymbol="$"/></p>
-                                    <p class="mb-2"><strong>Total Allowances:</strong> <fmt:formatNumber value="${payroll.totalAllowances}" type="currency" currencySymbol="$"/></p>
-                                    <p class="mb-2"><strong>Overtime Pay:</strong> <fmt:formatNumber value="${payroll.overtimePay}" type="currency" currencySymbol="$"/></p>
-                                </div>
-                                <div class="col-md-6">
-                                    <p class="mb-2"><strong>Current Bonus:</strong> <fmt:formatNumber value="${payroll.totalBonus}" type="currency" currencySymbol="$"/></p>
-                                    <p class="mb-2"><strong>Gross Salary:</strong> <fmt:formatNumber value="${payroll.grossSalary}" type="currency" currencySymbol="$"/></p>
-                                    <p class="mb-2"><strong>Net Salary:</strong> <fmt:formatNumber value="${payroll.netSalary}" type="currency" currencySymbol="$"/></p>
-                                </div>
+                        <div class="card calculation-card mb-4">
+                            <div class="card-header bg-light">
+                                <h6 class="mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>Current Salary for ${year}-${String.format("%02d", month)}
+                                </h6>
+                            </div>
+                            <div class="card-body">
+                                <c:choose>
+                                    <c:when test="${not empty salaryDetail}">
+                                        <!-- Detailed breakdown using SalaryCalculationDetail -->
+                                        <div class="card mb-3">
+                                            <div class="card-header bg-light">
+                                                <h6 class="mb-0">
+                                                    <strong>${salaryDetail.employeeCode}</strong> - ${salaryDetail.employeeName}
+                                                    <br>
+                                                    <small class="text-muted">${salaryDetail.departmentName} | ${salaryDetail.positionName}</small>
+                                                </h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <!-- Base Salary & Allowances -->
+                                                <div class="breakdown-section">
+                                                    <h6 class="text-primary"><i class="fas fa-money-bill-wave me-2"></i>Base Salary & Allowances</h6>
+                                                    <div class="breakdown-item">
+                                                        <span>Base Salary:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.baseSalary}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Position Allowance:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.positionAllowance}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Housing Allowance:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.housingAllowance}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Transportation Allowance:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.transportationAllowance}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Meal Allowance:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.mealAllowance}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Other Allowances:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.otherAllowances}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                    <div class="breakdown-item breakdown-total">
+                                                        <span>Total Allowances:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.totalAllowances}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Attendance & Overtime -->
+                                                <div class="breakdown-section">
+                                                    <h6 class="text-success"><i class="fas fa-clock me-2"></i>Attendance & Overtime</h6>
+                                                    <div class="breakdown-item">
+                                                        <span>Working Days:</span>
+                                                        <span>${salaryDetail.workingDays} days</span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Absent Days:</span>
+                                                        <span>${salaryDetail.absentDays} days</span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Late Days:</span>
+                                                        <span>${salaryDetail.lateDays} days</span>
+                                                    </div>
+                                                    <div class="breakdown-item">
+                                                        <span>Overtime Hours:</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.overtimeHours}" pattern="#,##0.00"/> hours</span>
+                                                    </div>
+                                                    <div class="breakdown-item breakdown-total">
+                                                        <span>Overtime Pay (1.5x):</span>
+                                                        <span><fmt:formatNumber value="${salaryDetail.overtimePay}" type="currency" currencySymbol="$"/></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Benefits -->
+                                                <c:if test="${not empty salaryDetail.benefits}">
+                                                    <div class="breakdown-section">
+                                                        <h6 class="text-info"><i class="fas fa-gift me-2"></i>Benefits</h6>
+                                                        <c:forEach var="benefit" items="${salaryDetail.benefits}">
+                                                            <div class="breakdown-item">
+                                                                <span>${benefit.benefitName} (${benefit.calculationType}):</span>
+                                                                <span><fmt:formatNumber value="${benefit.amount}" type="currency" currencySymbol="$"/></span>
+                                                            </div>
+                                                        </c:forEach>
+                                                        <div class="breakdown-item breakdown-total">
+                                                            <span>Total Benefits:</span>
+                                                            <span><fmt:formatNumber value="${salaryDetail.totalBenefits}" type="currency" currencySymbol="$"/></span>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
+
+                                                <!-- Current Bonus -->
+                                                <c:if test="${not empty payroll.totalBonus && payroll.totalBonus > 0}">
+                                                    <div class="breakdown-section">
+                                                        <h6 class="text-warning"><i class="fas fa-star me-2"></i>Current Bonus</h6>
+                                                        <div class="breakdown-item breakdown-total">
+                                                            <span>Total Bonus:</span>
+                                                            <span><fmt:formatNumber value="${payroll.totalBonus}" type="currency" currencySymbol="$"/></span>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
+
+                                                <!-- Gross Salary -->
+                                                <div class="breakdown-section bg-primary text-white">
+                                                    <div class="breakdown-item">
+                                                        <span><strong>GROSS SALARY:</strong></span>
+                                                        <span><strong><fmt:formatNumber value="${payroll.grossSalary}" type="currency" currencySymbol="$"/></strong></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Deductions -->
+                                                <c:if test="${not empty salaryDetail.deductions}">
+                                                    <div class="breakdown-section">
+                                                        <h6 class="text-danger"><i class="fas fa-minus-circle me-2"></i>Deductions</h6>
+                                                        <c:forEach var="deduction" items="${salaryDetail.deductions}">
+                                                            <div class="breakdown-item">
+                                                                <span>${deduction.deductionName} (${deduction.calculationType}):</span>
+                                                                <span class="text-danger">-<fmt:formatNumber value="${deduction.amount}" type="currency" currencySymbol="$"/></span>
+                                                            </div>
+                                                        </c:forEach>
+                                                        <div class="breakdown-item breakdown-total text-danger">
+                                                            <span>Total Deductions:</span>
+                                                            <span>-<fmt:formatNumber value="${salaryDetail.totalDeductions}" type="currency" currencySymbol="$"/></span>
+                                                        </div>
+                                                    </div>
+                                                </c:if>
+
+                                                <!-- Net Salary -->
+                                                <div class="breakdown-section bg-success text-white">
+                                                    <div class="breakdown-item">
+                                                        <span><strong>NET SALARY (Take Home):</strong></span>
+                                                        <span><strong><fmt:formatNumber value="${payroll.netSalary}" type="currency" currencySymbol="$"/></strong></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Calculation Notes -->
+                                                <c:if test="${not empty salaryDetail.calculationNotes}">
+                                                    <div class="mt-3">
+                                                        <small class="text-muted">
+                                                            <i class="fas fa-info-circle me-1"></i>
+                                                            <c:forEach var="note" items="${salaryDetail.calculationNotes}">
+                                                                ${note}<br>
+                                                            </c:forEach>
+                                                        </small>
+                                                    </div>
+                                                </c:if>
+                                            </div>
+                                        </div>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Fallback to simple display if detail not available -->
+                                        <div class="info-card">
+                                            <h6 class="mb-3"><i class="fas fa-info-circle me-2"></i>Current Salary for ${year}-${String.format("%02d", month)}</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <p class="mb-2"><strong>Base Salary:</strong> <fmt:formatNumber value="${payroll.baseSalary}" type="currency" currencySymbol="$"/></p>
+                                                    <p class="mb-2"><strong>Total Allowances:</strong> <fmt:formatNumber value="${payroll.totalAllowances}" type="currency" currencySymbol="$"/></p>
+                                                    <p class="mb-2"><strong>Overtime Pay:</strong> <fmt:formatNumber value="${payroll.overtimePay}" type="currency" currencySymbol="$"/></p>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <p class="mb-2"><strong>Current Bonus:</strong> <fmt:formatNumber value="${payroll.totalBonus}" type="currency" currencySymbol="$"/></p>
+                                                    <p class="mb-2"><strong>Gross Salary:</strong> <fmt:formatNumber value="${payroll.grossSalary}" type="currency" currencySymbol="$"/></p>
+                                                    <p class="mb-2"><strong>Net Salary:</strong> <fmt:formatNumber value="${payroll.netSalary}" type="currency" currencySymbol="$"/></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                         </div>
                     </c:if>

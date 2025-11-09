@@ -6,7 +6,9 @@ import dal.PayrollDAO;
 import model.BonusAdjustment;
 import model.Employee;
 import model.MonthlyPayroll;
+import model.SalaryCalculationDetail;
 import model.User;
+import service.SalaryCalculationService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -185,6 +187,23 @@ public class AdjustBonusServlet extends HttpServlet {
         Date payrollMonth = Date.valueOf(String.format("%d-%02d-01", year, month));
         MonthlyPayroll payroll = payrollDAO.getPayrollByEmployeeAndMonth(employeeId, payrollMonth);
         
+        // Get detailed salary calculation for display
+        SalaryCalculationDetail salaryDetail = null;
+        if (payroll != null) {
+            try {
+                SalaryCalculationService salaryService = new SalaryCalculationService();
+                salaryDetail = salaryService.calculateEmployeeSalary(employeeId, year, month);
+                // Update with actual payroll data (including approved bonuses)
+                if (salaryDetail != null && payroll.getTotalBonus() != null) {
+                    salaryDetail.setGrossSalary(payroll.getGrossSalary());
+                    salaryDetail.setNetSalary(payroll.getNetSalary());
+                }
+            } catch (Exception e) {
+                System.err.println("Error calculating salary detail: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
         // Get existing adjustments
         List<BonusAdjustment> existingAdjustments = 
             bonusAdjustmentDAO.getAdjustmentsByEmployeeAndMonth(employeeId, payrollMonth);
@@ -192,6 +211,7 @@ public class AdjustBonusServlet extends HttpServlet {
         // Set attributes
         request.setAttribute("employee", employee);
         request.setAttribute("payroll", payroll);
+        request.setAttribute("salaryDetail", salaryDetail);
         request.setAttribute("existingAdjustments", existingAdjustments);
         request.setAttribute("year", year);
         request.setAttribute("month", month);

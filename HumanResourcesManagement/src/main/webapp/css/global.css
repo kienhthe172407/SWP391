@@ -286,8 +286,68 @@ body {
     color: var(--text-dark);
 }
 
-.card-header i {
+/* .card-header i {
     color: var(--primary-color);
+} */
+
+/* CRITICAL: Override card-header i for ALL button icons - MUST come after card-header i */
+.card-header .btn-primary i,
+.card-header .btn-primary:hover i,
+.card-header .btn-primary:focus i,
+.card-header .btn-primary:active i,
+.card-header button.btn-primary i,
+.card-header button.btn-primary:hover i,
+.card-header button.btn-primary:focus i,
+.card-header button.btn-primary:active i,
+.card-header button[type="submit"].btn-primary i,
+.card-header button[type="submit"].btn-primary:hover i,
+.card-header button[type="submit"].btn-primary:focus i,
+.card-header button[type="submit"].btn-primary:active i,
+.card-body .btn-primary i,
+.card-body .btn-primary:hover i,
+.card-body .btn-primary:focus i,
+.card-body .btn-primary:active i,
+.card-body button.btn-primary i,
+.card-body button.btn-primary:hover i,
+.card-body button.btn-primary:focus i,
+.card-body button.btn-primary:active i,
+.card-body button[type="submit"].btn-primary i,
+.card-body button[type="submit"].btn-primary:hover i,
+.card-body button[type="submit"].btn-primary:focus i,
+.card-body button[type="submit"].btn-primary:active i,
+button.btn-primary i,
+button.btn-primary:hover i,
+button.btn-primary:focus i,
+button.btn-primary:active i,
+button[type="submit"].btn-primary i,
+button[type="submit"].btn-primary:hover i,
+button[type="submit"].btn-primary:focus i,
+button[type="submit"].btn-primary:active i {
+    color: #fff !important;
+}
+
+/* Override card-header i for buttons inside card-body - HIGH SPECIFICITY */
+.card-body .btn-primary i,
+.card-body .btn-primary:hover i,
+.card-body .btn-primary:focus i,
+.card-body .btn-primary:active i,
+.card-body button.btn-primary i,
+.card-body button.btn-primary:hover i,
+.card-body button.btn-primary:focus i,
+.card-body button.btn-primary:active i,
+.card-body button[type="submit"].btn-primary i,
+.card-body button[type="submit"].btn-primary:hover i,
+.card-body button[type="submit"].btn-primary:focus i,
+.card-body button[type="submit"].btn-primary:active i,
+button.btn-primary i,
+button.btn-primary:hover i,
+button.btn-primary:focus i,
+button.btn-primary:active i,
+button[type="submit"].btn-primary i,
+button[type="submit"].btn-primary:hover i,
+button[type="submit"].btn-primary:focus i,
+button[type="submit"].btn-primary:active i {
+    color: #fff !important;
 }
 
 .card-body {
@@ -336,6 +396,34 @@ body {
     background-color: var(--primary-color);
     color: #fff;
     border-color: var(--primary-color);
+}
+
+/* Override ALL rules for button primary icons - HIGHEST SPECIFICITY */
+.btn-primary i,
+.btn-primary:hover i,
+.btn-primary:focus i,
+.btn-primary:active i,
+button.btn-primary i,
+button.btn-primary:hover i,
+button.btn-primary:focus i,
+button.btn-primary:active i,
+.card-body .btn-primary i,
+.card-body .btn-primary:hover i,
+.card-body .btn-primary:focus i,
+.card-body .btn-primary:active i,
+button[type="submit"].btn-primary i,
+button[type="submit"].btn-primary:hover i,
+button[type="submit"].btn-primary:focus i,
+button[type="submit"].btn-primary:active i,
+.card-body button.btn-primary i,
+.card-body button.btn-primary:hover i,
+.card-body button.btn-primary:focus i,
+.card-body button.btn-primary:active i,
+.card-body button[type="submit"].btn-primary i,
+.card-body button[type="submit"].btn-primary:hover i,
+.card-body button[type="submit"].btn-primary:focus i,
+.card-body button[type="submit"].btn-primary:active i {
+    color: #fff !important;
 }
 
 .btn-primary:hover {

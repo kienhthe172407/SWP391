@@ -6,6 +6,7 @@ import model.SalaryPreviewData.SalaryPreviewRecord;
 import dal.SalaryComponentDAO;
 import dal.EmployeeDAO;
 import model.Employee;
+import model.User;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
@@ -49,26 +50,16 @@ public class ImportSalaryServlet extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        // Normalize/ensure role in session
-        String userRole = (String) session.getAttribute("userRole");
-        if (userRole == null && session.getAttribute("user") != null) {
-            Object userObj = session.getAttribute("user");
-            try {
-                String roleFromUser = (String) userObj.getClass().getMethod("getRole").invoke(userObj);
-                if (roleFromUser != null && !roleFromUser.isEmpty()) {
-                    userRole = roleFromUser;
-                    session.setAttribute("userRole", userRole);
-                }
-            } catch (Exception ignored) {}
+        // Check authentication
+        if (session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
         }
-
-        // Check permission (accept common variants, trim + normalize)
-        String normalizedRole = userRole == null ? null : userRole.trim().toUpperCase().replace(' ', '_');
-        boolean isHR = "HR".equalsIgnoreCase(userRole) || "HR".equals(normalizedRole);
-        boolean isHRManager = "HR_MANAGER".equalsIgnoreCase(userRole)
-                || "HR_MANAGER".equals(normalizedRole)
-                || "HR MANAGER".equalsIgnoreCase(userRole);
-        if (!isHR && !isHRManager) {
+        
+        // Check authorization (HR and HR Manager only)
+        User user = (User) session.getAttribute("user");
+        String role = user.getRole();
+        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
             session.setAttribute("errorMessage", "Access denied. Only HR staff can import salary data.");
             response.sendRedirect(request.getContextPath() + "/");
             return;
@@ -96,26 +87,16 @@ public class ImportSalaryServlet extends HttpServlet {
         
         HttpSession session = request.getSession();
         
-        // Normalize/ensure role in session
-        String userRole = (String) session.getAttribute("userRole");
-        if (userRole == null && session.getAttribute("user") != null) {
-            Object userObj = session.getAttribute("user");
-            try {
-                String roleFromUser = (String) userObj.getClass().getMethod("getRole").invoke(userObj);
-                if (roleFromUser != null && !roleFromUser.isEmpty()) {
-                    userRole = roleFromUser;
-                    session.setAttribute("userRole", userRole);
-                }
-            } catch (Exception ignored) {}
+        // Check authentication
+        if (session.getAttribute("user") == null) {
+            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            return;
         }
-
-        // Check permission (accept common variants, trim + normalize)
-        String normalizedRole = userRole == null ? null : userRole.trim().toUpperCase().replace(' ', '_');
-        boolean isHR = "HR".equalsIgnoreCase(userRole) || "HR".equals(normalizedRole);
-        boolean isHRManager = "HR_MANAGER".equalsIgnoreCase(userRole)
-                || "HR_MANAGER".equals(normalizedRole)
-                || "HR MANAGER".equalsIgnoreCase(userRole);
-        if (!isHR && !isHRManager) {
+        
+        // Check authorization (HR and HR Manager only)
+        User user = (User) session.getAttribute("user");
+        String role = user.getRole();
+        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
             session.setAttribute("errorMessage", "Access denied. Only HR staff can import salary data.");
             response.sendRedirect(request.getContextPath() + "/");
             return;

@@ -47,35 +47,90 @@ public class ViewAttendanceSummaryServlet extends HttpServlet {
         
         // Get user role
         String userRole = (String) session.getAttribute("userRole");
-        if (userRole == null && session.getAttribute("user") != null) {
-            model.User user = (model.User) session.getAttribute("user");
-            userRole = user.getRole();
+        model.User user = (model.User) session.getAttribute("user");
+        
+        // Get role from user object if not in session (more reliable)
+        String actualRole = null;
+        if (user != null) {
+            actualRole = user.getRole(); // This is the actual role from database
+        }
+        if (actualRole == null && userRole != null) {
+            actualRole = userRole; // Fallback to session role
         }
         
-        // Only HR and HR Manager can access
-        if (!"HR".equals(userRole) && !"HR_MANAGER".equals(userRole) && 
-            !"HR Manager".equals(userRole)) {
-            response.sendRedirect(request.getContextPath() + "/access-denied.jsp");
+        // Normalize role for comparison (handle both formats)
+        if (actualRole != null) {
+            actualRole = actualRole.trim();
+        }
+        
+        // Check if user has permission (HR, HR Manager, Dept Manager, or Employee)
+        // Handle both "Dept Manager" and "Department Manager" (from getRoleDisplayName)
+        boolean isHR = "HR".equals(actualRole);
+        boolean isHRManager = "HR_MANAGER".equals(actualRole) || "HR Manager".equals(actualRole);
+        boolean isDeptManager = "DEPT_MANAGER".equals(actualRole) || "Dept Manager".equals(actualRole) || "Department Manager".equals(actualRole);
+        boolean isEmployee = "EMPLOYEE".equals(actualRole) || "Employee".equals(actualRole);
+        
+        if (!isHR && !isHRManager && !isDeptManager && !isEmployee) {
+            // Redirect to dashboard with error message instead of non-existent access-denied.jsp
+            session.setAttribute("errorMessage", "Access denied. You don't have permission to view attendance records.");
+            if (user != null && "Admin".equals(user.getRole())) {
+                response.sendRedirect(request.getContextPath() + "/dashboard/admin");
+            } else {
+                response.sendRedirect(request.getContextPath() + "/");
+            }
             return;
+        }
+        
+        // Get employee information for Employee and Dept Manager roles
+        Employee currentEmployee = null;
+        String employeeCode = null;
+        Integer managerDepartmentId = null;
+        
+        if (isEmployee && user != null) {
+            currentEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
+            if (currentEmployee == null) {
+                session.setAttribute("errorMessage", "Employee record not found. Please contact HR.");
+                response.sendRedirect(request.getContextPath() + "/dashboard/employee");
+                return;
+            }
+            // Auto-filter by current employee's code
+            employeeCode = currentEmployee.getEmployeeCode();
+        } else if (isDeptManager && user != null) {
+            // Get manager's employee record to get their department
+            Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
+            if (managerEmployee == null) {
+                session.setAttribute("errorMessage", "Manager record not found. Please contact HR.");
+                response.sendRedirect(request.getContextPath() + "/dashboard/dept-manager");
+                return;
+            }
+            // Auto-filter by manager's department
+            managerDepartmentId = managerEmployee.getDepartmentID();
         }
         
         try {
             // Get filter parameters
-            String employeeCode = request.getParameter("employeeCode");
-            String departmentIdStr = request.getParameter("departmentId");
+            // For Employee: force filter by their own employee code
+            // For Dept Manager: force filter by their department
+            Integer departmentId = managerDepartmentId; // Default to manager's department for Dept Manager
+            
+            if (!isEmployee && !isDeptManager) {
+                employeeCode = request.getParameter("employeeCode");
+                String departmentIdStr = request.getParameter("departmentId");
+                if (departmentIdStr != null && !departmentIdStr.trim().isEmpty()) {
+                    try {
+                        departmentId = Integer.parseInt(departmentIdStr);
+                    } catch (NumberFormatException e) {
+                        // Invalid department ID, ignore
+                    }
+                }
+            } else if (!isEmployee) {
+                // For Dept Manager, allow employee filter within their department
+                employeeCode = request.getParameter("employeeCode");
+            }
+            
             String startDate = request.getParameter("startDate");
             String endDate = request.getParameter("endDate");
             String pageStr = request.getParameter("page");
-            
-            // Parse department ID
-            Integer departmentId = null;
-            if (departmentIdStr != null && !departmentIdStr.trim().isEmpty()) {
-                try {
-                    departmentId = Integer.parseInt(departmentIdStr);
-                } catch (NumberFormatException e) {
-                    // Invalid department ID, ignore
-                }
-            }
             
             // Parse page number
             int currentPage = 1;
@@ -107,8 +162,17 @@ public class ViewAttendanceSummaryServlet extends HttpServlet {
             int totalPages = (int) Math.ceil((double) totalRecords / PAGE_SIZE);
             
             // Get filter options
-            List<Employee> employees = employeeDAO.getAllActiveEmployees();
-            List<Department> departments = employeeDAO.getAllDepartments();
+            List<Employee> employees = null;
+            List<Department> departments = null;
+            if (isHR || isHRManager) {
+                employees = employeeDAO.getAllActiveEmployees();
+                departments = employeeDAO.getAllDepartments();
+            } else if (isDeptManager && managerDepartmentId != null) {
+                // For Dept Manager, only show employees in their department
+                employees = employeeDAO.getEmployeesByDepartment(managerDepartmentId);
+                // Get department info for display
+                departments = employeeDAO.getAllDepartments();
+            }
             
             // Set attributes for display in JSP
             request.setAttribute("attendanceRecords", attendanceRecords);
@@ -119,6 +183,11 @@ public class ViewAttendanceSummaryServlet extends HttpServlet {
             request.setAttribute("pageSize", PAGE_SIZE);
             request.setAttribute("employees", employees);
             request.setAttribute("departments", departments);
+            request.setAttribute("currentEmployee", currentEmployee);
+            request.setAttribute("isEmployee", isEmployee);
+            request.setAttribute("isHR", isHR);
+            request.setAttribute("isHRManager", isHRManager);
+            request.setAttribute("isDeptManager", isDeptManager);
             
             // Preserve filter parameters
             request.setAttribute("filterEmployeeCode", employeeCode);

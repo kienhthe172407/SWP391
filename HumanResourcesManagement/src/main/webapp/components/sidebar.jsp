@@ -17,19 +17,19 @@
     <c:when test="${param.role != null && param.role != ''}">
         <c:set var="role" value="${param.role}" />
     </c:when>
-    <c:when test="${userRole == 'HR_MANAGER' || roleDisplayName == 'HR Manager'}">
+    <c:when test="${userRole == 'HR_MANAGER' || userRole == 'HR Manager' || roleDisplayName == 'HR Manager'}">
         <c:set var="role" value="HR Manager" />
     </c:when>
     <c:when test="${userRole == 'HR' || roleDisplayName == 'HR'}">
         <c:set var="role" value="HR" />
     </c:when>
-    <c:when test="${userRole == 'DEPT_MANAGER' || roleDisplayName == 'Dept Manager'}">
+    <c:when test="${userRole == 'DEPT_MANAGER' || userRole == 'Dept Manager' || roleDisplayName == 'Dept Manager' || roleDisplayName == 'Department Manager'}">
         <c:set var="role" value="Dept Manager" />
     </c:when>
-    <c:when test="${userRole == 'EMPLOYEE' || roleDisplayName == 'Employee'}">
+    <c:when test="${userRole == 'EMPLOYEE' || userRole == 'Employee' || roleDisplayName == 'Employee'}">
         <c:set var="role" value="Employee" />
     </c:when>
-    <c:when test="${userRole == 'ADMIN' || roleDisplayName == 'Admin'}">
+    <c:when test="${userRole == 'ADMIN' || userRole == 'Admin' || roleDisplayName == 'Admin' || roleDisplayName == 'Administrator'}">
         <c:set var="role" value="Admin" />
     </c:when>
     <c:otherwise>
@@ -199,7 +199,7 @@
                 </a>
             </li>
             <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/attendance/exception/list">
                     <i class="fas fa-clipboard-check"></i>
                     <span>Approval Queue</span>
                 </a>
@@ -230,12 +230,6 @@
                 <a href="${pageContext.request.contextPath}/attendance/import">
                     <i class="fas fa-clock"></i>
                     <span>Attendance</span>
-                </a>
-            </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Leave Requests</span>
                 </a>
             </li>
 
@@ -317,12 +311,6 @@
                     <span>Attendance</span>
                 </a>
             </li>
-            <li>
-                <a href="#">
-                    <i class="fas fa-calendar-check"></i>
-                    <span>Leave Requests</span>
-                </a>
-            </li>
 
             <li class="menu-section">Recruitment</li>
             <li>
@@ -375,11 +363,11 @@
                 </a>
             </li>
 
-            <li class="menu-section">Approval & Requests</li>
+            <li class="menu-section">Attendance & Approval</li>
             <li>
-                <a href="#">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Approval Queue</span>
+                <a href="${pageContext.request.contextPath}/attendance/summary">
+                    <i class="fas fa-clock"></i>
+                    <span>Attendance</span>
                 </a>
             </li>
             <li>
@@ -482,7 +470,7 @@
 
             <li class="menu-section">Attendance & Payroll</li>
             <li>
-                <a href="#">
+                <a href="${pageContext.request.contextPath}/attendance/summary">
                     <i class="fas fa-clock"></i>
                     <span>Attendance Record</span>
                 </a>
