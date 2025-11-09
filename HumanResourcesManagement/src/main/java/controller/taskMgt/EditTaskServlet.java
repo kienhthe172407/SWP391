@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -64,13 +65,19 @@ public class EditTaskServlet extends HttpServlet {
             }
 
             int taskId = Integer.parseInt(taskIdStr);
+            System.out.println("EditTaskServlet - Loading task with ID: " + taskId);
             Task task = taskDAO.getTaskById(taskId);
 
             if (task == null) {
+                System.err.println("EditTaskServlet - Task not found with ID: " + taskId);
                 session.setAttribute("errorMessage", "Task not found.");
                 response.sendRedirect(request.getContextPath() + "/task/list");
                 return;
             }
+            
+            System.out.println("EditTaskServlet - Task loaded: " + task.getTaskTitle() + 
+                             ", Status: " + task.getTaskStatus() + 
+                             ", Start Date: " + task.getStartDate());
 
             // Check if user has permission to edit
             String userRole = user.getRole();
@@ -110,29 +117,54 @@ public class EditTaskServlet extends HttpServlet {
             // Get list of employees for reassignment (managers only)
             if (isHRManager || isDeptManager) {
                 List<Employee> employees;
-                if (isDeptManager) {
-                    Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
-                    if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
-                        employees = employeeDAO.getEmployeesByDepartment(managerEmployee.getDepartmentID());
+                try {
+                    if (isDeptManager) {
+                        Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
+                        if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
+                            employees = employeeDAO.getEmployeesByDepartment(managerEmployee.getDepartmentID());
+                            System.out.println("EditTaskServlet - Loaded " + employees.size() + " employees from department " + managerEmployee.getDepartmentID());
+                        } else {
+                            employees = employeeDAO.getAllActiveEmployees();
+                            System.out.println("EditTaskServlet - Manager has no department, loaded all " + employees.size() + " employees");
+                        }
                     } else {
                         employees = employeeDAO.getAllActiveEmployees();
+                        System.out.println("EditTaskServlet - HR Manager, loaded all " + employees.size() + " employees");
                     }
-                } else {
-                    employees = employeeDAO.getAllActiveEmployees();
+                    request.setAttribute("employees", employees != null ? employees : new ArrayList<>());
+                } catch (Exception e) {
+                    System.err.println("EditTaskServlet - Error loading employees: " + e.getMessage());
+                    e.printStackTrace();
+                    request.setAttribute("employees", new ArrayList<>());
                 }
-                request.setAttribute("employees", employees);
             }
 
             // Get list of departments
-            List<Department> departments = employeeDAO.getAllDepartments();
+            List<Department> departments;
+            try {
+                departments = employeeDAO.getAllDepartments();
+                System.out.println("EditTaskServlet - Loaded " + (departments != null ? departments.size() : 0) + " departments");
+                request.setAttribute("departments", departments != null ? departments : new ArrayList<>());
+            } catch (Exception e) {
+                System.err.println("EditTaskServlet - Error loading departments: " + e.getMessage());
+                e.printStackTrace();
+                request.setAttribute("departments", new ArrayList<>());
+            }
 
             // Set attributes for JSP
             request.setAttribute("task", task);
-            request.setAttribute("departments", departments);
             request.setAttribute("userRole", userRole);
 
+            System.out.println("EditTaskServlet - Forwarding to edit-task.jsp");
+
             // Forward to JSP page
-            request.getRequestDispatcher("/task-mgt/edit-task.jsp").forward(request, response);
+            try {
+                request.getRequestDispatcher("/task-mgt/edit-task.jsp").forward(request, response);
+            } catch (Exception e) {
+                System.err.println("EditTaskServlet - Error forwarding to JSP: " + e.getMessage());
+                e.printStackTrace();
+                throw e; // Re-throw to be caught by outer catch block
+            }
 
         } catch (NumberFormatException e) {
             System.err.println("Error parsing task ID: " + e.getMessage());

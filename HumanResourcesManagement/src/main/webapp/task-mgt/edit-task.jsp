@@ -39,12 +39,24 @@
             <ol class="breadcrumb">
                 <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/">Home</a></li>
                 <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/task/list">Tasks</a></li>
-                <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/task/detail?id=${task.taskId}">Task Details</a></li>
+                <c:if test="${not empty task}">
+                    <li class="breadcrumb-item"><a href="${pageContext.request.contextPath}/task/detail?id=${task.taskId}">Task Details</a></li>
+                </c:if>
                 <li class="breadcrumb-item active">Edit Task</li>
             </ol>
         </nav>
 
         <div class="content-area">
+            <!-- Check if task exists -->
+            <c:if test="${empty task}">
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fas fa-exclamation-circle me-2"></i>
+                    Task not found or you don't have permission to edit this task.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            </c:if>
+            
+            <c:if test="${not empty task}">
             <!-- Success/Error Messages -->
             <c:if test="${not empty sessionScope.successMessage}">
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -111,8 +123,8 @@
                                     <select class="form-select" id="departmentId" name="departmentId">
                                         <option value="">-- Select Department (Optional) --</option>
                                         <c:forEach var="dept" items="${departments}">
-                                            <option value="${dept.departmentID}" 
-                                                    ${dept.departmentID == task.departmentId ? 'selected' : ''}>
+                                            <option value="${dept.departmentId}" 
+                                                    ${dept.departmentId == task.departmentId ? 'selected' : ''}>
                                                 ${dept.departmentName}
                                             </option>
                                         </c:forEach>
@@ -135,13 +147,13 @@
                             <div class="col-md-4 mb-3">
                                 <label for="startDate" class="form-label">Start Date</label>
                                 <input type="date" class="form-control" id="startDate" name="startDate" 
-                                       value="<fmt:formatDate value='${task.startDate}' pattern='yyyy-MM-dd'/>">
+                                       value="<c:if test='${not empty task.startDate}'><fmt:formatDate value='${task.startDate}' pattern='yyyy-MM-dd'/></c:if>">
                             </div>
 
                             <div class="col-md-4 mb-3">
                                 <label for="dueDate" class="form-label required-field">Due Date</label>
                                 <input type="date" class="form-control" id="dueDate" name="dueDate" 
-                                       value="<fmt:formatDate value='${task.dueDate}' pattern='yyyy-MM-dd'/>" required>
+                                       value="<c:if test='${not empty task.dueDate}'><fmt:formatDate value='${task.dueDate}' pattern='yyyy-MM-dd'/></c:if>" required>
                             </div>
                         </div>
 
@@ -174,6 +186,7 @@
                     </form>
                 </div>
             </div>
+            </c:if> <!-- End of c:if test="${not empty task}" -->
         </div>
     </div>
 
@@ -182,18 +195,25 @@
     
     <script>
         // Update due date minimum when start date changes
-        document.getElementById('startDate').addEventListener('change', function() {
-            const startDate = this.value;
-            if (startDate) {
-                document.getElementById('dueDate').setAttribute('min', startDate);
+        document.addEventListener('DOMContentLoaded', function() {
+            const startDateInput = document.getElementById('startDate');
+            const dueDateInput = document.getElementById('dueDate');
+            
+            if (startDateInput && dueDateInput) {
+                startDateInput.addEventListener('change', function() {
+                    const startDate = this.value;
+                    if (startDate) {
+                        dueDateInput.setAttribute('min', startDate);
+                    }
+                });
+                
+                // Set initial minimum for due date
+                const startDateValue = startDateInput.value;
+                if (startDateValue) {
+                    dueDateInput.setAttribute('min', startDateValue);
+                }
             }
         });
-        
-        // Set initial minimum for due date
-        const startDateValue = document.getElementById('startDate').value;
-        if (startDateValue) {
-            document.getElementById('dueDate').setAttribute('min', startDateValue);
-        }
     </script>
 </body>
 </html>

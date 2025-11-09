@@ -263,8 +263,7 @@
                             <c:if test="${canCancel}">
                                 <div class="detail-card">
                                     <h5 class="mb-3 text-danger"><i class="fas fa-ban me-2"></i>Cancel Task</h5>
-                                    <form action="${pageContext.request.contextPath}/task/cancel" method="POST" 
-                                          onsubmit="return confirm('Are you sure you want to cancel this task?');">
+                                    <form id="cancelTaskForm" action="${pageContext.request.contextPath}/task/cancel" method="POST">
                                         <input type="hidden" name="taskId" value="${task.taskId}">
                                         <input type="hidden" name="redirect" value="detail">
                                         
@@ -274,7 +273,7 @@
                                                       rows="3" placeholder="Why is this task being cancelled?"></textarea>
                                         </div>
 
-                                        <button type="submit" class="btn btn-danger w-100">
+                                        <button type="button" class="btn btn-danger w-100" data-bs-toggle="modal" data-bs-target="#cancelTaskModal">
                                             <i class="fas fa-ban me-2"></i>Cancel Task
                                         </button>
                                     </form>
@@ -317,8 +316,62 @@
         </div>
     </div>
 
+    <!-- Cancel Task Confirmation Modal -->
+    <div class="modal fade" id="cancelTaskModal" tabindex="-1" aria-labelledby="cancelTaskModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <h5 class="modal-title" id="cancelTaskModalLabel">
+                        <i class="fas fa-exclamation-triangle text-warning me-2"></i>Confirm Cancellation
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="d-flex align-items-start mb-3">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-ban fa-2x text-danger"></i>
+                        </div>
+                        <div class="flex-grow-1 ms-3">
+                            <h6 class="mb-2">Are you sure you want to cancel this task?</h6>
+                            <p class="text-muted mb-0">
+                                This action cannot be undone. The task will be marked as cancelled and cannot be edited or updated.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="alert alert-warning mb-0" role="alert">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Task:</strong> ${task.taskTitle}
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-times me-2"></i>No, Keep Task
+                    </button>
+                    <button type="button" class="btn btn-danger" id="confirmCancelBtn">
+                        <i class="fas fa-ban me-2"></i>Yes, Cancel Task
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Handle cancel task confirmation
+        document.addEventListener('DOMContentLoaded', function() {
+            const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+            const cancelTaskForm = document.getElementById('cancelTaskForm');
+            
+            if (confirmCancelBtn && cancelTaskForm) {
+                confirmCancelBtn.addEventListener('click', function() {
+                    // Submit the form
+                    cancelTaskForm.submit();
+                });
+            }
+        });
+    </script>
 </body>
 </html>
 
