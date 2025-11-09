@@ -19,6 +19,168 @@
     
     <!-- Global CSS -->
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/global.css">
+    
+    <style>
+        /* Contract Card Styles - Based on my-contract.jsp */
+        .contract-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+            background-color: #fff;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .contract-card:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Card header icon styling */
+        .contract-card .card-header i {
+            color: white !important;
+        }
+        
+        .contract-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+        
+        .contract-number {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin: 0;
+        }
+        
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-expired {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-draft {
+            background-color: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .status-terminated {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-rejected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        .contract-detail-row {
+            display: flex;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .contract-detail-row:last-child {
+            border-bottom: none;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #495057;
+            width: 200px;
+            flex-shrink: 0;
+        }
+        
+        .detail-value {
+            color: #212529;
+            flex-grow: 1;
+        }
+        
+        .contract-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+        }
+        
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        
+        .contract-approval-actions {
+            margin-top: 15px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+        
+        .alert-sm {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8125rem;
+            margin-bottom: 0;
+        }
+        
+        /* Remove border from Edit button and set white color */
+        .contract-card .btn-warning,
+        .contract-card .btn-warning:hover,
+        .contract-card .btn-warning:focus,
+        .contract-card .btn-warning:active {
+            border: none !important;
+            color: #fff !important;
+        }
+        
+        .contract-card .btn-warning i,
+        .contract-card .btn-warning:hover i,
+        .contract-card .btn-warning:focus i,
+        .contract-card .btn-warning:active i {
+            color: #fff !important;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .contract-card {
+                margin-bottom: 1rem;
+            }
+            
+            .detail-label {
+                width: 150px;
+                font-size: 0.875rem;
+            }
+            
+            .detail-value {
+                font-size: 0.875rem;
+            }
+            
+            .contract-number {
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
     <c:if test="${empty requestScope.contracts}">
@@ -102,7 +264,7 @@
                 </div>
             </div>
             
-            <!-- Table -->
+            <!-- Contracts Cards -->
             <div class="table-wrapper">
                 <div class="table-header">
                     <h5>Contracts List</h5>
@@ -121,122 +283,160 @@
                         </div>
                     </c:when>
                     <c:otherwise>
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Contract #</th>
-                                    <th>Employee</th>
-                                    <th>Contract Type</th>
-                                    <th>Start Date</th>
-                                    <th>End Date</th>
-                                    <th>Status</th>
-                                    <th>Contact</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <div class="container-fluid p-3">
+                            <div class="row g-3">
                                 <c:forEach var="contract" items="${contracts}">
-                                    <tr>
-                                        <td>
-                                            <strong>#${contract.contractID}</strong>
-                                            <c:if test="${contract.contractNumber != null}">
-                                                <br/><small class="text-muted">${contract.contractNumber}</small>
-                                            </c:if>
-                                        </td>
-                                        <td>
-                                            ${contract.employeeFullName != null ? contract.employeeFullName : 'N/A'}
-                                            <c:if test="${contract.employeeCode != null}">
-                                                <br/><small class="text-muted">(${contract.employeeCode})</small>
-                                            </c:if>
-                                        </td>
-                                        <td>${contract.contractType != null ? contract.contractType : 'N/A'}</td>
-                                        <td><fmt:formatDate value="${contract.startDate}" pattern="dd/MM/yyyy"/></td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${contract.endDate != null}">
-                                                    <fmt:formatDate value="${contract.endDate}" pattern="dd/MM/yyyy"/>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span style="color: #999;">Not specified</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:choose>
-                                                <c:when test="${contract.contractStatus == 'Active'}">
-                                                    <span class="badge badge-active">Active</span>
-                                                </c:when>
-                                                <c:when test="${contract.contractStatus == 'Expired'}">
-                                                    <span class="badge badge-expired">Expired</span>
-                                                </c:when>
-                                                <c:when test="${contract.contractStatus == 'Pending Approval'}">
-                                                    <span class="badge badge-pending">Pending Approval</span>
-                                                    <br/>
-                                                    <c:if test="${sessionScope.user != null && sessionScope.user.role == 'HR Manager'}">
-                                                        <div class="btn-group btn-group-sm mt-1" role="group">
-                                                            <button type="button" class="btn btn-success btn-sm approve-btn"
-                                                                    data-contract-id="${contract.contractID}"
-                                                                    data-employee-name="${contract.employeeFullName}"
-                                                                    title="Approve Contract">
-                                                                <i class="fas fa-check"></i> Approve
-                                                            </button>
-                                                            <button type="button" class="btn btn-danger btn-sm reject-btn"
-                                                                    data-contract-id="${contract.contractID}"
-                                                                    data-employee-name="${contract.employeeFullName}"
-                                                                    title="Reject Contract">
-                                                                <i class="fas fa-times"></i> Reject
-                                                            </button>
-                                                        </div>
+                                    <div class="col-md-6">
+                                        <div class="card contract-card">
+                                            <div class="card-header bg-success text-white">
+                                                <h5 class="mb-0"><i class="fas fa-file-contract me-2"></i>Contract Details</h5>
+                                            </div>
+                                            <div class="card-body">
+                                            <!-- Contract Header -->
+                                            <div class="contract-header">
+                                                <div>
+                                                    <div class="contract-number">
+                                                        <c:choose>
+                                                            <c:when test="${contract.contractNumber != null}">
+                                                                ${contract.contractNumber}
+                                                            </c:when>
+                                                            <c:otherwise>
+                                                                Contract #${contract.contractID}
+                                                            </c:otherwise>
+                                                        </c:choose>
+                                                    </div>
+                                                    <small class="text-muted">Contract ID: ${contract.contractID}</small>
+                                                </div>
+                                                <c:choose>
+                                                    <c:when test="${contract.contractStatus == 'Active'}">
+                                                        <span class="status-badge status-active">${contract.contractStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${contract.contractStatus == 'Expired'}">
+                                                        <span class="status-badge status-expired">${contract.contractStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${contract.contractStatus == 'Pending Approval'}">
+                                                        <span class="status-badge status-pending">${contract.contractStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${contract.contractStatus == 'Draft'}">
+                                                        <span class="status-badge status-draft">${contract.contractStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${contract.contractStatus == 'Terminated'}">
+                                                        <span class="status-badge status-terminated">${contract.contractStatus}</span>
+                                                    </c:when>
+                                                    <c:when test="${contract.contractStatus == 'Rejected'}">
+                                                        <span class="status-badge status-rejected">${contract.contractStatus}</span>
+                                                    </c:when>
+                                                    <c:otherwise>
+                                                        <span class="status-badge status-pending">${contract.contractStatus}</span>
+                                                    </c:otherwise>
+                                                </c:choose>
+                                            </div>
+
+                                            <!-- Basic Information -->
+                                            <div class="contract-detail-row">
+                                                <div class="detail-label">Employee:</div>
+                                                <div class="detail-value">
+                                                    ${contract.employeeFullName != null ? contract.employeeFullName : 'N/A'}
+                                                    <c:if test="${contract.employeeCode != null}">
+                                                        <small class="text-muted ms-1">(${contract.employeeCode})</small>
                                                     </c:if>
-                                                </c:when>
-                                                <c:when test="${contract.contractStatus == 'Draft'}">
-                                                    <span class="badge bg-secondary">Draft</span>
-                                                </c:when>
-                                                <c:when test="${contract.contractStatus == 'Terminated'}">
-                                                    <span class="badge bg-danger">Terminated</span>
-                                                </c:when>
-                                                <c:when test="${contract.contractStatus == 'Rejected'}">
-                                                    <span class="badge bg-danger">Rejected</span>
-                                                    <c:if test="${not empty contract.approvalComment}">
-                                                        <br/><small class="text-danger">${contract.approvalComment}</small>
+                                                </div>
+                                            </div>
+
+                                            <div class="contract-detail-row">
+                                                <div class="detail-label">Contract Type:</div>
+                                                <div class="detail-value">
+                                                    ${contract.contractType != null ? contract.contractType : 'N/A'}
+                                                </div>
+                                            </div>
+
+                                            <div class="contract-detail-row">
+                                                <div class="detail-label">Start Date:</div>
+                                                <div class="detail-value">
+                                                    <fmt:formatDate value="${contract.startDate}" pattern="dd/MM/yyyy"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="contract-detail-row">
+                                                <div class="detail-label">End Date:</div>
+                                                <div class="detail-value">
+                                                    <c:choose>
+                                                        <c:when test="${contract.endDate != null}">
+                                                            <fmt:formatDate value="${contract.endDate}" pattern="dd/MM/yyyy"/>
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <span class="text-muted">Not specified</span>
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </div>
+
+                                            <div class="contract-detail-row">
+                                                <div class="detail-label">Contact:</div>
+                                                <div class="detail-value">
+                                                    <c:if test="${contract.employeePhone != null}">
+                                                        <div><small><i class="fas fa-phone me-1"></i>${contract.employeePhone}</small></div>
                                                     </c:if>
-                                                </c:when>
-                                                <c:otherwise>
-                                                    <span class="badge badge-pending">${contract.contractStatus}</span>
-                                                </c:otherwise>
-                                            </c:choose>
-                                        </td>
-                                        <td>
-                                            <c:if test="${contract.employeePhone != null}">
-                                                <small><i class="fas fa-phone"></i> ${contract.employeePhone}</small><br/>
+                                                    <c:if test="${contract.employeeEmail != null}">
+                                                        <div><small><i class="fas fa-envelope me-1"></i>${contract.employeeEmail}</small></div>
+                                                    </c:if>
+                                                    <c:if test="${contract.employeePhone == null && contract.employeeEmail == null}">
+                                                        <span class="text-muted">N/A</span>
+                                                    </c:if>
+                                                </div>
+                                            </div>
+
+                                            <!-- Approval Actions for Pending Contracts -->
+                                            <c:if test="${contract.contractStatus == 'Pending Approval' && sessionScope.user != null && sessionScope.user.role == 'HR Manager'}">
+                                                <div class="contract-approval-actions">
+                                                    <div class="btn-group w-100" role="group">
+                                                        <button type="button" class="btn btn-success btn-sm approve-btn"
+                                                                data-contract-id="${contract.contractID}"
+                                                                data-employee-name="${contract.employeeFullName}">
+                                                            <i class="fas fa-check me-1"></i> Approve
+                                                        </button>
+                                                        <button type="button" class="btn btn-danger btn-sm reject-btn"
+                                                                data-contract-id="${contract.contractID}"
+                                                                data-employee-name="${contract.employeeFullName}">
+                                                            <i class="fas fa-times me-1"></i> Reject
+                                                        </button>
+                                                    </div>
+                                                </div>
                                             </c:if>
-                                            <c:if test="${contract.employeeEmail != null}">
-                                                <small><i class="fas fa-envelope"></i> ${contract.employeeEmail}</small>
+
+                                            <!-- Rejection Reason -->
+                                            <c:if test="${contract.contractStatus == 'Rejected' && not empty contract.approvalComment}">
+                                                <div class="alert alert-danger alert-sm mt-2">
+                                                    <small><strong>Rejection Reason:</strong> ${contract.approvalComment}</small>
+                                                </div>
                                             </c:if>
-                                            <c:if test="${contract.employeePhone == null && contract.employeeEmail == null}">
-                                                <small class="text-muted">N/A</small>
-                                            </c:if>
-                                        </td>
-                                        <td class="actions-cell">
-                                            <div class="actions-wrapper">
+
+                                            <!-- Action Buttons Footer -->
+                                            <div class="mt-4 d-flex gap-2">
                                                 <a href="${pageContext.request.contextPath}/contracts/detail?id=${contract.contractID}"
-                                                   class="btn-action btn-view" title="View Details">
-                                                    <i class="fas fa-eye"></i>
+                                                   class="btn btn-primary" title="View Details">
+                                                    <i class="fas fa-eye me-2"></i>View
                                                 </a>
-                                                <a href="${pageContext.request.contextPath}/contracts/edit?id=${contract.contractID}" class="btn-action btn-edit" title="Edit">
-                                                    <i class="fas fa-edit"></i>
+                                                <a href="${pageContext.request.contextPath}/contracts/export?id=${contract.contractID}" 
+                                                   class="btn btn-danger" title="Export PDF">
+                                                    <i class="fas fa-file-pdf me-2"></i>Export PDF
                                                 </a>
-                                                <a href="#" class="btn-action btn-delete" title="Delete"
+                                                <a href="${pageContext.request.contextPath}/contracts/edit?id=${contract.contractID}" 
+                                                   class="btn btn-warning" title="Edit">
+                                                    <i class="fas fa-edit me-2"></i>Edit
+                                                </a>
+                                                <a href="#" class="btn btn-danger btn-delete" title="Delete"
                                                    data-contract-id="${contract.contractID}"
                                                    data-employee-name="${contract.employeeFullName != null ? contract.employeeFullName : 'N/A'}">
-                                                    <i class="fas fa-trash"></i>
+                                                    <i class="fas fa-trash me-2"></i>Delete
                                                 </a>
                                             </div>
-                                        </td>
-                                    </tr>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </c:forEach>
-                            </tbody>
-                        </table>
+                            </div>
+                        </div>
                     </c:otherwise>
                 </c:choose>
             </div>

@@ -2,6 +2,7 @@ package controller.contractMgt;
 
 import dal.ContractDAO;
 import model.Contract;
+import model.User;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -38,27 +39,16 @@ public class ViewContractDetailServlet extends HttpServlet {
         
         // Get user session information
         HttpSession session = request.getSession();
-        String userRole = (String) session.getAttribute("userRole");
-        Integer userId = (Integer) session.getAttribute("userId");
+        User user = (User) session.getAttribute("user");
 
-        // Derive role from authenticated user if missing
-        if (userRole == null) {
-            Object userObj = session.getAttribute("user");
-            if (userObj instanceof model.User) {
-                userRole = ((model.User) userObj).getRole();
-                session.setAttribute("userRole", userRole);
-                if (userId == null) {
-                    userId = ((model.User) userObj).getUserId();
-                    session.setAttribute("userId", userId);
-                }
-            }
-        }
-        
         // If not logged in, redirect to login
-        if (userRole == null || userId == null) {
+        if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+
+        String userRole = user.getRole();
+        Integer userId = user.getUserId();
         
         // Get contract ID from request
         String contractIdStr = request.getParameter("id");

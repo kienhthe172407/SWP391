@@ -478,9 +478,15 @@
 
                                             <!-- Action Buttons -->
                                             <div class="mt-4 d-flex gap-2">
-                                                <button onclick="window.print()" class="btn btn-primary">
-                                                    <i class="fas fa-print me-2"></i>Print Contract
-                                                </button>
+                                                <c:if test="${sessionScope.user != null && sessionScope.user.role != 'Employee' && sessionScope.user.role != 'EMPLOYEE'}">
+                                                    <button onclick="window.print()" class="btn btn-primary">
+                                                        <i class="fas fa-print me-2"></i>Print Contract
+                                                    </button>
+                                                </c:if>
+                                                <a href="${pageContext.request.contextPath}/contracts/export?id=${selectedContract.contractID}" 
+                                                   class="btn btn-danger">
+                                                    <i class="fas fa-file-pdf me-2"></i>Export PDF
+                                                </a>
                                                 <a href="${pageContext.request.contextPath}/employee/my-contract" class="btn btn-secondary">
                                                     <i class="fas fa-list me-2"></i>View All Contracts
                                                 </a>
