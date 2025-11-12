@@ -198,12 +198,6 @@
                     <span>Task Management</span>
                 </a>
             </li>
-            <li>
-                <a href="${pageContext.request.contextPath}/attendance/exception/list">
-                    <i class="fas fa-clipboard-check"></i>
-                    <span>Approval Queue</span>
-                </a>
-            </li>
 
             <li class="menu-section">Employee Management</li>
             <li>

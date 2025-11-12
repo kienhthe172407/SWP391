@@ -154,7 +154,9 @@
                             <select name="department" class="form-select">
                                 <option value="">Select Department</option>
                                 <c:forEach var="dept" items="${departments}">
-                                    <option value="${dept}" ${dept == selectedDepartment ? 'selected' : ''}>${dept}</option>
+                                    <option value="${dept.departmentName}" ${dept.departmentName == selectedDepartment ? 'selected' : ''}>
+                                        ${dept.departmentName}
+                                    </option>
                                 </c:forEach>
                             </select>
                         </div>

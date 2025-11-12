@@ -279,18 +279,11 @@
                         <div class="form-section">
                             <h5><i class="fas fa-file-alt me-2"></i>Contract Details</h5>
                             <div class="row g-3">
-                                <!-- Job Description -->
+                                <!-- Contract Details -->
                                 <div class="col-12">
-                                    <label for="jobDescription" class="form-label">Job Description</label>
+                                    <label for="jobDescription" class="form-label">Job Description & Terms</label>
                                     <textarea class="form-control" id="jobDescription" name="jobDescription" 
-                                              rows="4" placeholder="Enter job description...">${contract.jobDescription}</textarea>
-                                </div>
-                                
-                                <!-- Terms and Conditions -->
-                                <div class="col-12">
-                                    <label for="termsAndConditions" class="form-label">Terms and Conditions</label>
-                                    <textarea class="form-control" id="termsAndConditions" name="termsAndConditions" 
-                                              rows="6" placeholder="Enter terms and conditions...">${contract.termsAndConditions}</textarea>
+                                              rows="6" placeholder="Describe role responsibilities, expectations, and any key terms...">${contract.jobDescription}</textarea>
                                 </div>
                                 
                                 <!-- Contract Status -->
@@ -304,14 +297,19 @@
                                     </div>
                                     <select id="contractStatus" class="form-select" disabled>
                                         <option value="Draft">Draft</option>
-                                        <option value="Pending Approval" selected>Pending Approval</option>
+                                        <option value="Pending Approval">Pending Approval</option>
                                         <option value="Active">Active</option>
                                         <option value="Expired">Expired</option>
                                         <option value="Terminated">Terminated</option>
                                     </select>
-                                    <!-- Hidden input to submit the actual contract status -->
-                                    <input type="hidden" id="contractStatusInput" name="contractStatus" value="Pending Approval">
-                                    <small class="text-muted">Check "Save as Draft" to save without sending for approval, or leave unchecked to submit for HR Manager approval</small>
+                                    <c:choose>
+                                        <c:when test="${user.role == 'HR Manager'}">
+                                            <small class="text-muted">Check "Save as Draft" to save without activating, or leave unchecked to create and activate immediately</small>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <small class="text-muted">Check "Save as Draft" to save without sending for approval, or leave unchecked to submit for HR Manager approval</small>
+                                        </c:otherwise>
+                                    </c:choose>
                                 </div>
                                 
                                 <!-- Notes for Approver -->
@@ -668,20 +666,32 @@
                 });
             });
             
-            // Handle draft checkbox
+            // Handle draft checkbox - update display only (no hidden input needed)
             const saveDraftCheckbox = document.getElementById('saveDraft');
             const contractStatusSelect = document.getElementById('contractStatus');
-            const contractStatusInput = document.getElementById('contractStatusInput');
+            const userRole = '<c:out value="${user.role}"/>';
 
             saveDraftCheckbox.addEventListener('change', function() {
                 if (this.checked) {
                     contractStatusSelect.value = 'Draft';
-                    contractStatusInput.value = 'Draft';
                 } else {
-                    contractStatusSelect.value = 'Pending Approval';
-                    contractStatusInput.value = 'Pending Approval';
+                    // Show appropriate status based on user role
+                    if (userRole === 'HR Manager') {
+                        contractStatusSelect.value = 'Active';
+                    } else {
+                        contractStatusSelect.value = 'Pending Approval';
+                    }
                 }
             });
+            
+            // Set initial status display based on role
+            if (!saveDraftCheckbox.checked) {
+                if (userRole === 'HR Manager') {
+                    contractStatusSelect.value = 'Active';
+                } else {
+                    contractStatusSelect.value = 'Pending Approval';
+                }
+            }
 
             // Form submission handler
             form.addEventListener('submit', function(event) {

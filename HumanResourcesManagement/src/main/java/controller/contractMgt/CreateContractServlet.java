@@ -45,8 +45,8 @@ public class CreateContractServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Get employee list for dropdown
-        List<Employee> employees = employeeDAO.getAllActiveEmployees();
+        // Get employee list for dropdown - only employees without active contracts
+        List<Employee> employees = employeeDAO.getEmployeesWithoutActiveContract();
         request.setAttribute("employees", employees);
         
         // Generate a default contract number
@@ -90,7 +90,6 @@ public class CreateContractServlet extends HttpServlet {
             String endDateStr = request.getParameter("endDate");
             String salaryAmountStr = request.getParameter("salaryAmount");
             String jobDescription = request.getParameter("jobDescription");
-            String termsAndConditions = request.getParameter("termsAndConditions");
             String approvalComment = request.getParameter("approvalComment");
             String saveDraft = request.getParameter("saveDraft");
             String contractStatus = request.getParameter("contractStatus");
@@ -101,12 +100,23 @@ public class CreateContractServlet extends HttpServlet {
             contract.setContractNumber(contractNumber);
             contract.setContractType(contractType);
 
-            // Set contract status based on draft checkbox or contractStatus parameter
+            // Determine contract status based on user role
+            String userRole = currentUser.getRole();
+            
             if (contractStatus != null && !contractStatus.isEmpty()) {
+                // If contractStatus is explicitly provided, use it
                 contract.setContractStatus(contractStatus);
             } else if ("true".equals(saveDraft)) {
+                // Save as draft if checkbox is checked
                 contract.setContractStatus("Draft");
+            } else if ("HR Manager".equals(userRole)) {
+                // HR Manager creates contract -> immediately Active
+                contract.setContractStatus("Active");
+                contract.setApprovedBy(currentUserId); // Auto-approved by creator
+                contract.setApprovedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+                contract.setSignedDate(new Date(System.currentTimeMillis())); // Auto set signed date
             } else {
+                // HR Staff creates contract -> Pending Approval
                 contract.setContractStatus("Pending Approval");
             }
 
@@ -127,7 +137,6 @@ public class CreateContractServlet extends HttpServlet {
             }
             
             contract.setJobDescription(jobDescription);
-            contract.setTermsAndConditions(termsAndConditions);
             contract.setCreatedBy(currentUserId);
             
             // Save contract to database
@@ -135,10 +144,15 @@ public class CreateContractServlet extends HttpServlet {
             
             if (success) {
                 // Set success message based on contract status
-                if ("Draft".equals(contract.getContractStatus())) {
+                String status = contract.getContractStatus();
+                if ("Draft".equals(status)) {
                     session.setAttribute("successMessage", "Contract saved as draft successfully!");
-                } else {
+                } else if ("Active".equals(status)) {
+                    session.setAttribute("successMessage", "Contract created and activated successfully!");
+                } else if ("Pending Approval".equals(status)) {
                     session.setAttribute("successMessage", "Contract submitted for HR Manager approval!");
+                } else {
+                    session.setAttribute("successMessage", "Contract created successfully!");
                 }
                 response.sendRedirect(request.getContextPath() + "/contracts/list");
             } else {
@@ -146,7 +160,7 @@ public class CreateContractServlet extends HttpServlet {
                 request.setAttribute("errorMessage", "Failed to create contract. Please try again.");
                 
                 // Get employee list for dropdown again
-                List<Employee> employees = employeeDAO.getAllActiveEmployees();
+                List<Employee> employees = employeeDAO.getEmployeesWithoutActiveContract();
                 request.setAttribute("employees", employees);
                 
                 // Keep form data for re-population
@@ -161,7 +175,7 @@ public class CreateContractServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Invalid numeric value: " + e.getMessage());
             
             // Get employee list for dropdown again
-            List<Employee> employees = employeeDAO.getAllActiveEmployees();
+            List<Employee> employees = employeeDAO.getEmployeesWithoutActiveContract();
             request.setAttribute("employees", employees);
             
             // Forward back to the form
@@ -171,7 +185,7 @@ public class CreateContractServlet extends HttpServlet {
             request.setAttribute("errorMessage", "Invalid date format: " + e.getMessage());
             
             // Get employee list for dropdown again
-            List<Employee> employees = employeeDAO.getAllActiveEmployees();
+            List<Employee> employees = employeeDAO.getEmployeesWithoutActiveContract();
             request.setAttribute("employees", employees);
             
             // Forward back to the form

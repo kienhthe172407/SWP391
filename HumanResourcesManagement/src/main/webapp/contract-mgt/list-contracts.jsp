@@ -161,6 +161,59 @@
             color: #fff !important;
         }
         
+        /* Pagination Styles */
+        .pagination-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        .pagination {
+            margin-bottom: 0;
+        }
+        
+        .page-item.active .page-link {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+            color: white !important;
+            font-weight: 600 !important;
+            z-index: 3;
+        }
+        
+        .page-item.active .page-link:hover {
+            background-color: #0a58ca !important;
+            border-color: #0a58ca !important;
+            color: white !important;
+        }
+        
+        .page-item .page-link {
+            color: #0d6efd !important;
+            border: 1px solid #dee2e6 !important;
+            padding: 0.5rem 0.75rem;
+            transition: all 0.3s ease;
+        }
+        
+        .page-item .page-link:hover {
+            background-color: #e9ecef !important;
+            border-color: #dee2e6 !important;
+            color: #0a58ca !important;
+        }
+        
+        .page-item.disabled .page-link {
+            color: #6c757d;
+            pointer-events: none;
+            background-color: #fff;
+            border-color: #dee2e6;
+        }
+        
+        .pagination-info {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
         /* Responsive adjustments */
         @media (max-width: 768px) {
             .contract-card {
@@ -178,6 +231,15 @@
             
             .contract-number {
                 font-size: 1rem;
+            }
+            
+            .pagination-wrapper {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .pagination-info {
+                order: -1;
             }
         }
     </style>
@@ -447,44 +509,18 @@
                     <nav>
                         <ul class="pagination">
                             <!-- Previous Button -->
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <c:url value="/contracts/list" var="prevUrl">
-                                    <c:param name="page" value="${currentPage - 1}"/>
-                                    <c:param name="keyword" value="${keyword}"/>
-                                    <c:param name="status" value="${status}"/>
-                                </c:url>
-                                <a class="page-link" href="${currentPage > 1 ? prevUrl : '#'}" aria-label="Previous">
+                            <li class="page-item" id="prevPageItem">
+                                <a class="page-link" href="#" id="prevPageLink" aria-label="Previous">
                                     <i class="fas fa-chevron-left"></i>
                                 </a>
                             </li>
                             
-                            <!-- Page Numbers -->
-                            <c:forEach begin="1" end="${totalPages}" var="pageNum">
-                                <c:if test="${pageNum <= 3 || pageNum > totalPages - 3 || (pageNum >= currentPage - 1 && pageNum <= currentPage + 1)}">
-                                    <c:url value="/contracts/list" var="pageUrl">
-                                        <c:param name="page" value="${pageNum}"/>
-                                        <c:param name="keyword" value="${keyword}"/>
-                                        <c:param name="status" value="${status}"/>
-                                    </c:url>
-                                    <li class="page-item ${currentPage == pageNum ? 'active' : ''}">
-                                        <a class="page-link" href="${pageUrl}">${pageNum}</a>
-                                    </li>
-                                </c:if>
-                                <c:if test="${(pageNum == 3 && currentPage > 4 && totalPages > 7) || (pageNum == totalPages - 3 && currentPage < totalPages - 3 && totalPages > 7)}">
-                                    <li class="page-item disabled">
-                                        <span class="page-link">...</span>
-                                    </li>
-                                </c:if>
-                            </c:forEach>
+                            <!-- Page Numbers (will be populated by JavaScript) -->
+                            <div id="pageNumbersContainer" style="display: contents;"></div>
                             
                             <!-- Next Button -->
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <c:url value="/contracts/list" var="nextUrl">
-                                    <c:param name="page" value="${currentPage + 1}"/>
-                                    <c:param name="keyword" value="${keyword}"/>
-                                    <c:param name="status" value="${status}"/>
-                                </c:url>
-                                <a class="page-link" href="${currentPage < totalPages ? nextUrl : '#'}" aria-label="Next">
+                            <li class="page-item" id="nextPageItem">
+                                <a class="page-link" href="#" id="nextPageLink" aria-label="Next">
                                     <i class="fas fa-chevron-right"></i>
                                 </a>
                             </li>
@@ -603,6 +639,91 @@
     <!-- Contract Approval/Rejection/Deletion JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Get current page from URL parameter (more reliable than server-side value)
+            const urlParams = new URLSearchParams(window.location.search);
+            const pageFromUrl = urlParams.get('page');
+            
+            // Use URL param if available, otherwise use server value, default to 1
+            let currentPage = pageFromUrl ? parseInt(pageFromUrl) : (${not empty currentPage ? currentPage : 1});
+            const totalPages = ${not empty totalPages ? totalPages : 1};
+            
+            console.log('Page from URL:', pageFromUrl);
+            console.log('Current Page (final):', currentPage);
+            console.log('Total Pages:', totalPages);
+            
+            // Render page numbers dynamically
+            const pageNumbersContainer = document.getElementById('pageNumbersContainer');
+            
+            function buildPageUrl(page) {
+                const url = new URL(window.location.href);
+                url.searchParams.set('page', page);
+                return url.toString();
+            }
+            
+            function renderPageNumbers() {
+                let html = '';
+                let lastShown = 0;
+                
+                // Determine which pages to show
+                // Logic: Show first 3, last 3, and current +/- 1
+                for (let i = 1; i <= totalPages; i++) {
+                    const shouldShow = i <= 3 || 
+                                      i > totalPages - 3 || 
+                                      (i >= currentPage - 1 && i <= currentPage + 1);
+                    
+                    if (shouldShow) {
+                        // Add ellipsis if there's a gap
+                        if (lastShown > 0 && i > lastShown + 1) {
+                            html += '<li class="page-item disabled">' +
+                                    '<span class="page-link">...</span>' +
+                                    '</li>';
+                        }
+                        
+                        const activeClass = i === currentPage ? 'active' : '';
+                        const pageUrl = buildPageUrl(i);
+                        html += '<li class="page-item ' + activeClass + '">' +
+                                '<a class="page-link" href="' + pageUrl + '">' + i + '</a>' +
+                                '</li>';
+                        lastShown = i;
+                    }
+                }
+                
+                pageNumbersContainer.innerHTML = html;
+                console.log('✓ Rendered page numbers, current page:', currentPage, 'total:', totalPages);
+            }
+            
+            renderPageNumbers();
+            
+            // Handle Previous/Next buttons
+            const prevPageItem = document.getElementById('prevPageItem');
+            const prevPageLink = document.getElementById('prevPageLink');
+            const nextPageItem = document.getElementById('nextPageItem');
+            const nextPageLink = document.getElementById('nextPageLink');
+            
+            // Setup Previous button
+            if (currentPage > 1) {
+                prevPageLink.href = buildPageUrl(currentPage - 1);
+                prevPageItem.classList.remove('disabled');
+            } else {
+                prevPageLink.href = '#';
+                prevPageItem.classList.add('disabled');
+                prevPageLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                });
+            }
+            
+            // Setup Next button
+            if (currentPage < totalPages) {
+                nextPageLink.href = buildPageUrl(currentPage + 1);
+                nextPageItem.classList.remove('disabled');
+            } else {
+                nextPageLink.href = '#';
+                nextPageItem.classList.add('disabled');
+                nextPageLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                });
+            }
+            
             // Approve button handlers
             document.querySelectorAll('.approve-btn').forEach(function(btn) {
                 btn.addEventListener('click', function() {

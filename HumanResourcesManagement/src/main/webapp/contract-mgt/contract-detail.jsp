@@ -113,10 +113,10 @@
             <!-- Contract Details -->
             <div class="row">
                 <div class="col-md-8">
-                    <!-- Job Description -->
+                    <!-- Contract Details -->
                     <div class="card mb-4">
                         <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-briefcase me-2"></i>Job Description</h6>
+                            <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>Contract Details</h6>
                         </div>
                         <div class="card-body">
                             <c:choose>
@@ -124,24 +124,7 @@
                                     <p class="mb-0">${contract.jobDescription}</p>
                                 </c:when>
                                 <c:otherwise>
-                                    <p class="text-muted mb-0">No job description provided.</p>
-                                </c:otherwise>
-                            </c:choose>
-                        </div>
-                    </div>
-
-                    <!-- Terms and Conditions -->
-                    <div class="card mb-4">
-                        <div class="card-header">
-                            <h6 class="mb-0"><i class="fas fa-file-alt me-2"></i>Terms and Conditions</h6>
-                        </div>
-                        <div class="card-body">
-                            <c:choose>
-                                <c:when test="${not empty contract.termsAndConditions}">
-                                    <p class="mb-0">${contract.termsAndConditions}</p>
-                                </c:when>
-                                <c:otherwise>
-                                    <p class="text-muted mb-0">No terms and conditions specified.</p>
+                                    <p class="text-muted mb-0">No contract details provided.</p>
                                 </c:otherwise>
                             </c:choose>
                         </div>

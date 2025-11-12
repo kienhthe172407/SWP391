@@ -170,7 +170,6 @@ public class EditContractServlet extends HttpServlet {
             String endDateStr = request.getParameter("endDate");
             String salaryAmountStr = request.getParameter("salaryAmount");
             String jobDescription = request.getParameter("jobDescription");
-            String termsAndConditions = request.getParameter("termsAndConditions");
             String approvalComment = request.getParameter("approvalComment");
             String saveDraft = request.getParameter("saveDraft");
 
@@ -205,7 +204,6 @@ public class EditContractServlet extends HttpServlet {
             }
 
             updated.setJobDescription(jobDescription);
-            updated.setTermsAndConditions(termsAndConditions);
 
             // Set contract status based on role and draft checkbox
             if ("true".equals(saveDraft)) {

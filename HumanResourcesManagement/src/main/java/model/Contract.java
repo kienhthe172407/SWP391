@@ -17,8 +17,7 @@ public class Contract {
     private Date startDate;              // start_date
     private Date endDate;                // end_date
     private BigDecimal salaryAmount;     // salary_amount
-    private String jobDescription;       // job_description
-    private String termsAndConditions;   // terms_and_conditions
+    private String jobDescription;       // job_description (details + terms)
     private String contractStatus;       // contract_status (Draft, Pending Approval, Active, Expired, Terminated)
     private Date signedDate;             // signed_date
     private Integer approvedBy;          // approved_by (user_id)
@@ -56,7 +55,7 @@ public class Contract {
     // Full constructor
     public Contract(int contractID, int employeeID, String contractNumber, String contractType, 
                    Date startDate, Date endDate, BigDecimal salaryAmount, String jobDescription,
-                   String termsAndConditions, String contractStatus, Date signedDate,
+                   String contractStatus, Date signedDate,
                    Integer approvedBy, String approvalComment, Timestamp approvedAt,
                    Integer createdBy, Timestamp createdAt, Timestamp updatedAt) {
         this.contractID = contractID;
@@ -67,7 +66,6 @@ public class Contract {
         this.endDate = endDate;
         this.salaryAmount = salaryAmount;
         this.jobDescription = jobDescription;
-        this.termsAndConditions = termsAndConditions;
         this.contractStatus = contractStatus;
         this.signedDate = signedDate;
         this.approvedBy = approvedBy;
@@ -141,14 +139,6 @@ public class Contract {
 
     public void setJobDescription(String jobDescription) {
         this.jobDescription = jobDescription;
-    }
-
-    public String getTermsAndConditions() {
-        return termsAndConditions;
-    }
-
-    public void setTermsAndConditions(String termsAndConditions) {
-        this.termsAndConditions = termsAndConditions;
     }
 
     public String getContractStatus() {

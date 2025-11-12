@@ -410,23 +410,13 @@
                                                 </div>
                                             </div>
 
-                                            <!-- Job Description -->
+                                            <!-- Contract Details -->
                                             <c:if test="${selectedContract.jobDescription != null && !selectedContract.jobDescription.trim().isEmpty()}">
                                                 <div class="contract-section">
                                                     <div class="section-title">
-                                                        <i class="fas fa-briefcase me-2"></i>Job Description
+                                                        <i class="fas fa-file-alt me-2"></i>Contract Details
                                                     </div>
                                                     <div class="detail-value" style="white-space: pre-wrap;">${selectedContract.jobDescription}</div>
-                                                </div>
-                                            </c:if>
-
-                                            <!-- Terms and Conditions -->
-                                            <c:if test="${selectedContract.termsAndConditions != null && !selectedContract.termsAndConditions.trim().isEmpty()}">
-                                                <div class="contract-section">
-                                                    <div class="section-title">
-                                                        <i class="fas fa-file-alt me-2"></i>Terms and Conditions
-                                                    </div>
-                                                    <div class="detail-value" style="white-space: pre-wrap;">${selectedContract.termsAndConditions}</div>
                                                 </div>
                                             </c:if>
 

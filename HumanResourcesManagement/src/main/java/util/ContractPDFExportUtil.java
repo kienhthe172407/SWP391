@@ -164,34 +164,19 @@ public class ContractPDFExportUtil {
             document.add(salaryTable);
         }
         
-        // Job Description Section
+        // Contract Details Section
         if (contract.getJobDescription() != null && !contract.getJobDescription().trim().isEmpty()) {
-            document.add(new Paragraph("JOB DESCRIPTION")
+            document.add(new Paragraph("CONTRACT DETAILS")
                     .setFontSize(14)
                     .setBold()
                     .setMarginTop(15)
                     .setMarginBottom(10));
             
-            Paragraph jobDesc = new Paragraph(contract.getJobDescription())
+            Paragraph details = new Paragraph(contract.getJobDescription())
                     .setMarginBottom(15)
                     .setPadding(10)
                     .setBackgroundColor(LIGHT_GRAY);
-            document.add(jobDesc);
-        }
-        
-        // Terms and Conditions Section
-        if (contract.getTermsAndConditions() != null && !contract.getTermsAndConditions().trim().isEmpty()) {
-            document.add(new Paragraph("TERMS AND CONDITIONS")
-                    .setFontSize(14)
-                    .setBold()
-                    .setMarginTop(15)
-                    .setMarginBottom(10));
-            
-            Paragraph terms = new Paragraph(contract.getTermsAndConditions())
-                    .setMarginBottom(15)
-                    .setPadding(10)
-                    .setBackgroundColor(LIGHT_GRAY);
-            document.add(terms);
+            document.add(details);
         }
         
         // Approval Information Section

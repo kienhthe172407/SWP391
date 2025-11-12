@@ -199,12 +199,13 @@ public class SubmitRequestServlet extends HttpServlet {
             }
 
             // Validate against max days per year limit (if applicable)
-            if (requestType.getMaxDaysPerYear() > 0) {
+            Integer maxDaysPerYear = requestType.getMaxDaysPerYear();
+            if (maxDaysPerYear != null && maxDaysPerYear > 0) {
                 // Check if single request exceeds max days
-                if (numberOfDays.compareTo(new BigDecimal(requestType.getMaxDaysPerYear())) > 0) {
+                if (numberOfDays.compareTo(new BigDecimal(maxDaysPerYear)) > 0) {
                     request.setAttribute("errorMessage",
                         "The number of days requested (" + numberOfDays + ") exceeds the maximum allowed for " +
-                        requestType.getRequestTypeName() + " (" + requestType.getMaxDaysPerYear() + " days per year).");
+                        requestType.getRequestTypeName() + " (" + maxDaysPerYear + " days per year).");
 
                     // Reload request types for the form
                     List<RequestType> requestTypes = requestDAO.getAllRequestTypes();
@@ -231,12 +232,12 @@ public class SubmitRequestServlet extends HttpServlet {
                 BigDecimal totalWithNewRequest = totalUsedDays.add(numberOfDays);
 
                 // Check if total exceeds annual quota
-                if (totalWithNewRequest.compareTo(new BigDecimal(requestType.getMaxDaysPerYear())) > 0) {
-                    BigDecimal remainingDays = new BigDecimal(requestType.getMaxDaysPerYear()).subtract(totalUsedDays);
+                if (totalWithNewRequest.compareTo(new BigDecimal(maxDaysPerYear)) > 0) {
+                    BigDecimal remainingDays = new BigDecimal(maxDaysPerYear).subtract(totalUsedDays);
 
                     request.setAttribute("errorMessage",
                         "This request would exceed your annual quota for " + requestType.getRequestTypeName() + ". " +
-                        "Maximum allowed: " + requestType.getMaxDaysPerYear() + " days/year. " +
+                        "Maximum allowed: " + maxDaysPerYear + " days/year. " +
                         "Already used/pending: " + totalUsedDays + " days. " +
                         "Remaining: " + remainingDays + " days. " +
                         "You are requesting: " + numberOfDays + " days.");

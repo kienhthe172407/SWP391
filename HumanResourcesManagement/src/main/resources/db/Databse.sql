@@ -4,7 +4,6 @@
 DROP DATABASE IF EXISTS hr_management_system;
 CREATE DATABASE hr_management_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE hr_management_system;
-
 -- ==============================================================================
 -- TABLE: users
 -- Bảng quản lý tài khoản người dùng hệ thống
@@ -38,9 +37,76 @@ CREATE TABLE users (
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
--- TABLE: departments
--- Bảng quản lý các phòng ban
+-- TABLE: role_permissions
+-- Bảng mapping quyền giữa role và permission code
 -- ==============================================================================
+CREATE TABLE role_permissions (
+    role VARCHAR(100) NOT NULL,
+    permission_code VARCHAR(100) NOT NULL,
+    PRIMARY KEY (role, permission_code),
+    INDEX idx_role (role),
+    INDEX idx_permission_code (permission_code)
+) ENGINE=InnoDB;
+-- ===============================================================================
+-- TABLE: permissions
+-- Bảng metadata cho các permission (mã, tên, mô tả, category)
+-- ===============================================================================
+CREATE TABLE permissions (
+    code VARCHAR(100) PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category VARCHAR(100),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- Seed initial permissions (used by PermissionConstants.java)
+INSERT IGNORE INTO permissions (code, name, description, category) VALUES
+('USER_VIEW', 'Xem danh sách người dùng', 'Cho phép xem danh sách tài khoản người dùng', 'User Management'),
+('USER_CREATE', 'Tạo người dùng mới', 'Cho phép tạo tài khoản người dùng mới', 'User Management'),
+('USER_EDIT', 'Chỉnh sửa người dùng', 'Cho phép chỉnh sửa thông tin người dùng', 'User Management'),
+('USER_ACTIVATE', 'Kích hoạt/Vô hiệu hóa', 'Cho phép kích hoạt hoặc vô hiệu hóa tài khoản', 'User Management'),
+('EMPLOYEE_VIEW', 'Xem danh sách nhân viên', 'Cho phép xem thông tin nhân viên', 'Employee Management'),
+('EMPLOYEE_CREATE', 'Thêm nhân viên mới', 'Cho phép thêm nhân viên mới vào hệ thống', 'Employee Management'),
+('EMPLOYEE_EDIT', 'Chỉnh sửa nhân viên', 'Cho phép chỉnh sửa thông tin nhân viên', 'Employee Management'),
+('EMPLOYEE_DELETE', 'Xóa nhân viên', 'Cho phép xóa nhân viên khỏi hệ thống', 'Employee Management'),
+('DEPT_VIEW', 'Xem phòng ban', 'Cho phép xem danh sách phòng ban', 'Department Management'),
+('DEPT_CREATE', 'Tạo phòng ban', 'Cho phép tạo phòng ban mới', 'Department Management'),
+('DEPT_EDIT', 'Chỉnh sửa phòng ban', 'Cho phép chỉnh sửa thông tin phòng ban', 'Department Management'),
+('DEPT_DELETE', 'Xóa phòng ban', 'Cho phép xóa phòng ban', 'Department Management'),
+('CONTRACT_VIEW', 'Xem hợp đồng', 'Cho phép xem danh sách hợp đồng', 'Contract Management'),
+('CONTRACT_CREATE', 'Tạo hợp đồng', 'Cho phép tạo hợp đồng mới', 'Contract Management'),
+('CONTRACT_EDIT', 'Chỉnh sửa hợp đồng', 'Cho phép chỉnh sửa hợp đồng', 'Contract Management'),
+('CONTRACT_DELETE', 'Xóa hợp đồng', 'Cho phép xóa hợp đồng', 'Contract Management'),
+('CONTRACT_APPROVE', 'Phê duyệt hợp đồng', 'Cho phép phê duyệt hợp đồng', 'Contract Management'),
+('JOB_VIEW', 'Xem tin tuyển dụng', 'Cho phép xem danh sách tin tuyển dụng', 'Job Posting'),
+('JOB_CREATE', 'Tạo tin tuyển dụng', 'Cho phép tạo tin tuyển dụng mới', 'Job Posting'),
+('JOB_EDIT', 'Chỉnh sửa tin tuyển dụng', 'Cho phép chỉnh sửa tin tuyển dụng', 'Job Posting'),
+('JOB_DELETE', 'Xóa tin tuyển dụng', 'Cho phép xóa tin tuyển dụng', 'Job Posting'),
+('SYSTEM_CONFIG', 'Cấu hình hệ thống', 'Cho phép cấu hình các thiết lập hệ thống', 'System Settings'),
+('ROLE_MANAGE', 'Quản lý vai trò', 'Cho phép quản lý các vai trò người dùng', 'System Settings'),
+('PERMISSION_MANAGE', 'Quản lý phân quyền', 'Cho phép quản lý phân quyền cho vai trò', 'System Settings');
+-- Additional permissions added for finer-grained control
+INSERT IGNORE INTO permissions (code, name, description, category) VALUES
+('SALARY_VIEW', 'Xem bảng lương', 'Cho phép xem bảng lương và báo cáo liên quan', 'Salary'),
+('SALARY_IMPORT', 'Nhập lương', 'Cho phép nhập file lương (CSV) và cập nhật dữ liệu', 'Salary'),
+('SALARY_CALCULATE', 'Tính lương', 'Cho phép thực hiện tính lương cho chu kỳ', 'Salary'),
+('SALARY_ADJUST', 'Điều chỉnh lương', 'Cho phép điều chỉnh thưởng/ phạt cho nhân viên', 'Salary'),
+('SALARY_EXPORT', 'Xuất payroll/payslip', 'Cho phép xuất payslip hoặc báo cáo bảng lương', 'Salary'),
+('REQUEST_VIEW', 'Xem yêu cầu', 'Cho phép xem danh sách yêu cầu/đề xuất', 'Request'),
+('REQUEST_CREATE', 'Tạo yêu cầu', 'Cho phép tạo yêu cầu (ví dụ: nghỉ phép, sửa công)', 'Request'),
+('REQUEST_APPROVE', 'Duyệt yêu cầu', 'Cho phép duyệt hoặc từ chối các yêu cầu', 'Request'),
+('ATTENDANCE_VIEW', 'Xem chấm công', 'Cho phép xem báo cáo chấm công', 'Attendance'),
+('ATTENDANCE_ADJUST', 'Chỉnh sửa chấm công', 'Cho phép chỉnh sửa hồ sơ chấm công thủ công', 'Attendance'),
+('TASK_VIEW', 'Xem nhiệm vụ', 'Cho phép xem danh sách nhiệm vụ', 'Task'),
+('TASK_CREATE', 'Tạo nhiệm vụ', 'Cho phép tạo nhiệm vụ mới', 'Task'),
+('TASK_ASSIGN', 'Phân công nhiệm vụ', 'Cho phép phân công nhiệm vụ cho người khác', 'Task'),
+('TASK_EDIT', 'Chỉnh sửa nhiệm vụ', 'Cho phép chỉnh sửa nhiệm vụ', 'Task'),
+('REPORT_VIEW', 'Xem báo cáo', 'Cho phép truy cập các báo cáo hệ thống', 'Reporting'),
+('HR_DASHBOARD_VIEW', 'Xem Dashboard HR', 'Cho phép truy cập bảng điều khiển HR', 'Reporting');
+
+-- Grant Admin role all permissions (safe seed to avoid locking out Admin)
+INSERT IGNORE INTO role_permissions (role, permission_code)
+SELECT 'Admin', code FROM permissions;
 CREATE TABLE departments (
     department_id INT PRIMARY KEY AUTO_INCREMENT,              -- ID phòng ban (khóa chính)
     department_name VARCHAR(100) UNIQUE NOT NULL,              -- Tên phòng ban (duy nhất)
@@ -53,8 +119,9 @@ CREATE TABLE departments (
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
+-- ==============================================================================
 -- TABLE: positions
--- Bảng quản lý các chức vụ/vị trí công việc
+-- Bảng quản lý chức vụ
 -- ==============================================================================
 CREATE TABLE positions (
     position_id INT PRIMARY KEY AUTO_INCREMENT,                -- ID chức vụ (khóa chính)
@@ -90,10 +157,9 @@ CREATE TABLE employees (
     manager_id INT,                                            -- ID quản lý trực tiếp
     hire_date DATE,                                            -- Ngày vào làm
     employment_status ENUM('Active', 'On Leave', 'Terminated') DEFAULT 'Active', -- Trạng thái làm việc
+    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,            -- Thời gian tạo
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Thời gian cập nhật
-    is_deleted BOOLEAN DEFAULT FALSE,                          -- Soft delete flag
-    FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE SET NULL, -- Khóa ngoại tới users
     FOREIGN KEY (department_id) REFERENCES departments(department_id) ON DELETE SET NULL, -- Khóa ngoại tới departments
     FOREIGN KEY (position_id) REFERENCES positions(position_id) ON DELETE SET NULL, -- Khóa ngoại tới positions
     FOREIGN KEY (manager_id) REFERENCES employees(employee_id) ON DELETE SET NULL, -- Khóa ngoại tự tham chiếu
@@ -102,7 +168,9 @@ CREATE TABLE employees (
     INDEX idx_department (department_id),                      -- Index cho lọc theo phòng ban
     INDEX idx_position (position_id),                          -- Index cho lọc theo chức vụ
     INDEX idx_employment_status (employment_status),           -- Index cho lọc theo trạng thái
+    INDEX idx_created_at (created_at),                         -- Index cho sắp xếp theo thời gian tạo
     FULLTEXT INDEX ft_employee_search (first_name, last_name, employee_code) -- FULLTEXT index cho tìm kiếm toàn văn
+
 ) ENGINE=InnoDB;
 
 -- ==============================================================================
@@ -294,8 +362,7 @@ CREATE TABLE employment_contracts (
     start_date DATE NOT NULL,                                  -- Ngày bắt đầu
     end_date DATE,                                             -- Ngày kết thúc (NULL nếu vô thời hạn)
     salary_amount DECIMAL(12, 2),                              -- Mức lương trong hợp đồng
-    job_description TEXT,                                      -- Mô tả công việc
-    terms_and_conditions TEXT,                                 -- Điều khoản và điều kiện
+    job_description TEXT,                                      -- Chi tiết công việc & điều khoản
     contract_status ENUM('Draft', 'Pending Approval', 'Active', 'Expired', 'Terminated', 'Rejected') DEFAULT 'Draft', -- Trạng thái
     signed_date DATE,                                          -- Ngày ký
     approved_by INT,                                           -- Người duyệt
@@ -814,89 +881,89 @@ INSERT INTO payroll_adjustments (payroll_id, employee_id, adjustment_type, amoun
 -- ==============================================================================
 
 -- Existing Active Contracts (approved by HR Manager)
-INSERT INTO employment_contracts (employee_id, contract_number, contract_type, start_date, end_date, salary_amount, job_description, terms_and_conditions, contract_status, signed_date, approved_by, approval_comment, approved_at, created_by) VALUES
-(1, 'CTR-2015-001', 'Indefinite', '2015-01-15', NULL, 7000.00, 'Responsible for overall HR strategy, employee relations, recruitment, and team management', 'Standard employment terms including benefits, leave policy, and confidentiality agreement', 'Active', '2015-01-10', 2, 'Excellent qualifications and experience', '2015-01-12 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(2, 'CTR-2018-015', 'Indefinite', '2018-03-10', NULL, 3500.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment terms with 3-month probation period', 'Active', '2018-03-05', 2, 'Strong HR background, approved for immediate start', '2018-03-07 11:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(4, 'CTR-2014-008', 'Indefinite', '2014-08-20', NULL, 8000.00, 'Lead IT department, oversee infrastructure, software development, and technical projects', 'Management contract with performance bonuses and stock options', 'Active', '2014-08-15', 2, 'Exceptional technical leadership skills', '2014-08-17 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(5, 'CTR-2016-012', 'Indefinite', '2016-02-14', NULL, 7500.00, 'Lead sales team, develop sales strategies, and drive revenue growth', 'Management contract with commission structure', 'Active', '2016-02-10', 2, 'Proven sales track record', '2016-02-12 14:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+INSERT INTO employment_contracts (employee_id, contract_number, contract_type, start_date, end_date, salary_amount, job_description, contract_status, signed_date, approved_by, approval_comment, approved_at, created_by) VALUES
+(1, 'CTR-2015-001', 'Indefinite', '2015-01-15', NULL, 7000.00, 'Responsible for overall HR strategy, employee relations, recruitment, and team management\n\nTerms: Standard employment terms including benefits, leave policy, and confidentiality agreement', 'Active', '2015-01-10', 2, 'Excellent qualifications and experience', '2015-01-12 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(2, 'CTR-2018-015', 'Indefinite', '2018-03-10', NULL, 3500.00, 'Handle recruitment processes, employee onboarding, and HR documentation\n\nTerms: Standard employment terms with 3-month probation period', 'Active', '2018-03-05', 2, 'Strong HR background, approved for immediate start', '2018-03-07 11:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(4, 'CTR-2014-008', 'Indefinite', '2014-08-20', NULL, 8000.00, 'Lead IT department, oversee infrastructure, software development, and technical projects\n\nTerms: Management contract with performance bonuses and stock options', 'Active', '2014-08-15', 2, 'Exceptional technical leadership skills', '2014-08-17 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(5, 'CTR-2016-012', 'Indefinite', '2016-02-14', NULL, 7500.00, 'Lead sales team, develop sales strategies, and drive revenue growth\n\nTerms: Management contract with commission structure', 'Active', '2016-02-10', 2, 'Proven sales track record', '2016-02-12 14:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Draft Contracts (created by different HR staff - only visible to creators)
-(6, 'CTR-2024-101', 'Indefinite', '2024-12-01', NULL, 6000.00, 'Lead technical projects, mentor junior developers, and ensure code quality', 'Standard employment with technical certifications support', 'Draft', NULL, NULL, 'Still reviewing technical requirements', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(7, 'CTR-2024-102', 'Fixed-term', '2024-11-15', '2025-11-14', 4500.00, 'Develop and maintain software applications using modern technologies', 'Fixed-term contract with renewal option based on performance', 'Draft', NULL, NULL, 'Waiting for budget approval', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(8, 'CTR-2024-103', 'Indefinite', '2024-10-20', NULL, 3200.00, 'Generate sales, maintain client relationships, and achieve sales targets', 'Standard employment with commission-based incentives', 'Draft', NULL, NULL, 'Need to finalize commission structure', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(9, 'CTR-2024-104', 'Indefinite', '2024-11-01', NULL, 3800.00, 'Business development and client acquisition in assigned territory', 'Standard employment terms with travel allowance', 'Draft', NULL, NULL, 'Reviewing territory assignments', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(10, 'CTR-2024-105', 'Fixed-term', '2024-12-15', '2025-06-14', 3000.00, 'Develop and execute marketing campaigns, analyze market trends', 'Temporary contract for holiday season campaign', 'Draft', NULL, NULL, 'Seasonal position - finalizing details', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(6, 'CTR-2024-101', 'Indefinite', '2024-12-01', NULL, 6000.00, 'Lead technical projects, mentor junior developers, and ensure code quality\n\nTerms: Standard employment with technical certifications support', 'Draft', NULL, NULL, 'Still reviewing technical requirements', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(7, 'CTR-2024-102', 'Fixed-term', '2024-11-15', '2025-11-14', 4500.00, 'Develop and maintain software applications using modern technologies\n\nTerms: Fixed-term contract with renewal option based on performance', 'Draft', NULL, NULL, 'Waiting for budget approval', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(8, 'CTR-2024-103', 'Indefinite', '2024-10-20', NULL, 3200.00, 'Generate sales, maintain client relationships, and achieve sales targets\n\nTerms: Standard employment with commission-based incentives', 'Draft', NULL, NULL, 'Need to finalize commission structure', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(9, 'CTR-2024-104', 'Indefinite', '2024-11-01', NULL, 3800.00, 'Business development and client acquisition in assigned territory\n\nTerms: Standard employment terms with travel allowance', 'Draft', NULL, NULL, 'Reviewing territory assignments', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(10, 'CTR-2024-105', 'Fixed-term', '2024-12-15', '2025-06-14', 3000.00, 'Develop and execute marketing campaigns, analyze market trends\n\nTerms: Temporary contract for holiday season campaign', 'Draft', NULL, NULL, 'Seasonal position - finalizing details', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Pending Approval Contracts (submitted by HR staff, waiting for HR Manager approval)
-(11, 'CTR-2024-201', 'Indefinite', '2024-11-25', NULL, 4200.00, 'Manage accounting records, financial reporting, and tax compliance', 'Standard employment with CPA certification support and annual bonus', 'Pending Approval', NULL, NULL, 'Ready for review - candidate has excellent credentials', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(12, 'CTR-2024-202', 'Indefinite', '2024-12-10', NULL, 6500.00, 'Oversee daily operations, optimize processes, and manage operational staff', 'Management contract with performance metrics and team bonuses', 'Pending Approval', NULL, NULL, 'Urgent position - operations manager needed ASAP', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(13, 'CTR-2024-203', 'Fixed-term', '2024-11-20', '2025-05-19', 2800.00, 'Provide administrative support including scheduling, documentation, and coordination', 'Temporary contract to cover maternity leave', 'Pending Approval', NULL, NULL, 'Temporary replacement for Sarah - 6 months', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(14, 'CTR-2024-204', 'Indefinite', '2024-12-05', NULL, 5500.00, 'Software development and maintenance of internal systems', 'Standard employment with remote work options', 'Pending Approval', NULL, NULL, 'Senior developer with 8 years experience', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(15, 'CTR-2024-205', 'Fixed-term', '2025-01-15', '2025-12-31', 4800.00, 'Project management for digital transformation initiative', 'Project-based contract with completion bonuses', 'Pending Approval', NULL, NULL, 'Critical project - need experienced PM', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(11, 'CTR-2024-201', 'Indefinite', '2024-11-25', NULL, 4200.00, 'Manage accounting records, financial reporting, and tax compliance\n\nTerms: Standard employment with CPA certification support and annual bonus', 'Pending Approval', NULL, NULL, 'Ready for review - candidate has excellent credentials', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(12, 'CTR-2024-202', 'Indefinite', '2024-12-10', NULL, 6500.00, 'Oversee daily operations, optimize processes, and manage operational staff\n\nTerms: Management contract with performance metrics and team bonuses', 'Pending Approval', NULL, NULL, 'Urgent position - operations manager needed ASAP', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(13, 'CTR-2024-203', 'Fixed-term', '2024-11-20', '2025-05-19', 2800.00, 'Provide administrative support including scheduling, documentation, and coordination\n\nTerms: Temporary contract to cover maternity leave', 'Pending Approval', NULL, NULL, 'Temporary replacement for Sarah - 6 months', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(14, 'CTR-2024-204', 'Indefinite', '2024-12-05', NULL, 5500.00, 'Software development and maintenance of internal systems\n\nTerms: Standard employment with remote work options', 'Pending Approval', NULL, NULL, 'Senior developer with 8 years experience', NULL, (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(15, 'CTR-2024-205', 'Fixed-term', '2025-01-15', '2025-12-31', 4800.00, 'Project management for digital transformation initiative\n\nTerms: Project-based contract with completion bonuses', 'Pending Approval', NULL, NULL, 'Critical project - need experienced PM', NULL, (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Rejected Contracts (rejected by HR Manager with reasons)
-(16, 'CTR-2024-301', 'Indefinite', '2024-10-01', NULL, 8500.00, 'Senior HR Business Partner role with strategic responsibilities', 'Executive level contract with stock options', 'Rejected', NULL, 2, 'Salary request exceeds budget allocation for this position. Please revise compensation package.', '2024-10-15 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(17, 'CTR-2024-302', 'Fixed-term', '2024-09-15', '2024-12-15', 2200.00, 'Data entry and basic administrative tasks', 'Entry level position with basic benefits', 'Rejected', NULL, 2, 'Position requirements do not match candidate qualifications. Candidate is overqualified for this role.', '2024-09-20 10:15:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(18, 'CTR-2024-303', 'Indefinite', '2024-08-20', NULL, 7200.00, 'Lead architect for new software platform development', 'Senior technical role with leadership responsibilities', 'Rejected', NULL, 2, 'Technical requirements not clearly defined. Please provide detailed technical specifications and team structure.', '2024-08-25 16:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(19, 'CTR-2024-304', 'Fixed-term', '2024-07-10', '2024-09-10', 3500.00, 'Temporary sales support during summer campaign', 'Short-term contract with performance incentives', 'Rejected', NULL, 2, 'Contract duration too short for effective onboarding and training. Minimum 6-month contracts required for sales positions.', '2024-07-15 11:20:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(16, 'CTR-2024-301', 'Indefinite', '2024-10-01', NULL, 8500.00, 'Senior HR Business Partner role with strategic responsibilities\n\nTerms: Executive level contract with stock options', 'Rejected', NULL, 2, 'Salary request exceeds budget allocation for this position. Please revise compensation package.', '2024-10-15 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(17, 'CTR-2024-302', 'Fixed-term', '2024-09-15', '2024-12-15', 2200.00, 'Data entry and basic administrative tasks\n\nTerms: Entry level position with basic benefits', 'Rejected', NULL, 2, 'Position requirements do not match candidate qualifications. Candidate is overqualified for this role.', '2024-09-20 10:15:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(18, 'CTR-2024-303', 'Indefinite', '2024-08-20', NULL, 7200.00, 'Lead architect for new software platform development\n\nTerms: Senior technical role with leadership responsibilities', 'Rejected', NULL, 2, 'Technical requirements not clearly defined. Please provide detailed technical specifications and team structure.', '2024-08-25 16:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(19, 'CTR-2024-304', 'Fixed-term', '2024-07-10', '2024-09-10', 3500.00, 'Temporary sales support during summer campaign\n\nTerms: Short-term contract with performance incentives', 'Rejected', NULL, 2, 'Contract duration too short for effective onboarding and training. Minimum 6-month contracts required for sales positions.', '2024-07-15 11:20:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Expired Contracts
-(20, 'CTR-2023-401', 'Fixed-term', '2023-01-15', '2024-01-14', 3200.00, 'Temporary customer service representative', 'One-year fixed contract with renewal option', 'Expired', '2023-01-10', 2, 'Approved for one year term', '2023-01-12 09:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(21, 'CTR-2022-402', 'Fixed-term', '2022-06-01', '2024-05-31', 4100.00, 'Project coordinator for system upgrade', 'Two-year project contract', 'Expired', '2022-05-25', 2, 'Critical project role approved', '2022-05-28 13:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(20, 'CTR-2023-401', 'Fixed-term', '2023-01-15', '2024-01-14', 3200.00, 'Temporary customer service representative\n\nTerms: One-year fixed contract with renewal option', 'Expired', '2023-01-10', 2, 'Approved for one year term', '2023-01-12 09:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(21, 'CTR-2022-402', 'Fixed-term', '2022-06-01', '2024-05-31', 4100.00, 'Project coordinator for system upgrade\n\nTerms: Two-year project contract', 'Expired', '2022-05-25', 2, 'Critical project role approved', '2022-05-28 13:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Terminated Contracts
-(22, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns', 'Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(22, 'CTR-2023-501', 'Indefinite', '2023-03-01', NULL, 3800.00, 'Marketing specialist for digital campaigns\n\nTerms: Standard employment with creative bonuses', 'Terminated', '2023-02-25', 2, 'Approved with probation period', '2023-02-27 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Additional Active Contracts for Employee Role Users (for testing)
 -- Software Engineers
-(7, 'CTR-2020-001', 'Indefinite', '2020-01-20', NULL, 4200.00, 'Develop and maintain software applications using modern technologies and frameworks', 'Standard employment with technical training support and annual performance bonuses', 'Active', '2020-01-15', 2, 'Strong technical background, approved for immediate start', '2020-01-17 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(8, 'CTR-2020-002', 'Indefinite', '2020-01-20', NULL, 3800.00, 'Frontend development using React, Vue.js and modern web technologies', 'Standard employment with flexible working hours and remote work options', 'Active', '2020-01-18', 2, 'Excellent frontend skills, team player', '2020-01-20 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(7, 'CTR-2020-001', 'Indefinite', '2020-01-20', NULL, 4200.00, 'Develop and maintain software applications using modern technologies and frameworks\n\nTerms: Standard employment with technical training support and annual performance bonuses', 'Active', '2020-01-15', 2, 'Strong technical background, approved for immediate start', '2020-01-17 10:00:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(8, 'CTR-2020-002', 'Indefinite', '2020-01-20', NULL, 3800.00, 'Frontend development using React, Vue.js and modern web technologies\n\nTerms: Standard employment with flexible working hours and remote work options', 'Active', '2020-01-18', 2, 'Excellent frontend skills, team player', '2020-01-20 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
 
 -- Sales Representatives
-(9, 'CTR-2018-001', 'Indefinite', '2018-07-11', NULL, 3200.00, 'Generate sales leads, maintain client relationships, and achieve monthly sales targets', 'Standard employment with commission structure and quarterly bonuses', 'Active', '2018-07-08', 2, 'Proven sales track record, excellent communication skills', '2018-07-10 09:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(10, 'CTR-2020-003', 'Indefinite', '2020-09-05', NULL, 3100.00, 'Business development and client acquisition in assigned territory', 'Standard employment with travel allowance and performance incentives', 'Active', '2020-09-02', 2, 'Strong business development background', '2020-09-04 11:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(9, 'CTR-2018-001', 'Indefinite', '2018-07-11', NULL, 3200.00, 'Generate sales leads, maintain client relationships, and achieve monthly sales targets\n\nTerms: Standard employment with commission structure and quarterly bonuses', 'Active', '2018-07-08', 2, 'Proven sales track record, excellent communication skills', '2018-07-10 09:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(10, 'CTR-2020-003', 'Indefinite', '2020-09-05', NULL, 3100.00, 'Business development and client acquisition in assigned territory\n\nTerms: Standard employment with travel allowance and performance incentives', 'Active', '2020-09-02', 2, 'Strong business development background', '2020-09-04 11:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Marketing Specialists
-(11, 'CTR-2017-001', 'Indefinite', '2017-05-18', NULL, 3600.00, 'Develop and execute marketing campaigns, analyze market trends and customer behavior', 'Standard employment with creative project bonuses and professional development support', 'Active', '2017-05-15', 2, 'Creative marketing professional with digital expertise', '2017-05-17 13:20:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(11, 'CTR-2017-001', 'Indefinite', '2017-05-18', NULL, 3600.00, 'Develop and execute marketing campaigns, analyze market trends and customer behavior\n\nTerms: Standard employment with creative project bonuses and professional development support', 'Active', '2017-05-15', 2, 'Creative marketing professional with digital expertise', '2017-05-17 13:20:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Finance Specialists
-(12, 'CTR-2019-001', 'Indefinite', '2019-11-22', NULL, 4100.00, 'Manage accounting records, financial reporting, and ensure tax compliance', 'Standard employment with CPA certification support and annual bonus', 'Active', '2019-11-19', 2, 'Strong accounting background with CPA eligibility', '2019-11-21 15:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(12, 'CTR-2019-001', 'Indefinite', '2019-11-22', NULL, 4100.00, 'Manage accounting records, financial reporting, and ensure tax compliance\n\nTerms: Standard employment with CPA certification support and annual bonus', 'Active', '2019-11-19', 2, 'Strong accounting background with CPA eligibility', '2019-11-21 15:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
 
 -- Operations Specialists
-(13, 'CTR-2018-002', 'Indefinite', '2018-10-30', NULL, 3900.00, 'Oversee daily operations, optimize processes, and coordinate with various departments', 'Standard employment with process improvement bonuses and leadership development', 'Active', '2018-10-27', 2, 'Operations expert with process optimization experience', '2018-10-29 10:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(14, 'CTR-2021-001', 'Indefinite', '2021-02-15', NULL, 3500.00, 'Support daily operations, maintain documentation, and assist with process improvements', 'Standard employment with training opportunities and performance reviews', 'Active', '2021-02-12', 2, 'Detail-oriented professional with strong organizational skills', '2021-02-14 16:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(13, 'CTR-2018-002', 'Indefinite', '2018-10-30', NULL, 3900.00, 'Oversee daily operations, optimize processes, and coordinate with various departments\n\nTerms: Standard employment with process improvement bonuses and leadership development', 'Active', '2018-10-27', 2, 'Operations expert with process optimization experience', '2018-10-29 10:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(14, 'CTR-2021-001', 'Indefinite', '2021-02-15', NULL, 3500.00, 'Support daily operations, maintain documentation, and assist with process improvements\n\nTerms: Standard employment with training opportunities and performance reviews', 'Active', '2021-02-12', 2, 'Detail-oriented professional with strong organizational skills', '2021-02-14 16:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
 
 -- Additional HR Specialists
-(15, 'CTR-2024-001', 'Indefinite', '2024-10-01', NULL, 3400.00, 'Handle recruitment processes, employee onboarding, and HR documentation', 'Standard employment with HR certification support and professional development', 'Active', '2024-09-28', 2, 'Recent graduate with strong HR foundation', '2024-09-30 12:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
-(16, 'CTR-2024-002', 'Indefinite', '2024-09-15', NULL, 3300.00, 'Assist with HR operations, maintain employee records, and support recruitment activities', 'Standard employment with mentorship program and career advancement opportunities', 'Active', '2024-09-12', 2, 'Entry-level HR professional with growth potential', '2024-09-14 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(15, 'CTR-2024-001', 'Indefinite', '2024-10-01', NULL, 3400.00, 'Handle recruitment processes, employee onboarding, and HR documentation\n\nTerms: Standard employment with HR certification support and professional development', 'Active', '2024-09-28', 2, 'Recent graduate with strong HR foundation', '2024-09-30 12:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(16, 'CTR-2024-002', 'Indefinite', '2024-09-15', NULL, 3300.00, 'Assist with HR operations, maintain employee records, and support recruitment activities\n\nTerms: Standard employment with mentorship program and career advancement opportunities', 'Active', '2024-09-12', 2, 'Entry-level HR professional with growth potential', '2024-09-14 14:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
 
 -- IT Support Specialists
-(17, 'CTR-2024-003', 'Indefinite', '2024-08-20', NULL, 3700.00, 'Provide technical support, maintain IT infrastructure, and assist with system implementations', 'Standard employment with technical training and certification support', 'Active', '2024-08-17', 2, 'Technical support specialist with strong troubleshooting skills', '2024-08-19 11:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(18, 'CTR-2024-004', 'Indefinite', '2024-10-20', NULL, 3600.00, 'Develop and maintain software applications, participate in code reviews and technical discussions', 'Standard employment with agile development practices and continuous learning', 'Active', '2024-10-17', 2, 'Software developer with modern technology stack experience', '2024-10-19 15:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(17, 'CTR-2024-003', 'Indefinite', '2024-08-20', NULL, 3700.00, 'Provide technical support, maintain IT infrastructure, and assist with system implementations\n\nTerms: Standard employment with technical training and certification support', 'Active', '2024-08-17', 2, 'Technical support specialist with strong troubleshooting skills', '2024-08-19 11:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(18, 'CTR-2024-004', 'Indefinite', '2024-10-20', NULL, 3600.00, 'Develop and maintain software applications, participate in code reviews and technical discussions\n\nTerms: Standard employment with agile development practices and continuous learning', 'Active', '2024-10-17', 2, 'Software developer with modern technology stack experience', '2024-10-19 15:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Sales Team Members
-(19, 'CTR-2024-005', 'Indefinite', '2024-12-15', NULL, 3200.00, 'Generate new business opportunities, maintain existing client relationships, and achieve sales targets', 'Standard employment with competitive commission structure and sales incentives', 'Active', '2024-12-12', 2, 'Sales professional with strong client relationship skills', '2024-12-14 09:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(20, 'CTR-2023-001', 'Indefinite', '2023-01-15', NULL, 3400.00, 'Business development and market expansion in assigned regions', 'Standard employment with territory management and growth bonuses', 'Active', '2023-01-12', 2, 'Business development specialist with market expansion experience', '2023-01-14 13:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(19, 'CTR-2024-005', 'Indefinite', '2024-12-15', NULL, 3200.00, 'Generate new business opportunities, maintain existing client relationships, and achieve sales targets\n\nTerms: Standard employment with competitive commission structure and sales incentives', 'Active', '2024-12-12', 2, 'Sales professional with strong client relationship skills', '2024-12-14 09:30:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(20, 'CTR-2023-001', 'Indefinite', '2023-01-15', NULL, 3400.00, 'Business development and market expansion in assigned regions\n\nTerms: Standard employment with territory management and growth bonuses', 'Active', '2023-01-12', 2, 'Business development specialist with market expansion experience', '2023-01-14 13:15:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Marketing Team Members
-(21, 'CTR-2023-002', 'Indefinite', '2023-03-01', NULL, 3500.00, 'Create marketing content, manage social media presence, and analyze campaign performance', 'Standard employment with creative project bonuses and digital marketing training', 'Active', '2023-02-26', 2, 'Digital marketing specialist with content creation expertise', '2023-02-28 16:20:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(22, 'CTR-2023-003', 'Indefinite', '2023-06-01', NULL, 3800.00, 'Develop marketing strategies, coordinate campaigns, and analyze market research data', 'Standard employment with strategic planning bonuses and leadership development', 'Active', '2023-05-29', 2, 'Marketing strategist with analytical and creative skills', '2023-05-31 10:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(21, 'CTR-2023-002', 'Indefinite', '2023-03-01', NULL, 3500.00, 'Create marketing content, manage social media presence, and analyze campaign performance\n\nTerms: Standard employment with creative project bonuses and digital marketing training', 'Active', '2023-02-26', 2, 'Digital marketing specialist with content creation expertise', '2023-02-28 16:20:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(22, 'CTR-2023-003', 'Indefinite', '2023-06-01', NULL, 3800.00, 'Develop marketing strategies, coordinate campaigns, and analyze market research data\n\nTerms: Standard employment with strategic planning bonuses and leadership development', 'Active', '2023-05-29', 2, 'Marketing strategist with analytical and creative skills', '2023-05-31 10:45:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Finance Team Members
-(23, 'CTR-2022-001', 'Indefinite', '2022-08-15', NULL, 4000.00, 'Prepare financial reports, assist with budgeting, and ensure compliance with accounting standards', 'Standard employment with financial analysis training and professional development', 'Active', '2022-08-12', 2, 'Financial analyst with strong analytical and reporting skills', '2022-08-14 14:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(24, 'CTR-2022-002', 'Indefinite', '2022-11-01', NULL, 3900.00, 'Manage accounts payable and receivable, process invoices, and maintain financial records', 'Standard employment with accounting software training and process improvement opportunities', 'Active', '2022-10-29', 2, 'Accounting specialist with attention to detail and accuracy', '2022-10-31 12:30:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(23, 'CTR-2022-001', 'Indefinite', '2022-08-15', NULL, 4000.00, 'Prepare financial reports, assist with budgeting, and ensure compliance with accounting standards\n\nTerms: Standard employment with financial analysis training and professional development', 'Active', '2022-08-12', 2, 'Financial analyst with strong analytical and reporting skills', '2022-08-14 14:00:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(24, 'CTR-2022-002', 'Indefinite', '2022-11-01', NULL, 3900.00, 'Manage accounts payable and receivable, process invoices, and maintain financial records\n\nTerms: Standard employment with accounting software training and process improvement opportunities', 'Active', '2022-10-29', 2, 'Accounting specialist with attention to detail and accuracy', '2022-10-31 12:30:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Operations Team Members
-(25, 'CTR-2021-002', 'Indefinite', '2021-07-20', NULL, 3600.00, 'Coordinate daily operations, manage inventory, and optimize workflow processes', 'Standard employment with operations management training and efficiency bonuses', 'Active', '2021-07-17', 2, 'Operations coordinator with process optimization experience', '2021-07-19 15:15:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(26, 'CTR-2021-003', 'Indefinite', '2021-10-05', NULL, 3400.00, 'Support operational activities, maintain documentation, and assist with quality control', 'Standard employment with quality management training and continuous improvement focus', 'Active', '2021-10-02', 2, 'Operations support specialist with quality focus', '2021-10-04 11:20:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(25, 'CTR-2021-002', 'Indefinite', '2021-07-20', NULL, 3600.00, 'Coordinate daily operations, manage inventory, and optimize workflow processes\n\nTerms: Standard employment with operations management training and efficiency bonuses', 'Active', '2021-07-17', 2, 'Operations coordinator with process optimization experience', '2021-07-19 15:15:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(26, 'CTR-2021-003', 'Indefinite', '2021-10-05', NULL, 3400.00, 'Support operational activities, maintain documentation, and assist with quality control\n\nTerms: Standard employment with quality management training and continuous improvement focus', 'Active', '2021-10-02', 2, 'Operations support specialist with quality focus', '2021-10-04 11:20:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Additional IT Team Members
-(27, 'CTR-2020-004', 'Indefinite', '2020-04-12', NULL, 4100.00, 'Backend development using Java, Python, and database technologies', 'Standard employment with backend architecture training and performance bonuses', 'Active', '2020-04-09', 2, 'Backend developer with strong database and API skills', '2020-04-11 13:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
-(28, 'CTR-2020-005', 'Indefinite', '2020-11-22', NULL, 3800.00, 'Full-stack development with focus on web applications and user experience', 'Standard employment with full-stack development training and project bonuses', 'Active', '2020-11-19', 2, 'Full-stack developer with modern web technologies expertise', '2020-11-21 16:10:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
+(27, 'CTR-2020-004', 'Indefinite', '2020-04-12', NULL, 4100.00, 'Backend development using Java, Python, and database technologies\n\nTerms: Standard employment with backend architecture training and performance bonuses', 'Active', '2020-04-09', 2, 'Backend developer with strong database and API skills', '2020-04-11 13:45:00', (SELECT user_id FROM users WHERE username = 'hr_staff1')),
+(28, 'CTR-2020-005', 'Indefinite', '2020-11-22', NULL, 3800.00, 'Full-stack development with focus on web applications and user experience\n\nTerms: Standard employment with full-stack development training and project bonuses', 'Active', '2020-11-19', 2, 'Full-stack developer with modern web technologies expertise', '2020-11-21 16:10:00', (SELECT user_id FROM users WHERE username = 'hr_manager')),
 
 -- Additional Sales Team Members
-(29, 'CTR-2019-002', 'Indefinite', '2019-08-14', NULL, 3300.00, 'Customer relationship management, sales support, and client retention', 'Standard employment with CRM training and customer service bonuses', 'Active', '2019-08-11', 2, 'Sales support specialist with strong customer service skills', '2019-08-13 14:25:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
-(30, 'CTR-2019-003', 'Indefinite', '2019-12-01', NULL, 3500.00, 'Lead generation, sales prospecting, and territory management', 'Standard employment with sales training and lead generation bonuses', 'Active', '2019-11-28', 2, 'Sales professional with lead generation and prospecting expertise', '2019-11-30 10:50:00', (SELECT user_id FROM users WHERE username = 'hr_manager'));
+(29, 'CTR-2019-002', 'Indefinite', '2019-08-14', NULL, 3300.00, 'Customer relationship management, sales support, and client retention\n\nTerms: Standard employment with CRM training and customer service bonuses', 'Active', '2019-08-11', 2, 'Sales support specialist with strong customer service skills', '2019-08-13 14:25:00', (SELECT user_id FROM users WHERE username = 'hr_staff2')),
+(30, 'CTR-2019-003', 'Indefinite', '2019-12-01', NULL, 3500.00, 'Lead generation, sales prospecting, and territory management\n\nTerms: Standard employment with sales training and lead generation bonuses', 'Active', '2019-11-28', 2, 'Sales professional with lead generation and prospecting expertise', '2019-11-30 10:50:00', (SELECT user_id FROM users WHERE username = 'hr_manager'));
 
 -- ==============================================================================
 -- INSERT DATA: job_postings
@@ -1953,47 +2020,42 @@ AND (ar.adjustment_reason IS NULL OR ar.adjustment_reason = '');
 -- =====================================================
 
 -- Add more attendance records for the last 6 months (for trend analysis)
-INSERT INTO attendance_records (employee_id, attendance_date, check_in_time, check_out_time, status, overtime_hours)
-SELECT 
+INSERT IGNORE INTO attendance_records (employee_id, attendance_date, check_in_time, check_out_time, status, overtime_hours)
+SELECT
     e.employee_id,
     DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY) AS attendance_date,
-    CASE 
+    CASE
         WHEN RAND() > 0.15 THEN TIME('08:00:00')
         WHEN RAND() > 0.5 THEN TIME('08:30:00')
         ELSE TIME('09:15:00')
     END AS check_in_time,
-    CASE 
+    CASE
         WHEN RAND() > 0.2 THEN TIME('17:30:00')
         ELSE TIME('18:30:00')
     END AS check_out_time,
-    CASE 
+    CASE
         WHEN RAND() > 0.85 THEN 'Absent'
         WHEN RAND() > 0.75 THEN 'Late'
         WHEN RAND() > 0.90 THEN 'Remote'
         WHEN RAND() > 0.95 THEN 'Business Trip'
         ELSE 'Present'
     END AS status,
-    CASE 
+    CASE
         WHEN RAND() > 0.7 THEN ROUND(RAND() * 3, 2)
         ELSE 0
     END AS overtime_hours
 FROM employees e
 WHERE e.employment_status = 'Active'
-AND NOT EXISTS (
-    SELECT 1 FROM attendance_records ar 
-    WHERE ar.employee_id = e.employee_id 
-    AND ar.attendance_date = DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY)
-)
 LIMIT 500;
 
 -- Add more job applications for the last 6 months (for recruitment trend)
 INSERT INTO job_applications (job_id, applicant_name, applicant_email, applicant_phone, application_status, applied_date)
-SELECT 
+SELECT
     jp.job_id,
     CONCAT('Applicant ', FLOOR(RAND() * 1000)) AS applicant_name,
     CONCAT('applicant', FLOOR(RAND() * 10000), '@example.com') AS applicant_email,
     CONCAT('09', LPAD(FLOOR(RAND() * 100000000), 8, '0')) AS applicant_phone,
-    CASE 
+    CASE
         WHEN RAND() > 0.7 THEN 'Submitted'
         WHEN RAND() > 0.5 THEN 'Screening'
         WHEN RAND() > 0.3 THEN 'Interview'
@@ -2003,7 +2065,7 @@ SELECT
     END AS application_status,
     DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY) AS applied_date
 FROM job_postings jp
-WHERE jp.status = 'Open'
+WHERE jp.job_status = 'Open'
 LIMIT 200;
 
 -- Add more tasks with various statuses (for task statistics)
@@ -2042,9 +2104,9 @@ SELECT
         ELSE 100
     END AS progress_percentage
 FROM employees e
-INNER JOIN users u ON e.employee_id = u.employee_id
+INNER JOIN users u ON e.user_id = u.user_id
 WHERE e.employment_status = 'Active'
-AND u.role IN ('HR_MANAGER', 'DEPT_MANAGER')
+AND u.role IN ('HR Manager', 'Dept Manager')
 LIMIT 100;
 
 -- Update some tasks to be completed
@@ -2075,8 +2137,7 @@ SELECT
         WHEN 1 THEN 'Approved'
         ELSE 'Rejected'
     END AS request_status,
-    (SELECT u2.user_id FROM users u2 
-     INNER JOIN employees e2 ON u2.employee_id = e2.employee_id
+    (SELECT e2.user_id FROM employees e2
      INNER JOIN departments d ON e2.employee_id = d.manager_id
      WHERE d.department_id = e.department_id
      LIMIT 1) AS reviewed_by,
@@ -2094,72 +2155,89 @@ WHERE e.employment_status = 'Active'
 LIMIT 150;
 
 -- Add more contracts with various statuses (for contract statistics)
-INSERT INTO contracts (employee_id, contract_type, contract_number, start_date, end_date, salary_amount, contract_status, signed_date)
-SELECT 
+INSERT INTO employment_contracts (employee_id, contract_type, contract_number, start_date, end_date, salary_amount, contract_status, signed_date, job_description, created_by)
+SELECT
     e.employee_id,
     CASE FLOOR(RAND() * 4)
-        WHEN 0 THEN 'Full-time'
-        WHEN 1 THEN 'Part-time'
-        WHEN 2 THEN 'Contract'
-        ELSE 'Internship'
+        WHEN 0 THEN 'Indefinite'
+        WHEN 1 THEN 'Fixed-term'
+        WHEN 2 THEN 'Probation'
+        ELSE 'Seasonal'
     END AS contract_type,
-    CONCAT('CT', YEAR(CURDATE()), LPAD(FLOOR(RAND() * 10000), 4, '0')) AS contract_number,
+    CONCAT('CTR-', YEAR(CURDATE()), '-', LPAD(FLOOR(RAND() * 10000), 4, '0')) AS contract_number,
     DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY) AS start_date,
     CASE FLOOR(RAND() * 3)
         WHEN 0 THEN DATE_ADD(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY)
         WHEN 1 THEN DATE_ADD(CURDATE(), INTERVAL FLOOR(RAND() * 180) DAY)
         ELSE DATE_ADD(CURDATE(), INTERVAL 30 DAY) -- Expiring soon
     END AS end_date,
-    ROUND(8000000 + (RAND() * 22000000), 0) AS salary_amount,
+    ROUND(3000 + (RAND() * 7000), 2) AS salary_amount,
     CASE FLOOR(RAND() * 4)
         WHEN 0 THEN 'Active'
         WHEN 1 THEN 'Active'
         WHEN 2 THEN 'Expired'
-        ELSE 'Pending'
+        ELSE 'Pending Approval'
     END AS contract_status,
-    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY) AS signed_date
+    DATE_SUB(CURDATE(), INTERVAL FLOOR(RAND() * 365) DAY) AS signed_date,
+    CONCAT('Standard employment contract with responsibilities as per position description',
+           '\n\nTerms: Standard employment terms including benefits, leave policy, and confidentiality agreement') AS job_description,
+    2 AS created_by
 FROM employees e
 WHERE e.employment_status = 'Active'
 AND NOT EXISTS (
-    SELECT 1 FROM contracts c 
-    WHERE c.employee_id = e.employee_id 
-    AND c.contract_status = 'Active'
+    SELECT 1 FROM employment_contracts ec
+    WHERE ec.employee_id = e.employee_id
+    AND ec.contract_status = 'Active'
 )
 LIMIT 50;
 
 -- Add monthly payroll records for the last 6 months (for salary statistics)
-INSERT INTO monthly_payroll (employee_id, pay_period_month, pay_period_year, base_salary, overtime_pay, bonus, deductions, net_salary, payment_status, payment_date)
-SELECT 
+INSERT INTO monthly_payroll (employee_id, payroll_month, base_salary, total_allowances, overtime_pay, total_bonus, total_benefits, total_deductions, gross_salary, net_salary, working_days, absent_days, late_days, overtime_hours, status, calculated_by, calculated_at, approved_by, approved_at, paid_at)
+SELECT
     e.employee_id,
-    MONTH(DATE_SUB(CURDATE(), INTERVAL n.n MONTH)) AS pay_period_month,
-    YEAR(DATE_SUB(CURDATE(), INTERVAL n.n MONTH)) AS pay_period_year,
-    ROUND(10000000 + (RAND() * 20000000), 0) AS base_salary,
-    ROUND(RAND() * 3000000, 0) AS overtime_pay,
-    CASE 
-        WHEN RAND() > 0.7 THEN ROUND(RAND() * 5000000, 0)
+    DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL n.n MONTH), '%Y-%m-01') AS payroll_month,
+    sc.base_salary,
+    sc.position_allowance + sc.housing_allowance + sc.transportation_allowance + sc.meal_allowance + sc.other_allowances AS total_allowances,
+    ROUND(RAND() * 500, 2) AS overtime_pay,
+    CASE
+        WHEN RAND() > 0.7 THEN ROUND(RAND() * 1000, 2)
         ELSE 0
-    END AS bonus,
-    ROUND(1000000 + (RAND() * 2000000), 0) AS deductions,
-    ROUND((10000000 + (RAND() * 20000000)) + (RAND() * 3000000) + 
-          CASE WHEN RAND() > 0.7 THEN RAND() * 5000000 ELSE 0 END - 
-          (1000000 + (RAND() * 2000000)), 0) AS net_salary,
+    END AS total_bonus,
+    250.00 AS total_benefits,
+    ROUND((sc.base_salary + sc.position_allowance + sc.housing_allowance + sc.transportation_allowance + sc.meal_allowance + sc.other_allowances) * 0.2275, 2) AS total_deductions,
+    sc.base_salary + sc.position_allowance + sc.housing_allowance + sc.transportation_allowance + sc.meal_allowance + sc.other_allowances + ROUND(RAND() * 500, 2) + CASE WHEN RAND() > 0.7 THEN ROUND(RAND() * 1000, 2) ELSE 0 END + 250.00 AS gross_salary,
+    ROUND((sc.base_salary + sc.position_allowance + sc.housing_allowance + sc.transportation_allowance + sc.meal_allowance + sc.other_allowances + ROUND(RAND() * 500, 2) + CASE WHEN RAND() > 0.7 THEN ROUND(RAND() * 1000, 2) ELSE 0 END + 250.00) - ((sc.base_salary + sc.position_allowance + sc.housing_allowance + sc.transportation_allowance + sc.meal_allowance + sc.other_allowances) * 0.2275), 2) AS net_salary,
+    22 AS working_days,
+    0 AS absent_days,
+    0 AS late_days,
+    ROUND(RAND() * 10, 2) AS overtime_hours,
     CASE FLOOR(RAND() * 3)
-        WHEN 0 THEN 'Pending'
-        WHEN 1 THEN 'Paid'
-        ELSE 'Paid'
-    END AS payment_status,
+        WHEN 0 THEN 'Draft'
+        WHEN 1 THEN 'Calculated'
+        ELSE 'Approved'
+    END AS status,
+    2 AS calculated_by,
+    DATE_SUB(LAST_DAY(DATE_SUB(CURDATE(), INTERVAL n.n MONTH)), INTERVAL 2 DAY) AS calculated_at,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN NULL
+        ELSE 2
+    END AS approved_by,
     CASE FLOOR(RAND() * 3)
         WHEN 0 THEN NULL
         ELSE LAST_DAY(DATE_SUB(CURDATE(), INTERVAL n.n MONTH))
-    END AS payment_date
+    END AS approved_at,
+    CASE FLOOR(RAND() * 3)
+        WHEN 0 THEN NULL
+        ELSE DATE_ADD(LAST_DAY(DATE_SUB(CURDATE(), INTERVAL n.n MONTH)), INTERVAL 5 DAY)
+    END AS paid_at
 FROM employees e
 CROSS JOIN (SELECT 0 AS n UNION SELECT 1 UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5) n
+JOIN salary_components sc ON e.employee_id = sc.employee_id AND sc.is_active = TRUE
 WHERE e.employment_status = 'Active'
 AND NOT EXISTS (
-    SELECT 1 FROM monthly_payroll mp 
-    WHERE mp.employee_id = e.employee_id 
-    AND mp.pay_period_month = MONTH(DATE_SUB(CURDATE(), INTERVAL n.n MONTH))
-    AND mp.pay_period_year = YEAR(DATE_SUB(CURDATE(), INTERVAL n.n MONTH))
+    SELECT 1 FROM monthly_payroll mp
+    WHERE mp.employee_id = e.employee_id
+    AND mp.payroll_month = DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL n.n MONTH), '%Y-%m-01')
 )
 LIMIT 300;
 
@@ -2204,5 +2282,5 @@ SELECT 'Total Attendance Records (Last 6 months)' AS metric, COUNT(*) AS count F
 SELECT 'Total Job Applications (Last 6 months)' AS metric, COUNT(*) AS count FROM job_applications WHERE applied_date >= DATE_SUB(CURDATE(), INTERVAL 6 MONTH);
 SELECT 'Total Tasks' AS metric, COUNT(*) AS count FROM tasks WHERE is_deleted = FALSE;
 SELECT 'Total Requests' AS metric, COUNT(*) AS count FROM requests;
-SELECT 'Total Contracts' AS metric, COUNT(*) AS count FROM contracts;
-SELECT 'Total Payroll Records (Last 6 months)' AS metric, COUNT(*) AS count FROM monthly_payroll WHERE CONCAT(pay_period_year, '-', LPAD(pay_period_month, 2, '0')) >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), '%Y-%m');
+SELECT 'Total Contracts' AS metric, COUNT(*) AS count FROM employment_contracts;
+SELECT 'Total Payroll Records (Last 6 months)' AS metric, COUNT(*) AS count FROM monthly_payroll WHERE payroll_month >= DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 6 MONTH), '%Y-%m-01');

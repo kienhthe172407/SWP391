@@ -18,9 +18,9 @@ public class ContractDAO extends DBContext {
      */
     public boolean createContract(Contract contract) {
         String sql = "INSERT INTO employment_contracts (employee_id, contract_number, contract_type, " +
-                    "start_date, end_date, salary_amount, job_description, terms_and_conditions, " +
+                    "start_date, end_date, salary_amount, job_description, " +
                     "contract_status, created_by, approval_comment) " +
-                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, contract.getEmployeeID());
@@ -30,16 +30,15 @@ public class ContractDAO extends DBContext {
             ps.setDate(5, contract.getEndDate()); // Can be null for indefinite contracts
             ps.setBigDecimal(6, contract.getSalaryAmount());
             ps.setString(7, contract.getJobDescription());
-            ps.setString(8, contract.getTermsAndConditions());
-            ps.setString(9, contract.getContractStatus());
+            ps.setString(8, contract.getContractStatus());
             
             if (contract.getCreatedBy() != null) {
-                ps.setInt(10, contract.getCreatedBy());
+                ps.setInt(9, contract.getCreatedBy());
             } else {
-                ps.setNull(10, java.sql.Types.INTEGER);
+                ps.setNull(9, java.sql.Types.INTEGER);
             }
             
-            ps.setString(11, contract.getApprovalComment());
+            ps.setString(10, contract.getApprovalComment());
             
             int affectedRows = ps.executeUpdate();
             
@@ -128,7 +127,7 @@ public class ContractDAO extends DBContext {
         List<Contract> contracts = new ArrayList<>();
         String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
                      "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.contract_status, c.signed_date, " +
                      "c.approved_by, c.approval_comment, c.approved_at, " +
                      "c.created_by, c.created_at, c.updated_at, " +
                      "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -169,7 +168,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
             "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.contract_status, c.signed_date, " +
             "c.approved_by, c.approval_comment, c.approved_at, " +
             "c.created_by, c.created_at, c.updated_at, " +
             "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -282,7 +281,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
             "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.contract_status, c.signed_date, " +
             "c.approved_by, c.approval_comment, c.approved_at, " +
             "c.created_by, c.created_at, c.updated_at, " +
             "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -388,7 +387,7 @@ public class ContractDAO extends DBContext {
         List<Contract> contracts = new ArrayList<>();
         String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
                      "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.contract_status, c.signed_date, " +
                      "c.approved_by, c.approval_comment, c.approved_at, " +
                      "c.created_by, c.created_at, c.updated_at, " +
                      "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -428,7 +427,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
             "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.contract_status, c.signed_date, " +
             "c.approved_by, c.approval_comment, c.approved_at, " +
             "c.created_by, c.created_at, c.updated_at, " +
             "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -483,7 +482,7 @@ public class ContractDAO extends DBContext {
         
         String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
                      "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.contract_status, c.signed_date, " +
                      "c.approved_by, c.approval_comment, c.approved_at, " +
                      "c.created_by, c.created_at, c.updated_at, " +
                      "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -612,7 +611,7 @@ public class ContractDAO extends DBContext {
     public Contract getContractById(int contractID) {
         String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
                      "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.contract_status, c.signed_date, " +
                      "c.approved_by, c.approval_comment, c.approved_at, " +
                      "c.created_by, c.created_at, c.updated_at, " +
                      "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -646,7 +645,7 @@ public class ContractDAO extends DBContext {
         List<Contract> contracts = new ArrayList<>();
         String sql = "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
                      "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-                     "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+                     "c.contract_status, c.signed_date, " +
                      "c.approved_by, c.approval_comment, c.approved_at, " +
                      "c.created_by, c.created_at, c.updated_at, " +
                      "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -684,7 +683,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
             "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.contract_status, c.signed_date, " +
             "c.approved_by, c.approval_comment, c.approved_at, " +
             "c.created_by, c.created_at, c.updated_at, " +
             "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -760,7 +759,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
             "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.contract_status, c.signed_date, " +
             "c.approved_by, c.approval_comment, c.approved_at, " +
             "c.created_by, c.created_at, c.updated_at, " +
             "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -848,7 +847,7 @@ public class ContractDAO extends DBContext {
         StringBuilder sql = new StringBuilder(
             "SELECT c.contract_id, c.employee_id, c.contract_number, c.contract_type, " +
             "c.start_date, c.end_date, c.salary_amount, c.job_description, " +
-            "c.terms_and_conditions, c.contract_status, c.signed_date, " +
+            "c.contract_status, c.signed_date, " +
             "c.approved_by, c.approval_comment, c.approved_at, " +
             "c.created_by, c.created_at, c.updated_at, " +
             "CONCAT(e.first_name, ' ', e.last_name) AS employee_full_name, " +
@@ -1086,7 +1085,6 @@ public class ContractDAO extends DBContext {
                 "end_date = ?, " +
                 "salary_amount = ?, " +
                 "job_description = ?, " +
-                "terms_and_conditions = ?, " +
                 "contract_status = ?, " +
                 "approval_comment = ?, " +
                 "updated_at = CURRENT_TIMESTAMP " +
@@ -1100,10 +1098,9 @@ public class ContractDAO extends DBContext {
             ps.setDate(5, contract.getEndDate());
             ps.setBigDecimal(6, contract.getSalaryAmount());
             ps.setString(7, contract.getJobDescription());
-            ps.setString(8, contract.getTermsAndConditions());
-            ps.setString(9, contract.getContractStatus());
-            ps.setString(10, contract.getApprovalComment());
-            ps.setInt(11, contract.getContractID());
+            ps.setString(8, contract.getContractStatus());
+            ps.setString(9, contract.getApprovalComment());
+            ps.setInt(10, contract.getContractID());
 
             int affectedRows = ps.executeUpdate();
             System.out.println("Update contract affected rows: " + affectedRows + " for contract ID: " + contract.getContractID() + 
@@ -1135,7 +1132,6 @@ public class ContractDAO extends DBContext {
         contract.setEndDate(rs.getDate("end_date"));
         contract.setSalaryAmount(rs.getBigDecimal("salary_amount"));
         contract.setJobDescription(rs.getString("job_description"));
-        contract.setTermsAndConditions(rs.getString("terms_and_conditions"));
         contract.setContractStatus(rs.getString("contract_status"));
         contract.setSignedDate(rs.getDate("signed_date"));
         
