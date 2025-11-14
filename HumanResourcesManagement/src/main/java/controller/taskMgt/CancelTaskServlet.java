@@ -70,20 +70,24 @@ public class CancelTaskServlet extends HttpServlet {
                 return;
             }
 
-            // Check if user has permission to cancel
+            // Check permission
+            if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_CANCEL)) {
+                request.setAttribute("errorMessage", "Bạn không có quyền hủy nhiệm vụ");
+                request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+                return;
+            }
+            
             String userRole = user.getRole();
             boolean canCancel = false;
             boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
             boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
 
             if (isHRManager) {
-                canCancel = true; // HR Manager can cancel any task
+                canCancel = true;
             } else if (isDeptManager) {
-                // Dept Manager can cancel tasks they assigned
                 if (task.getAssignedBy() == user.getUserId()) {
                     canCancel = true;
                 } else {
-                    // Or tasks in their department
                     Employee managerEmployee = employeeDAO.getEmployeeByUserId(user.getUserId());
                     if (managerEmployee != null && managerEmployee.getDepartmentID() != null) {
                         if (task.getDepartmentId() != null && 
@@ -95,8 +99,8 @@ public class CancelTaskServlet extends HttpServlet {
             }
 
             if (!canCancel) {
-                session.setAttribute("errorMessage", "You don't have permission to cancel this task.");
-                response.sendRedirect(request.getContextPath() + "/task/list");
+                request.setAttribute("errorMessage", "Bạn không có quyền hủy nhiệm vụ này");
+                request.getRequestDispatcher("/error/403.jsp").forward(request, response);
                 return;
             }
 

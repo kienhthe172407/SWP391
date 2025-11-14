@@ -1,5 +1,15 @@
 package controller.auth;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,10 +17,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import model.Permission;
 import model.User;
 import util.PermissionChecker;
-import util.PermissionConstants;
-
-import java.io.IOException;
-import java.util.*;
 
 /**
  * Servlet quản lý Permission Settings
@@ -34,26 +40,26 @@ public class PermissionSettingsServlet extends HttpServlet {
             return;
         }
         
-        // Lấy role từ parameter (mặc định là Admin)
-        String selectedRole = request.getParameter("role");
-        if (selectedRole == null || selectedRole.isEmpty()) {
-            selectedRole = "Admin";
-        }
-        
-        // Lấy tất cả permissions theo category
-        Map<String, List<Permission>> permissionsByCategory = PermissionConstants.getPermissionsByCategory();
-        
-        // Lấy permissions hiện tại của role
-        Set<String> rolePermissions = PermissionChecker.getRolePermissions(selectedRole);
+        // Lấy permissions từ database
+        dal.PermissionDAO permissionDAO = new dal.PermissionDAO();
+        Map<String, List<Permission>> permissionsByCategory = permissionDAO.getPermissionsByCategory();
         
         // Lấy tất cả roles
-        Set<String> allRoles = PermissionChecker.getAllRoles();
+        List<String> allRoles = new ArrayList<>(PermissionChecker.getAllRoles());
+        Collections.sort(allRoles);
+        
+        // Tạo map permissions cho từng role
+        Map<String, Set<String>> rolePermissionsMap = new LinkedHashMap<>();
+        for (String role : allRoles) {
+            rolePermissionsMap.put(role, PermissionChecker.getRolePermissions(role));
+        }
+        
+        permissionDAO.close();
         
         // Set attributes
         request.setAttribute("permissionsByCategory", permissionsByCategory);
-        request.setAttribute("rolePermissions", rolePermissions);
-        request.setAttribute("selectedRole", selectedRole);
         request.setAttribute("allRoles", allRoles);
+        request.setAttribute("rolePermissionsMap", rolePermissionsMap);
         
         // Forward to JSP
         request.getRequestDispatcher("/auth/permission-settings.jsp").forward(request, response);
@@ -76,23 +82,53 @@ public class PermissionSettingsServlet extends HttpServlet {
             return;
         }
         
-        String role = request.getParameter("role");
-        String[] selectedPermissions = request.getParameterValues("permissions");
-        
-        if (role != null && !role.isEmpty()) {
-            // Cập nhật permissions cho role
-            Set<String> newPermissions = new HashSet<>();
-            if (selectedPermissions != null) {
-                newPermissions.addAll(Arrays.asList(selectedPermissions));
+        try {
+            // Lấy tất cả roles
+            Set<String> allRoles = PermissionChecker.getAllRoles();
+            int updatedCount = 0;
+            StringBuilder logMessage = new StringBuilder("=== PERMISSION UPDATE LOG ===\n");
+            
+            // Duyệt qua từng role và cập nhật permissions
+            for (String role : allRoles) {
+                // Thay khoảng trắng thành underscore để khớp với tên parameter trong form
+                String paramName = "permissions_" + role.replace(" ", "_");
+                String[] rolePermissions = request.getParameterValues(paramName);
+                
+                Set<String> newPermissions = new HashSet<>();
+                if (rolePermissions != null) {
+                    newPermissions.addAll(Arrays.asList(rolePermissions));
+                }
+                
+                // Log thông tin trước khi cập nhật
+                Set<String> oldPermissions = PermissionChecker.getRolePermissions(role);
+                logMessage.append(String.format("Role: %s\n", role));
+                logMessage.append(String.format("  Old permissions count: %d\n", oldPermissions.size()));
+                logMessage.append(String.format("  New permissions count: %d\n", newPermissions.size()));
+                logMessage.append(String.format("  New permissions: %s\n", newPermissions));
+                
+                // Cập nhật permissions cho role
+                PermissionChecker.updateRolePermissions(role, newPermissions);
+                
+                // Xác nhận cập nhật thành công
+                Set<String> verifyPermissions = PermissionChecker.getRolePermissions(role);
+                logMessage.append(String.format("  Verified permissions count: %d\n", verifyPermissions.size()));
+                
+                updatedCount++;
             }
             
-            PermissionChecker.updateRolePermissions(role, newPermissions);
+            // In log ra console
+            System.out.println(logMessage.toString());
             
-            request.getSession().setAttribute("successMessage", "Cập nhật phân quyền thành công cho role: " + role);
-        } else {
-            request.getSession().setAttribute("errorMessage", "Vui lòng chọn role");
+            request.getSession().setAttribute("successMessage", 
+                "Đã cập nhật phân quyền thành công cho " + updatedCount + " vai trò!");
+            
+        } catch (Exception e) {
+            // Log lỗi để debug
+            System.err.println("Error updating permissions: " + e.getMessage());
+            request.getSession().setAttribute("errorMessage", 
+                "Có lỗi xảy ra khi cập nhật phân quyền: " + e.getMessage());
         }
         
-        response.sendRedirect(request.getContextPath() + "/permission-settings?role=" + role);
+        response.sendRedirect(request.getContextPath() + "/permission-settings");
     }
 }

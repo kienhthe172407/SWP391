@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    
+    <!-- Permission Filter - Check permissions before accessing protected resources -->
+    <filter>
+        <filter-name>PermissionFilter</filter-name>
+        <filter-class>filter.PermissionFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>PermissionFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+    
     <!-- Authentication Servlets -->
     <servlet>
         <servlet-name>LoginServlet</servlet-name>
@@ -46,6 +57,14 @@
         <url-pattern>/permission-settings</url-pattern>
     </servlet-mapping>
     
+    <servlet>
+        <servlet-name>InitPermissionsServlet</servlet-name>
+        <servlet-class>controller.auth.InitPermissionsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>InitPermissionsServlet</servlet-name>
+        <url-pattern>/init-permissions</url-pattern>
+    </servlet-mapping>
 
     <!-- Welcome File List -->
     <welcome-file-list>

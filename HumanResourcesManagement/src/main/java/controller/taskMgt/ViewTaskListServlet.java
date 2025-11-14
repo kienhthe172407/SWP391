@@ -50,6 +50,13 @@ public class ViewTaskListServlet extends HttpServlet {
             return;
         }
 
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_VIEW_LIST)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xem danh sách nhiệm vụ");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+
         String userRole = user.getRole();
         List<Task> tasks = null;
         

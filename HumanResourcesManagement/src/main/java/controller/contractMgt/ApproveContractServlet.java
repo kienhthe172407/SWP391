@@ -36,28 +36,24 @@ public class ApproveContractServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Get current user role from session (robustly populate from user object if missing)
+        // Get current user from session
         HttpSession session = request.getSession();
-        String userRole = (String) session.getAttribute("userRole");
-        Integer currentUserId = (Integer) session.getAttribute("userId");
-        if (userRole == null) {
-            Object userObj = session.getAttribute("user");
-            if (userObj instanceof model.User) {
-                userRole = ((model.User) userObj).getRole();
-                session.setAttribute("userRole", userRole);
-                if (currentUserId == null) {
-                    currentUserId = ((model.User) userObj).getUserId();
-                    session.setAttribute("userId", currentUserId);
-                }
-            }
-        }
+        model.User currentUser = (model.User) session.getAttribute("user");
         
-        // Check if user is HR Manager
-        if (userRole == null || !userRole.equals("HR Manager")) {
-            session.setAttribute("errorMessage", "You don't have permission to approve contracts");
-            response.sendRedirect(request.getContextPath() + "/contracts/list");
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
+        // Check permission using PermissionChecker
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.CONTRACT_APPROVE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền phê duyệt hợp đồng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+        
+        Integer currentUserId = currentUser.getUserId();
         
         // Get contract ID from request
         String contractIdStr = request.getParameter("id");
@@ -160,28 +156,24 @@ public class ApproveContractServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // Get current user from session (robustly populate from user object if missing)
+        // Get current user from session
         HttpSession session = request.getSession();
-        String userRole = (String) session.getAttribute("userRole");
-        Integer currentUserId = (Integer) session.getAttribute("userId");
-        if (userRole == null) {
-            Object userObj = session.getAttribute("user");
-            if (userObj instanceof model.User) {
-                userRole = ((model.User) userObj).getRole();
-                session.setAttribute("userRole", userRole);
-                if (currentUserId == null) {
-                    currentUserId = ((model.User) userObj).getUserId();
-                    session.setAttribute("userId", currentUserId);
-                }
-            }
-        }
+        model.User currentUser = (model.User) session.getAttribute("user");
         
-        // Check if user is HR Manager
-        if (userRole == null || !userRole.equals("HR Manager") || currentUserId == null) {
-            session.setAttribute("errorMessage", "You don't have permission to approve contracts");
-            response.sendRedirect(request.getContextPath() + "/contracts/list");
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
             return;
         }
+        
+        // Check permission using PermissionChecker
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.CONTRACT_APPROVE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền phê duyệt hợp đồng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+        
+        Integer currentUserId = currentUser.getUserId();
         
         // Get form data
         String contractIdStr = request.getParameter("contractId");

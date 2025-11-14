@@ -61,11 +61,15 @@ public class ManageBenefitsDeductionsServlet extends HttpServlet {
             }
         }
         
-        // Check if user has permission
-        String userRole = (String) session.getAttribute("userRole");
-        if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR staff can manage benefits and deductions.");
-            response.sendRedirect(request.getContextPath() + "/");
+        // Check permission
+        model.User currentUser = (model.User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.SALARY_VIEW)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền quản lý lương và phúc lợi");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         

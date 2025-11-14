@@ -71,10 +71,11 @@ public class EditContractServlet extends HttpServlet {
                 return;
             }
 
-            // Permission: HR and HR Manager can edit contracts
-            if (!"HR".equals(role) && !"HR Manager".equals(role)) {
-                session.setAttribute("errorMessage", "Access denied.");
-                response.sendRedirect(request.getContextPath() + "/contracts/list");
+            // Check permission
+            model.User user = (model.User) session.getAttribute("user");
+            if (user != null && !util.PermissionChecker.hasPermission(user, util.PermissionConstants.CONTRACT_EDIT)) {
+                request.setAttribute("errorMessage", "Bạn không có quyền chỉnh sửa hợp đồng");
+                request.getRequestDispatcher("/error/403.jsp").forward(request, response);
                 return;
             }
 

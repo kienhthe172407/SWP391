@@ -53,11 +53,12 @@ public class AdjustBonusServlet extends HttpServlet {
             return;
         }
         
-        // Check authorization (HR and HR Manager only)
         User user = (User) session.getAttribute("user");
-        String role = user.getRole();
-        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_ADJUST_BONUS)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền điều chỉnh thưởng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         
@@ -92,11 +93,12 @@ public class AdjustBonusServlet extends HttpServlet {
             return;
         }
 
-        // Check authorization
         User user = (User) session.getAttribute("user");
-        String role = user.getRole();
-        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_ADJUST_BONUS)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền điều chỉnh thưởng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 
@@ -139,7 +141,8 @@ public class AdjustBonusServlet extends HttpServlet {
 
             // Determine status based on user role
             // HR Manager can approve immediately, HR staff needs approval
-            if ("HR Manager".equals(role) || "HR_MANAGER".equals(role)) {
+            String userRole = user.getRole();
+            if ("HR Manager".equals(userRole) || "HR_MANAGER".equals(userRole)) {
                 adjustment.setStatus(BonusAdjustment.STATUS_APPROVED);
                 adjustment.setApprovedBy(user.getUserID());
             } else {

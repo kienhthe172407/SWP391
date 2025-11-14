@@ -55,16 +55,16 @@ public class AssignTaskServlet extends HttpServlet {
             return;
         }
 
-        // Check if user has permission to assign tasks (HR Manager or Dept Manager)
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_ASSIGN)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền phân công nhiệm vụ");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+        
         String userRole = user.getRole();
         boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
         boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);
-        
-        if (!isHRManager && !isDeptManager) {
-            session.setAttribute("errorMessage", "Access denied. Only managers can assign tasks.");
-            response.sendRedirect(request.getContextPath() + "/");
-            return;
-        }
 
         // Get list of employees for assignment
         List<Employee> employees = new ArrayList<>();

@@ -26,11 +26,19 @@ public class DeleteJobPostingServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
         
-        // Set default role and user ID if not set (for development)
-        if (session.getAttribute("userId") == null) {
-            session.setAttribute("userId", 1);
-            session.setAttribute("userRole", "HR Manager");
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.JOB_DELETE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xóa tin tuyển dụng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
         }
         
         // Get job posting ID from request

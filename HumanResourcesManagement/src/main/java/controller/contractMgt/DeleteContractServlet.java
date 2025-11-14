@@ -28,11 +28,19 @@ public class DeleteContractServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
         
-        // Set default role and user ID if not set (for development)
-        if (session.getAttribute("userId") == null) {
-            session.setAttribute("userId", 1);
-            session.setAttribute("userRole", "HR Manager");
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.CONTRACT_DELETE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xóa hợp đồng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
         }
         
         // Get contract ID from request

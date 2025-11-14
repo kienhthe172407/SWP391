@@ -52,10 +52,9 @@ public class ExportPayslipServlet extends HttpServlet {
 
         User user = (User) session.getAttribute("user");
 
-        // Check authorization - only HR and HR Manager can export payslips
-        if (!"HR".equals(user.getRole()) && !"HR Manager".equals(user.getRole()) &&
-            !"HR_MANAGER".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access denied. Only HR staff can export payslips.");
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_EXPORT_PAYSLIP)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền xuất phiếu lương");
             return;
         }
 

@@ -48,13 +48,14 @@ public class ApproveRejectRequestServlet extends HttpServlet {
             return;
         }
 
-        // Check if user has permission (Dept Manager or HR Manager)
-        String userRole = user.getRole();
-        if (!"Dept Manager".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "Access denied. You don't have permission to approve/reject requests.");
-            response.sendRedirect(request.getContextPath() + "/request/list");
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.REQUEST_APPROVE_REJECT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền phê duyệt/từ chối yêu cầu");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
+        
+        String userRole = user.getRole();
 
         try {
             // Get form parameters

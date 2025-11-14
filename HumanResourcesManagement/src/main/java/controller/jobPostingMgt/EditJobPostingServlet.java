@@ -40,18 +40,19 @@ public class EditJobPostingServlet extends HttpServlet {
 
         // Get user session information
         HttpSession session = request.getSession();
-        String userRole = (String) session.getAttribute("userRole");
-        Integer userId = (Integer) session.getAttribute("userId");
-        if (userRole == null) {
-            Object userObj = session.getAttribute("user");
-            if (userObj instanceof model.User) {
-                userRole = ((model.User) userObj).getRole();
-                session.setAttribute("userRole", userRole);
-                if (userId == null) {
-                    userId = ((model.User) userObj).getUserId();
-                    session.setAttribute("userId", userId);
-                }
-            }
+        model.User currentUser = (model.User) session.getAttribute("user");
+        
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.JOB_EDIT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền chỉnh sửa tin tuyển dụng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
         }
 
         // Get job ID from request parameter

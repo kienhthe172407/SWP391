@@ -51,11 +51,12 @@ public class CalculateSalaryServlet extends HttpServlet {
             return;
         }
         
-        // Check authorization (HR and HR Manager only)
         User user = (User) session.getAttribute("user");
-        String role = user.getRole();
-        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_CALCULATE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền tính lương");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         
@@ -86,11 +87,12 @@ public class CalculateSalaryServlet extends HttpServlet {
             return;
         }
         
-        // Check authorization
         User user = (User) session.getAttribute("user");
-        String role = user.getRole();
-        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
-            response.sendRedirect(request.getContextPath() + "/dashboard");
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_CALCULATE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền tính lương");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         

@@ -6,24 +6,25 @@ import model.User;
 import util.PermissionChecker;
 
 /**
- * Custom JSP Tag để kiểm tra permission
- * Sử dụng: <permission:check permission="USER_CREATE">...</permission:check>
+ * Custom JSP Tag để check permission
+ * Sử dụng: <permission:check code="EMPLOYEE_VIEW">...</permission:check>
  */
 public class PermissionTag extends TagSupport {
-    private String permission;
     
-    public void setPermission(String permission) {
-        this.permission = permission;
+    private String code;
+    
+    public void setCode(String code) {
+        this.code = code;
     }
     
     @Override
     public int doStartTag() throws JspException {
         User user = (User) pageContext.getSession().getAttribute("user");
         
-        if (user != null && PermissionChecker.hasPermission(user, permission)) {
+        if (user != null && PermissionChecker.hasPermission(user, code)) {
             return EVAL_BODY_INCLUDE; // Hiển thị nội dung bên trong tag
         }
         
-        return SKIP_BODY; // Bỏ qua nội dung
+        return SKIP_BODY; // Bỏ qua nội dung bên trong tag
     }
 }

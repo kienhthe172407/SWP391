@@ -55,6 +55,13 @@ public class EditTaskServlet extends HttpServlet {
             return;
         }
 
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_EDIT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền chỉnh sửa nhiệm vụ");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+
         try {
             // Get task ID
             String taskIdStr = request.getParameter("id");
@@ -191,6 +198,13 @@ public class EditTaskServlet extends HttpServlet {
         User user = (User) session.getAttribute("user");
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/auth/login.jsp");
+            return;
+        }
+
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_EDIT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền chỉnh sửa nhiệm vụ");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 

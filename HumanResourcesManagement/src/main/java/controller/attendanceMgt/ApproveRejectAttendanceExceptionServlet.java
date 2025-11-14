@@ -51,12 +51,10 @@ public class ApproveRejectAttendanceExceptionServlet extends HttpServlet {
             return;
         }
 
-        // Check if user has permission (Dept Manager or HR Manager)
-        String userRole = user.getRole();
-        if (!"Dept Manager".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", 
-                "Access denied. You don't have permission to approve/reject attendance exception requests.");
-            response.sendRedirect(request.getContextPath() + "/attendance/exception/list");
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.ATTENDANCE_EXCEPTION_APPROVE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền phê duyệt đơn giải trình chấm công");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 
@@ -90,6 +88,7 @@ public class ApproveRejectAttendanceExceptionServlet extends HttpServlet {
             }
 
             // For Department Managers, verify the request is from their department
+            String userRole = user.getRole();
             if ("Dept Manager".equals(userRole)) {
                 Employee manager = employeeDAO.getEmployeeByUserId(user.getUserId());
                 if (manager == null) {

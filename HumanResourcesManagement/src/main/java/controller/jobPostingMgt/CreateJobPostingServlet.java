@@ -40,11 +40,19 @@ public class CreateJobPostingServlet extends HttpServlet {
 
         // Get user session information
         HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
         
-        // Set default role as HR Manager for full access (for development)
-        if (session.getAttribute("userRole") == null) {
-            session.setAttribute("userRole", "HR Manager");
-            session.setAttribute("userId", 1);
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.JOB_CREATE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền tạo tin tuyển dụng mới");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
         }
 
         try {

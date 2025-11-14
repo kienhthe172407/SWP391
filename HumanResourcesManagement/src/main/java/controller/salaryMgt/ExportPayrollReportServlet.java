@@ -57,11 +57,9 @@ public class ExportPayrollReportServlet extends HttpServlet {
         
         User user = (User) session.getAttribute("user");
         
-        // Check authorization - only HR and HR Manager can export payroll reports
-        if (!"HR".equals(user.getRole()) && !"HR Manager".equals(user.getRole()) && 
-            !"HR_MANAGER".equals(user.getRole())) {
-            response.sendError(HttpServletResponse.SC_FORBIDDEN, 
-                "Access denied. Only HR staff can export payroll reports.");
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_EXPORT_REPORT)) {
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Bạn không có quyền xuất báo cáo lương");
             return;
         }
         

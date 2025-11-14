@@ -45,18 +45,15 @@ public class AdjustAttendanceServlet extends HttpServlet {
             return;
         }
         
-        // Get user role - only HR and HR Manager can adjust attendance
-        String userRole = (String) session.getAttribute("userRole");
-        if (userRole == null && session.getAttribute("user") != null) {
-            User user = (User) session.getAttribute("user");
-            userRole = user.getRole();
-            session.setAttribute("userRole", userRole);
+        // Check permission
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
-        
-        // Validate role
-        if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "You do not have permission to adjust attendance records.");
-            response.sendRedirect(request.getContextPath() + "/attendance/summary");
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.ATTENDANCE_ADJUST)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền điều chỉnh chấm công");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         
@@ -112,18 +109,15 @@ public class AdjustAttendanceServlet extends HttpServlet {
             return;
         }
         
-        // Get user information
-        User user = (User) session.getAttribute("user");
-        String userRole = (String) session.getAttribute("userRole");
-        if (userRole == null) {
-            userRole = user.getRole();
-            session.setAttribute("userRole", userRole);
+        // Check permission
+        User currentUser = (User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
-        
-        // Validate role
-        if (!"HR".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "You do not have permission to adjust attendance records.");
-            response.sendRedirect(request.getContextPath() + "/attendance/summary");
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.ATTENDANCE_ADJUST)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền điều chỉnh chấm công");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         
@@ -217,7 +211,7 @@ public class AdjustAttendanceServlet extends HttpServlet {
             // Set manual adjustment fields
             record.setIsManualAdjustment(true);
             record.setAdjustmentReason(adjustmentReason.trim());
-            record.setAdjustedBy(user.getUserId());
+            record.setAdjustedBy(currentUser.getUserId());
             record.setAdjustedAt(new Timestamp(System.currentTimeMillis()));
             
             // Update in database

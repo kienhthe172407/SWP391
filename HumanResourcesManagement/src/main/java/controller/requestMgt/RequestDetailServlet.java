@@ -48,6 +48,13 @@ public class RequestDetailServlet extends HttpServlet {
             return;
         }
 
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.REQUEST_VIEW_DETAIL)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xem chi tiết yêu cầu");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+
         try {
             // Get request ID from parameter
             int requestID = Integer.parseInt(request.getParameter("id"));

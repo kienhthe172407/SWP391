@@ -48,6 +48,13 @@ public class ViewTaskDetailServlet extends HttpServlet {
             return;
         }
 
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_VIEW_DETAIL)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xem chi tiết nhiệm vụ");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
+
         try {
             // Get task ID
             String taskIdStr = request.getParameter("id");

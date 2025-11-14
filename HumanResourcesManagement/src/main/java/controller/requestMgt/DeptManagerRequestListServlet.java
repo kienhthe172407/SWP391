@@ -53,10 +53,10 @@ public class DeptManagerRequestListServlet extends HttpServlet {
             return;
         }
 
-        // Check if user is a Department Manager
-        if (!"Dept Manager".equals(user.getRole())) {
-            request.setAttribute("errorMessage", "Access denied. This page is only for Department Managers.");
-            request.getRequestDispatcher("/error.jsp").forward(request, response);
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.REQUEST_VIEW_DEPT_LIST)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xem danh sách yêu cầu của phòng ban");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 

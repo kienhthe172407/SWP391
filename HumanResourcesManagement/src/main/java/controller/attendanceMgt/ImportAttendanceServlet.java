@@ -44,6 +44,18 @@ public class ImportAttendanceServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
+        // Check permission
+        HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.ATTENDANCE_IMPORT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền import chấm công");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
         // Display import form
         request.getRequestDispatcher("/attendance-mgt/import-attendance.jsp").forward(request, response);
     }
@@ -51,6 +63,19 @@ public class ImportAttendanceServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        
+        // Check permission
+        HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.ATTENDANCE_IMPORT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền import chấm công");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+            return;
+        }
 
         try {
             // Get uploaded file
@@ -80,7 +105,6 @@ public class ImportAttendanceServlet extends HttpServlet {
             AttendancePreviewData previewData = parseExcelForPreview(inputStream, importBatchID);
 
             // Store preview data in session for later confirmation
-            HttpSession session = request.getSession();
             session.setAttribute("attendancePreviewData", previewData);
             session.setAttribute("uploadedFileName", fileName);
 

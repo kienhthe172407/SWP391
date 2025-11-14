@@ -89,10 +89,15 @@ public class UpdateTaskStatusServlet extends HttpServlet {
                 return;
             }
 
-            // Check if user is assigned to this task
+            // Check permission
+            if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.TASK_UPDATE_STATUS)) {
+                request.setAttribute("errorMessage", "Bạn không có quyền cập nhật trạng thái nhiệm vụ");
+                request.getRequestDispatcher("/error/403.jsp").forward(request, response);
+                return;
+            }
+            
             Employee employee = employeeDAO.getEmployeeByUserId(user.getUserId());
             if (employee == null || employee.getEmployeeID() != task.getAssignedTo()) {
-                // Allow managers to update status too
                 String userRole = user.getRole();
                 boolean isHRManager = "HR_MANAGER".equals(userRole) || "HR Manager".equals(userRole);
                 boolean isDeptManager = "DEPT_MANAGER".equals(userRole) || "Dept Manager".equals(userRole);

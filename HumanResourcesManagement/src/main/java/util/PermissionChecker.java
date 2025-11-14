@@ -1,92 +1,52 @@
 package util;
 
+import dal.PermissionDAO;
 import model.User;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Permission Checker - Kiểm tra quyền của user
+ * Permission Checker - Kiểm tra quyền của user từ database
+ * Hỗ trợ cache để tăng performance
  */
 public class PermissionChecker {
     
-    // Định nghĩa permissions cho từng role
-    private static final Map<String, Set<String>> ROLE_PERMISSIONS = new HashMap<>();
-    
-    static {
-        // Admin - Full permissions
-        Set<String> adminPerms = new HashSet<>(Arrays.asList(
-            PermissionConstants.USER_VIEW, PermissionConstants.USER_CREATE, PermissionConstants.USER_EDIT,
-            PermissionConstants.USER_ACTIVATE,
-            PermissionConstants.EMPLOYEE_VIEW, PermissionConstants.EMPLOYEE_CREATE, PermissionConstants.EMPLOYEE_EDIT,
-            PermissionConstants.EMPLOYEE_DELETE,
-            PermissionConstants.DEPT_VIEW, PermissionConstants.DEPT_CREATE, PermissionConstants.DEPT_EDIT,
-            PermissionConstants.DEPT_DELETE,
-            PermissionConstants.CONTRACT_VIEW, PermissionConstants.CONTRACT_CREATE, PermissionConstants.CONTRACT_EDIT,
-            PermissionConstants.CONTRACT_DELETE, PermissionConstants.CONTRACT_APPROVE,
-            PermissionConstants.JOB_VIEW, PermissionConstants.JOB_CREATE, PermissionConstants.JOB_EDIT,
-            PermissionConstants.JOB_DELETE,
-            PermissionConstants.SYSTEM_CONFIG, PermissionConstants.ROLE_MANAGE, PermissionConstants.PERMISSION_MANAGE
-        ));
-        ROLE_PERMISSIONS.put("Admin", adminPerms);
-        
-        // HR Manager
-        Set<String> hrManagerPerms = new HashSet<>(Arrays.asList(
-            PermissionConstants.USER_VIEW, PermissionConstants.USER_CREATE, PermissionConstants.USER_EDIT,
-            PermissionConstants.EMPLOYEE_VIEW, PermissionConstants.EMPLOYEE_CREATE, PermissionConstants.EMPLOYEE_EDIT,
-            PermissionConstants.EMPLOYEE_DELETE,
-            PermissionConstants.DEPT_VIEW,
-            PermissionConstants.CONTRACT_VIEW, PermissionConstants.CONTRACT_CREATE, PermissionConstants.CONTRACT_EDIT,
-            PermissionConstants.CONTRACT_APPROVE,
-            PermissionConstants.JOB_VIEW, PermissionConstants.JOB_CREATE, PermissionConstants.JOB_EDIT,
-            PermissionConstants.JOB_DELETE
-        ));
-        ROLE_PERMISSIONS.put("HR Manager", hrManagerPerms);
-        
-        // HR
-        Set<String> hrPerms = new HashSet<>(Arrays.asList(
-            PermissionConstants.USER_VIEW,
-            PermissionConstants.EMPLOYEE_VIEW, PermissionConstants.EMPLOYEE_CREATE, PermissionConstants.EMPLOYEE_EDIT,
-            PermissionConstants.DEPT_VIEW,
-            PermissionConstants.CONTRACT_VIEW, PermissionConstants.CONTRACT_CREATE, PermissionConstants.CONTRACT_EDIT,
-            PermissionConstants.JOB_VIEW, PermissionConstants.JOB_CREATE, PermissionConstants.JOB_EDIT
-        ));
-        ROLE_PERMISSIONS.put("HR", hrPerms);
-        
-        // Dept Manager
-        Set<String> deptManagerPerms = new HashSet<>(Arrays.asList(
-            PermissionConstants.EMPLOYEE_VIEW,
-            PermissionConstants.DEPT_VIEW,
-            PermissionConstants.CONTRACT_VIEW,
-            PermissionConstants.JOB_VIEW
-        ));
-        ROLE_PERMISSIONS.put("Dept Manager", deptManagerPerms);
-        
-        // Employee
-        Set<String> employeePerms = new HashSet<>(Arrays.asList(
-            PermissionConstants.EMPLOYEE_VIEW,
-            PermissionConstants.CONTRACT_VIEW,
-            PermissionConstants.JOB_VIEW
-        ));
-        ROLE_PERMISSIONS.put("Employee", employeePerms);
-    }
+    // Cache permissions trong memory để tăng performance
+    private static final ConcurrentHashMap<String, Set<String>> permissionsCache = new ConcurrentHashMap<>();
+    private static long lastCacheUpdate = 0;
+    private static final long CACHE_TIMEOUT = 5 * 60 * 1000; // 5 phút
     
     /**
      * Kiểm tra user có permission không
+     * Admin luôn có tất cả quyền
      */
-    public static boolean hasPermission(User user, String permission) {
-        if (user == null || user.getRole() == null) {
+    public static boolean hasPermission(User user, String permissionCode) {
+        if (user == null || permissionCode == null) {
             return false;
         }
         
-        Set<String> permissions = ROLE_PERMISSIONS.get(user.getRole());
-        return permissions != null && permissions.contains(permission);
+        String role = user.getRole();
+        
+        // Admin có tất cả quyền
+        if ("Admin".equals(role)) {
+            return true;
+        }
+        
+        // Lấy permissions của role từ cache hoặc database
+        Set<String> permissions = getRolePermissions(role);
+        return permissions.contains(permissionCode);
     }
     
     /**
      * Kiểm tra user có bất kỳ permission nào trong danh sách
      */
-    public static boolean hasAnyPermission(User user, String... permissions) {
-        for (String permission : permissions) {
-            if (hasPermission(user, permission)) {
+    public static boolean hasAnyPermission(User user, String... permissionCodes) {
+        if (user == null || permissionCodes == null || permissionCodes.length == 0) {
+            return false;
+        }
+        
+        for (String permissionCode : permissionCodes) {
+            if (hasPermission(user, permissionCode)) {
                 return true;
             }
         }
@@ -96,9 +56,13 @@ public class PermissionChecker {
     /**
      * Kiểm tra user có tất cả permissions trong danh sách
      */
-    public static boolean hasAllPermissions(User user, String... permissions) {
-        for (String permission : permissions) {
-            if (!hasPermission(user, permission)) {
+    public static boolean hasAllPermissions(User user, String... permissionCodes) {
+        if (user == null || permissionCodes == null || permissionCodes.length == 0) {
+            return false;
+        }
+        
+        for (String permissionCode : permissionCodes) {
+            if (!hasPermission(user, permissionCode)) {
                 return false;
             }
         }
@@ -113,29 +77,93 @@ public class PermissionChecker {
             return Collections.emptySet();
         }
         
-        Set<String> permissions = ROLE_PERMISSIONS.get(user.getRole());
-        return permissions != null ? new HashSet<>(permissions) : Collections.emptySet();
+        // Admin có tất cả quyền
+        if ("Admin".equals(user.getRole())) {
+            return getAllPermissionCodes();
+        }
+        
+        return new HashSet<>(getRolePermissions(user.getRole()));
     }
     
     /**
-     * Lấy permissions của role
+     * Lấy permissions của role từ cache hoặc database (public để các servlet khác dùng)
      */
     public static Set<String> getRolePermissions(String role) {
-        Set<String> permissions = ROLE_PERMISSIONS.get(role);
-        return permissions != null ? new HashSet<>(permissions) : Collections.emptySet();
+        // Check cache expiry
+        long now = System.currentTimeMillis();
+        if (now - lastCacheUpdate > CACHE_TIMEOUT) {
+            clearCache();
+        }
+        
+        // Lấy từ cache hoặc database
+        return permissionsCache.computeIfAbsent(role, r -> {
+            PermissionDAO dao = new PermissionDAO();
+            try {
+                return dao.getRolePermissions(r);
+            } finally {
+                dao.close();
+            }
+        });
     }
     
     /**
-     * Cập nhật permissions cho role
+     * Cập nhật permissions cho một role
      */
-    public static void updateRolePermissions(String role, Set<String> permissions) {
-        ROLE_PERMISSIONS.put(role, new HashSet<>(permissions));
+    public static boolean updateRolePermissions(String role, Set<String> permissions) {
+        PermissionDAO dao = new PermissionDAO();
+        try {
+            boolean success = dao.updateRolePermissions(role, permissions);
+            if (success) {
+                clearCacheForRole(role);
+            }
+            return success;
+        } finally {
+            dao.close();
+        }
     }
     
     /**
-     * Lấy tất cả roles
+     * Reload permissions từ database (clear toàn bộ cache)
+     */
+    public static void reloadPermissionsFromDatabase() {
+        clearCache();
+    }
+    
+    /**
+     * Lấy tất cả permission codes trong hệ thống
+     */
+    private static Set<String> getAllPermissionCodes() {
+        Set<String> allCodes = new HashSet<>();
+        for (model.Permission permission : PermissionConstants.getAllPermissions()) {
+            allCodes.add(permission.getCode());
+        }
+        return allCodes;
+    }
+    
+    /**
+     * Clear cache - gọi khi cập nhật permissions
+     */
+    public static void clearCache() {
+        permissionsCache.clear();
+        lastCacheUpdate = System.currentTimeMillis();
+    }
+    
+    /**
+     * Clear cache cho một role cụ thể
+     */
+    public static void clearCacheForRole(String role) {
+        permissionsCache.remove(role);
+    }
+    
+    /**
+     * Lấy tất cả roles trong hệ thống
      */
     public static Set<String> getAllRoles() {
-        return ROLE_PERMISSIONS.keySet();
+        PermissionDAO dao = new PermissionDAO();
+        try {
+            return dao.getAllRoles();
+        } finally {
+            dao.close();
+        }
     }
 }

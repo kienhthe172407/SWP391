@@ -56,12 +56,12 @@ public class ImportSalaryServlet extends HttpServlet {
             return;
         }
         
-        // Check authorization (HR and HR Manager only)
         User user = (User) session.getAttribute("user");
-        String role = user.getRole();
-        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR staff can import salary data.");
-            response.sendRedirect(request.getContextPath() + "/");
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_IMPORT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền nhập dữ liệu lương");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 
@@ -93,12 +93,12 @@ public class ImportSalaryServlet extends HttpServlet {
             return;
         }
         
-        // Check authorization (HR and HR Manager only)
         User user = (User) session.getAttribute("user");
-        String role = user.getRole();
-        if (!"HR".equals(role) && !"HR Manager".equals(role) && !"HR_MANAGER".equals(role)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR staff can import salary data.");
-            response.sendRedirect(request.getContextPath() + "/");
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.SALARY_IMPORT)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền nhập dữ liệu lương");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 

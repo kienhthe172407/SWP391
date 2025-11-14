@@ -101,12 +101,106 @@ INSERT IGNORE INTO permissions (code, name, description, category) VALUES
 ('TASK_CREATE', 'Tạo nhiệm vụ', 'Cho phép tạo nhiệm vụ mới', 'Task'),
 ('TASK_ASSIGN', 'Phân công nhiệm vụ', 'Cho phép phân công nhiệm vụ cho người khác', 'Task'),
 ('TASK_EDIT', 'Chỉnh sửa nhiệm vụ', 'Cho phép chỉnh sửa nhiệm vụ', 'Task'),
+('TASK_UPDATE_STATUS', 'Cập nhật trạng thái', 'Cho phép cập nhật trạng thái công việc', 'Task'),
+('TASK_CANCEL', 'Hủy công việc', 'Cho phép hủy công việc', 'Task'),
+('ATTENDANCE_IMPORT', 'Import chấm công', 'Cho phép import dữ liệu chấm công từ file', 'Attendance'),
+('ATTENDANCE_EXCEPTION_SUBMIT', 'Gửi đơn giải trình', 'Cho phép gửi đơn giải trình chấm công', 'Attendance'),
+('ATTENDANCE_EXCEPTION_APPROVE', 'Duyệt đơn giải trình', 'Cho phép phê duyệt đơn giải trình chấm công', 'Attendance'),
+('ATTENDANCE_REPORT', 'Báo cáo chấm công', 'Cho phép xem và xuất báo cáo chấm công', 'Attendance'),
+('PAYROLL_VIEW', 'Xem bảng lương', 'Cho phép xem thông tin bảng lương', 'Payroll'),
+('PAYROLL_CALCULATE', 'Tính lương', 'Cho phép tính toán bảng lương', 'Payroll'),
+('PAYROLL_APPROVE', 'Phê duyệt lương', 'Cho phép phê duyệt bảng lương', 'Payroll'),
+('PAYROLL_EXPORT', 'Xuất bảng lương', 'Cho phép xuất file bảng lương', 'Payroll'),
 ('REPORT_VIEW', 'Xem báo cáo', 'Cho phép truy cập các báo cáo hệ thống', 'Reporting'),
-('HR_DASHBOARD_VIEW', 'Xem Dashboard HR', 'Cho phép truy cập bảng điều khiển HR', 'Reporting');
+('REPORT_EXPORT', 'Xuất báo cáo', 'Cho phép xuất file báo cáo', 'Reporting'),
+('ANALYTICS_VIEW', 'Xem phân tích', 'Cho phép xem dashboard phân tích', 'Reporting'),
+('HR_DASHBOARD_VIEW', 'Xem Dashboard HR', 'Cho phép truy cập bảng điều khiển HR', 'Reporting'),
+('DASHBOARD_VIEW', 'Xem Dashboard', 'Xem trang tổng quan', 'Dashboard');
 
 -- Grant Admin role all permissions (safe seed to avoid locking out Admin)
 INSERT IGNORE INTO role_permissions (role, permission_code)
 SELECT 'Admin', code FROM permissions;
+
+-- HR Manager - Quản lý HR đầy đủ
+INSERT IGNORE INTO role_permissions (role, permission_code) VALUES
+('HR Manager', 'USER_VIEW'),
+('HR Manager', 'USER_CREATE'),
+('HR Manager', 'USER_EDIT'),
+('HR Manager', 'EMPLOYEE_VIEW'),
+('HR Manager', 'EMPLOYEE_CREATE'),
+('HR Manager', 'EMPLOYEE_EDIT'),
+('HR Manager', 'EMPLOYEE_DELETE'),
+('HR Manager', 'DEPT_VIEW'),
+('HR Manager', 'CONTRACT_VIEW'),
+('HR Manager', 'CONTRACT_CREATE'),
+('HR Manager', 'CONTRACT_EDIT'),
+('HR Manager', 'CONTRACT_APPROVE'),
+('HR Manager', 'JOB_VIEW'),
+('HR Manager', 'JOB_CREATE'),
+('HR Manager', 'JOB_EDIT'),
+('HR Manager', 'JOB_DELETE'),
+('HR Manager', 'ATTENDANCE_VIEW'),
+('HR Manager', 'ATTENDANCE_IMPORT'),
+('HR Manager', 'ATTENDANCE_ADJUST'),
+('HR Manager', 'ATTENDANCE_EXCEPTION_APPROVE'),
+('HR Manager', 'ATTENDANCE_REPORT'),
+('HR Manager', 'TASK_VIEW'),
+('HR Manager', 'TASK_CREATE'),
+('HR Manager', 'TASK_EDIT'),
+('HR Manager', 'TASK_ASSIGN'),
+('HR Manager', 'SALARY_VIEW'),
+('HR Manager', 'SALARY_CALCULATE'),
+('HR Manager', 'SALARY_APPROVE'),
+('HR Manager', 'SALARY_EXPORT'),
+('HR Manager', 'REPORT_VIEW'),
+('HR Manager', 'REPORT_EXPORT'),
+('HR Manager', 'HR_DASHBOARD_VIEW');
+
+-- HR - Nhân viên HR
+INSERT IGNORE INTO role_permissions (role, permission_code) VALUES
+('HR', 'USER_VIEW'),
+('HR', 'EMPLOYEE_VIEW'),
+('HR', 'EMPLOYEE_CREATE'),
+('HR', 'EMPLOYEE_EDIT'),
+('HR', 'DEPT_VIEW'),
+('HR', 'CONTRACT_VIEW'),
+('HR', 'CONTRACT_CREATE'),
+('HR', 'CONTRACT_EDIT'),
+('HR', 'JOB_VIEW'),
+('HR', 'JOB_CREATE'),
+('HR', 'JOB_EDIT'),
+('HR', 'ATTENDANCE_VIEW'),
+('HR', 'ATTENDANCE_IMPORT'),
+('HR', 'TASK_VIEW'),
+('HR', 'TASK_CREATE'),
+('HR', 'SALARY_VIEW');
+
+-- Dept Manager - Quản lý phòng ban
+INSERT IGNORE INTO role_permissions (role, permission_code) VALUES
+('Dept Manager', 'EMPLOYEE_VIEW'),
+('Dept Manager', 'DEPT_VIEW'),
+('Dept Manager', 'CONTRACT_VIEW'),
+('Dept Manager', 'JOB_VIEW'),
+('Dept Manager', 'ATTENDANCE_VIEW'),
+('Dept Manager', 'ATTENDANCE_EXCEPTION_APPROVE'),
+('Dept Manager', 'TASK_VIEW'),
+('Dept Manager', 'TASK_CREATE'),
+('Dept Manager', 'TASK_ASSIGN'),
+('Dept Manager', 'TASK_UPDATE_STATUS'),
+('Dept Manager', 'REQUEST_VIEW'),
+('Dept Manager', 'REQUEST_APPROVE');
+
+-- Employee - Nhân viên
+INSERT IGNORE INTO role_permissions (role, permission_code) VALUES
+('Employee', 'EMPLOYEE_VIEW'),
+('Employee', 'CONTRACT_VIEW'),
+('Employee', 'JOB_VIEW'),
+('Employee', 'ATTENDANCE_VIEW'),
+('Employee', 'ATTENDANCE_EXCEPTION_SUBMIT'),
+('Employee', 'TASK_VIEW'),
+('Employee', 'TASK_UPDATE_STATUS'),
+('Employee', 'REQUEST_VIEW'),
+('Employee', 'REQUEST_CREATE');
 CREATE TABLE departments (
     department_id INT PRIMARY KEY AUTO_INCREMENT,              -- ID phòng ban (khóa chính)
     department_name VARCHAR(100) UNIQUE NOT NULL,              -- Tên phòng ban (duy nhất)

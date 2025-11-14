@@ -41,9 +41,16 @@ public class ViewContractDetailServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User user = (User) session.getAttribute("user");
 
-        // If not logged in, redirect to login
+        // Check authentication
         if (user == null) {
             response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.CONTRACT_VIEW)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xem chi tiết hợp đồng");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 

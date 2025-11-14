@@ -36,12 +36,18 @@ public class DeleteEmployeeServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
+        model.User currentUser = (model.User) session.getAttribute("user");
         
-        // Check if user has permission to delete employees (HR Manager only)
-        String userRole = (String) session.getAttribute("userRole");
-        if (!"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR Managers can delete employee records.");
-            response.sendRedirect(request.getContextPath() + "/employees/list");
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission using PermissionChecker
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.EMPLOYEE_DELETE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xóa nhân viên");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         

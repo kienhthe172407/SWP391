@@ -45,6 +45,21 @@ public class CreateContractServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
+        // Check authentication and permission
+        HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
+        
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.CONTRACT_CREATE)) {
+            session.setAttribute("errorMessage", "Bạn không có quyền tạo hợp đồng mới");
+            response.sendRedirect(request.getContextPath() + "/contracts/list");
+            return;
+        }
+        
         // Get employee list for dropdown - only employees without active contracts
         List<Employee> employees = employeeDAO.getEmployeesWithoutActiveContract();
         request.setAttribute("employees", employees);
@@ -72,9 +87,16 @@ public class CreateContractServlet extends HttpServlet {
         HttpSession session = request.getSession();
         User currentUser = (User) session.getAttribute("user");
         
-        // If not logged in, redirect to login
+        // Check authentication
         if (currentUser == null) {
             response.sendRedirect(request.getContextPath() + "/login");
+            return;
+        }
+        
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.CONTRACT_CREATE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền tạo hợp đồng mới");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
         

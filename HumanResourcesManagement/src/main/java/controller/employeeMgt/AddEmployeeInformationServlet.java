@@ -44,34 +44,18 @@ public class AddEmployeeInformationServlet extends HttpServlet {
 
         // Get user session information
         HttpSession session = request.getSession();
+        User currentUser = (User) session.getAttribute("user");
         
-        // Ensure role in session mirrors the authenticated user; don't force HR Manager
-        if (session.getAttribute("userRole") == null) {
-            Object userObj = session.getAttribute("user");
-            if (userObj instanceof model.User) {
-                String roleFromUser = ((model.User) userObj).getRole();
-                if (roleFromUser != null && !roleFromUser.isEmpty()) {
-                    session.setAttribute("userRole", roleFromUser);
-                }
-            }
-            if (session.getAttribute("userRole") == null) {
-                session.setAttribute("userRole", "HR");
-            }
-            if (session.getAttribute("userId") == null) {
-                session.setAttribute("userId", 1);
-            }
+        // Check authentication
+        if (currentUser == null) {
+            response.sendRedirect(request.getContextPath() + "/login");
+            return;
         }
         
-        // Check if user has permission to create employee records
-        String userRole = (String) session.getAttribute("userRole");
-        
-        // Simple role check - handle both formats
-        boolean isHR = "HR".equals(userRole);
-        boolean isHRManager = "HR Manager".equals(userRole) || "HR_MANAGER".equals(userRole);
-        
-        if (!isHR && !isHRManager) {
-            session.setAttribute("errorMessage", "Access denied. Only HR staff can add employee information.");
-            response.sendRedirect(request.getContextPath() + "/employees/list");
+        // Check permission using PermissionChecker
+        if (!util.PermissionChecker.hasPermission(currentUser, util.PermissionConstants.EMPLOYEE_CREATE)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền thêm nhân viên mới");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
 

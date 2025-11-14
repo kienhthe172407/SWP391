@@ -47,13 +47,14 @@ public class ViewHRStatisticsServlet extends HttpServlet {
             return;
         }
 
-        // Check if user is HR Manager
-        String userRole = user.getRole();
-        if (!"HR_MANAGER".equals(userRole) && !"HR Manager".equals(userRole)) {
-            session.setAttribute("errorMessage", "Access denied. Only HR Manager can view statistics.");
-            response.sendRedirect(request.getContextPath() + "/");
+        // Check permission
+        if (!util.PermissionChecker.hasPermission(user, util.PermissionConstants.REPORT_VIEW_STATISTICS)) {
+            request.setAttribute("errorMessage", "Bạn không có quyền xem thống kê HR");
+            request.getRequestDispatcher("/error/403.jsp").forward(request, response);
             return;
         }
+        
+        String userRole = user.getRole();
 
         try {
             // Get comprehensive statistics
