@@ -1,11 +1,11 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="jakarta.tags.core" prefix="c" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ma Trận Phân Quyền - HR Management</title>
+    <title>Permission Matrix - HR Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -21,7 +21,7 @@
             background: white;
         }
         .permission-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
             padding: 20px;
             border-radius: 10px 10px 0 0;
@@ -39,7 +39,7 @@
             margin-top: 20px;
         }
         .matrix-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
             color: white;
             padding: 15px 10px;
             text-align: center;
@@ -47,10 +47,10 @@
             position: sticky;
             top: 0;
             z-index: 10;
-            border: 1px solid #5a67d8;
+            border: 1px solid #1e40af;
         }
         .matrix-table th:first-child {
-            background: #4c51bf;
+            background: #1e40af;
             text-align: left;
             min-width: 300px;
             max-width: 300px;
@@ -158,11 +158,11 @@
         <!-- Header -->
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
-                <h2><i class="fas fa-th me-2"></i>Ma Trận Phân Quyền</h2>
-                <p class="text-muted mb-0">Quản lý quyền truy cập cho tất cả vai trò</p>
+                <h2><i class="fas fa-th me-2"></i>Permission Matrix</h2>
+                <p class="text-muted mb-0">Manage access rights for all roles</p>
             </div>
             <a href="${pageContext.request.contextPath}/dashboard/admin-dashboard.jsp" class="btn btn-secondary">
-                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                <i class="fas fa-arrow-left me-2"></i>Back
             </a>
         </div>
 
@@ -188,23 +188,23 @@
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <div class="stat-item">
-                        <div class="stat-label">Tổng số vai trò</div>
+                        <div class="stat-label">Total Roles</div>
                         <div class="stat-value">${allRoles.size()}</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Tổng số quyền</div>
+                        <div class="stat-label">Total Permissions</div>
                         <div class="stat-value" id="totalPermissions">0</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-label">Quyền đã gán</div>
+                        <div class="stat-label">Assigned Permissions</div>
                         <div class="stat-value text-success" id="assignedPermissions">0</div>
                     </div>
                 </div>
                 <div>
                     <a href="${pageContext.request.contextPath}/init-permissions" 
                        class="btn btn-warning btn-sm me-2"
-                       onclick="return confirm('Bạn có chắc muốn khởi tạo/đồng bộ permissions vào database?')">
-                        <i class="fas fa-sync me-1"></i>Khởi Tạo Permissions
+                       onclick="return confirm('Are you sure you want to initialize/sync permissions to database?')">
+                        <i class="fas fa-sync me-1"></i>Initialize Permissions
                     </a>
                     <a href="${pageContext.request.contextPath}/auth/test-permissions.jsp" 
                        class="btn btn-outline-info btn-sm" target="_blank">
@@ -220,17 +220,17 @@
                 <div class="permission-header">
                     <div class="d-flex justify-content-between align-items-center">
                         <h4 class="mb-0">
-                            <i class="fas fa-key me-2"></i>Ma Trận Phân Quyền
+                            <i class="fas fa-key me-2"></i>Permission Matrix
                         </h4>
                         <div>
                             <button type="button" class="btn btn-light btn-sm me-2" onclick="selectAllPermissions()">
-                                <i class="fas fa-check-square me-1"></i>Chọn Tất Cả
+                                <i class="fas fa-check-square me-1"></i>Select All
                             </button>
                             <button type="button" class="btn btn-light btn-sm me-2" onclick="clearAllPermissions()">
-                                <i class="fas fa-times me-1"></i>Bỏ Chọn Tất Cả
+                                <i class="fas fa-times me-1"></i>Clear All
                             </button>
                             <button type="submit" class="btn btn-success">
-                                <i class="fas fa-save me-1"></i>Lưu Thay Đổi
+                                <i class="fas fa-save me-1"></i>Save Changes
                             </button>
                         </div>
                     </div>
@@ -241,7 +241,7 @@
                         <table class="matrix-table">
                             <thead>
                                 <tr>
-                                    <th>Chức Năng / Quyền</th>
+                                    <th>Function / Permission</th>
                                     <c:forEach var="role" items="${allRoles}">
                                         <th class="role-header">
                                             <div>
@@ -255,12 +255,12 @@
                                                 <div class="btn-group btn-group-sm mt-2" role="group">
                                                     <button type="button" class="btn btn-outline-light btn-xs" 
                                                             onclick="selectRoleColumn('${role}')" 
-                                                            title="Chọn tất cả">
+                                                            title="Select all">
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                     <button type="button" class="btn btn-outline-light btn-xs" 
                                                             onclick="clearRoleColumn('${role}')" 
-                                                            title="Bỏ chọn tất cả">
+                                                            title="Clear all">
                                                         <i class="fas fa-times"></i>
                                                     </button>
                                                 </div>
@@ -310,10 +310,10 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <i class="fas fa-info-circle text-primary me-2"></i>
-                            <small class="text-muted">Tích vào ô checkbox để gán quyền cho vai trò tương ứng</small>
+                            <small class="text-muted">Check the checkbox to assign permission to the corresponding role</small>
                         </div>
                         <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>Lưu Tất Cả Thay Đổi
+                            <i class="fas fa-save me-2"></i>Save All Changes
                         </button>
                     </div>
                 </div>
@@ -362,7 +362,7 @@
         
         // Clear all checkboxes
         function clearAllPermissions() {
-            if (confirm('Bạn có chắc muốn bỏ chọn tất cả quyền?')) {
+            if (confirm('Are you sure you want to clear all permissions?')) {
                 document.querySelectorAll('.permission-checkbox').forEach(cb => {
                     cb.checked = false;
                 });
@@ -394,7 +394,7 @@
         // Confirm before submit
         document.getElementById('permissionForm').addEventListener('submit', function(e) {
             const checkedCount = document.querySelectorAll('.permission-checkbox:checked').length;
-            const message = `Bạn có chắc muốn lưu các thay đổi phân quyền?\n\nTổng số quyền đã gán: ${checkedCount}`;
+            const message = `Are you sure you want to save permission changes?\n\nTotal assigned permissions: ${checkedCount}`;
             
             if (!confirm(message)) {
                 e.preventDefault();
@@ -405,7 +405,7 @@
             const submitButtons = document.querySelectorAll('button[type="submit"]');
             submitButtons.forEach(btn => {
                 btn.disabled = true;
-                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang lưu...';
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
             });
             
             return true;

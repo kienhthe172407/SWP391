@@ -4,11 +4,11 @@
 <%@ page import="model.User" %>
 <%@ page import="java.util.Set" %>
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test Permissions</title>
+    <title>Test Permissions - Debug</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body { padding: 20px; }
@@ -37,24 +37,24 @@
         
         <div class="card mt-3">
             <div class="card-header bg-primary text-white">
-                <h5>Thông Tin User Hiện Tại</h5>
+                <h5>Current User Information</h5>
             </div>
             <div class="card-body">
                 <p><strong>Username:</strong> <%= currentUser.getUsername() %></p>
                 <p><strong>Role:</strong> <%= role %></p>
-                <p><strong>Số permissions:</strong> <%= userPermissions.size() %></p>
+                <p><strong>Number of permissions:</strong> <%= userPermissions.size() %></p>
             </div>
         </div>
         
         <div class="card mt-3">
             <div class="card-header bg-success text-white">
-                <h5>Danh Sách Permissions Của Role: <%= role %></h5>
+                <h5>Permissions List for Role: <%= role %></h5>
             </div>
             <div class="card-body">
                 <% if (userPermissions.isEmpty()) { %>
                     <div class="alert alert-warning">
                         <i class="fas fa-exclamation-triangle"></i>
-                        Role này KHÔNG có quyền nào!
+                        This role has NO permissions!
                     </div>
                 <% } else { %>
                     <div class="row">
@@ -72,7 +72,7 @@
         
         <div class="card mt-3">
             <div class="card-header bg-info text-white">
-                <h5>Test Các Quyền Quan Trọng</h5>
+                <h5>Test Important Permissions</h5>
             </div>
             <div class="card-body">
                 <% 
@@ -88,7 +88,7 @@
                         String icon = hasPerm ? "✅" : "❌";
                 %>
                     <div class="<%= cssClass %>">
-                        <%= icon %> <%= testPerm %> - <%= hasPerm ? "CÓ QUYỀN" : "KHÔNG CÓ QUYỀN" %>
+                        <%= icon %> <%= testPerm %> - <%= hasPerm ? "HAS PERMISSION" : "NO PERMISSION" %>
                     </div>
                 <% } %>
             </div>
@@ -96,7 +96,7 @@
         
         <div class="card mt-3">
             <div class="card-header bg-secondary text-white">
-                <h5>Tất Cả Roles Và Permissions Trong Hệ Thống</h5>
+                <h5>All Roles and Permissions in System</h5>
             </div>
             <div class="card-body">
                 <% 
@@ -118,13 +118,13 @@
         
         <% } else { %>
             <div class="alert alert-danger">
-                Bạn chưa đăng nhập!
+                You are not logged in!
             </div>
         <% } %>
         
         <div class="mt-3">
             <a href="${pageContext.request.contextPath}/permission-settings" class="btn btn-primary">
-                ← Quay lại Ma Trận Phân Quyền
+                ← Back to Permission Matrix
             </a>
         </div>
     </div>
